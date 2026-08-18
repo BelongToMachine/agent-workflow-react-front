@@ -1,8 +1,8 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState } from "react";
+import { DraggableQueryDevtools } from "@/components/draggable-query-devtools";
 
 export function BackendQueryProvider({
   children,
@@ -26,11 +26,7 @@ export function BackendQueryProvider({
     <QueryClientProvider client={queryClient}>
       {children}
       {process.env.NODE_ENV === "development" ? (
-        <ReactQueryDevtools
-          buttonPosition="top-right"
-          initialIsOpen={false}
-          position="top"
-        />
+        <DraggableQueryDevtools />
       ) : null}
     </QueryClientProvider>
   );
