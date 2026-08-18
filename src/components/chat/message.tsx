@@ -109,6 +109,20 @@ const PurePreviewMessage = ({
     { isStreaming: false, rendered: false, text: "" }
   ) ?? { isStreaming: false, rendered: false, text: "" };
 
+  const dynamicToolCounts = new Map<string, number>();
+  const dynamicToolLastIndexes = new Map<string, number>();
+  message.parts?.forEach((part, index) => {
+    if (part.type !== "dynamic-tool") {
+      return;
+    }
+
+    dynamicToolCounts.set(
+      part.toolName,
+      (dynamicToolCounts.get(part.toolName) ?? 0) + 1
+    );
+    dynamicToolLastIndexes.set(part.toolName, index);
+  });
+
   const parts = message.parts?.map((part, index) => {
     const { type } = part;
     const key = `message-${message.id}-part-${index}`;
@@ -143,7 +157,12 @@ const PurePreviewMessage = ({
     }
 
     if (type === "dynamic-tool" && part.toolName === "searchProductsTool") {
+      if (dynamicToolLastIndexes.get(part.toolName) !== index) {
+        return null;
+      }
+
       const { toolCallId, state } = part;
+      const toolCallCount = dynamicToolCounts.get(part.toolName) ?? 1;
       const output =
         state === "output-available" &&
         part.output &&
@@ -185,12 +204,12 @@ const PurePreviewMessage = ({
       return (
         <Tool
           className="w-[min(100%,650px)]"
-          defaultOpen={true}
+          defaultOpen={false}
           key={toolCallId}
         >
           <ToolHeader
             state={state}
-            title="Search products"
+            title={`Search products${toolCallCount > 1 ? ` · ${toolCallCount} steps` : ""}`}
             toolName="searchProductsTool"
             type="dynamic-tool"
           />
@@ -269,7 +288,12 @@ const PurePreviewMessage = ({
     }
 
     if (type === "dynamic-tool" && part.toolName === "searchContentTool") {
+      if (dynamicToolLastIndexes.get(part.toolName) !== index) {
+        return null;
+      }
+
       const { toolCallId, state } = part;
+      const toolCallCount = dynamicToolCounts.get(part.toolName) ?? 1;
       const output =
         state === "output-available" &&
         part.output &&
@@ -299,12 +323,12 @@ const PurePreviewMessage = ({
       return (
         <Tool
           className="w-[min(100%,650px)]"
-          defaultOpen={true}
+          defaultOpen={false}
           key={toolCallId}
         >
           <ToolHeader
             state={state}
-            title="Search content operations"
+            title={`Search content operations${toolCallCount > 1 ? ` · ${toolCallCount} steps` : ""}`}
             toolName="searchContentTool"
             type="dynamic-tool"
           />
