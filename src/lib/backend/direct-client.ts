@@ -7,7 +7,7 @@ import {
 
 const DIRECT_TOKEN_STORAGE_KEY = "asianode.fastapi.direct-token";
 
-type DirectToken = {
+export type DirectToken = {
   accessToken: string;
   expiresAt: number;
   workspaceId: string;
@@ -25,7 +25,10 @@ function getStoredToken() {
   }
 
   if (memoryToken) {
-    return memoryToken;
+    if (memoryToken.expiresAt > Date.now() + 30_000) {
+      return memoryToken;
+    }
+    memoryToken = null;
   }
 
   try {
@@ -53,6 +56,29 @@ function getStoredToken() {
   }
 }
 
+export function setStoredDirectToken(token: DirectToken) {
+  memoryToken = token;
+  if (typeof window !== "undefined") {
+    window.sessionStorage.setItem(
+      DIRECT_TOKEN_STORAGE_KEY,
+      JSON.stringify(token)
+    );
+    window.dispatchEvent(new Event("asianode-auth-change"));
+  }
+}
+
+export function clearStoredDirectToken() {
+  memoryToken = null;
+  if (typeof window !== "undefined") {
+    window.sessionStorage.removeItem(DIRECT_TOKEN_STORAGE_KEY);
+    window.dispatchEvent(new Event("asianode-auth-change"));
+  }
+}
+
+export function getStoredDirectToken() {
+  return getStoredToken();
+}
+
 async function getDirectToken(forceRefresh = false) {
   if (!isFastApiDirectMode || typeof window === "undefined") {
     return null;
@@ -65,26 +91,9 @@ async function getDirectToken(forceRefresh = false) {
     }
   }
 
-  const response = await fetch(`${getBasePath()}/api/auth/fastapi-token`, {
-    cache: "no-store",
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Unable to obtain a FastAPI development access token.");
-  }
-
-  const token = (await response.json()) as DirectToken;
-  if (!token.accessToken || !token.workspaceId || !token.expiresAt) {
-    throw new Error("FastAPI development access token response is invalid.");
-  }
-
-  memoryToken = token;
-  window.sessionStorage.setItem(
-    DIRECT_TOKEN_STORAGE_KEY,
-    JSON.stringify(token)
-  );
-  return token;
+  // Standalone React/Vite does not depend on the deprecated Next.js token
+  // route. A development token is issued explicitly from /dev/oidc instead.
+  return null;
 }
 
 function getInputUrl(input: RequestInfo | URL) {
@@ -218,7 +227,19 @@ export async function apiFetch(
   ).toUpperCase();
 
   if (isFastApiProxyMode && typeof window !== "undefined") {
-    return fetch(mapLegacyApiPath(input, method, null), init);
+    const token = getStoredToken();
+    const headers = new Headers(
+      init?.headers ?? (input instanceof Request ? input.headers : undefined)
+    );
+
+    if (token && !headers.has("authorization")) {
+      headers.set("authorization", `Bearer ${token.accessToken}`);
+    }
+
+    return fetch(mapLegacyApiPath(input, method, token), {
+      ...init,
+      headers,
+    });
   }
 
   if (!isFastApiDirectMode || typeof window === "undefined") {

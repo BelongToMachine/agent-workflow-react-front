@@ -13,7 +13,35 @@ import { KnowledgeBaseFiles } from "./components/settings/knowledge-base-files";
 import { KnowledgeBaseGrants } from "./components/settings/knowledge-base-grants";
 import { MemberPermissions } from "./components/settings/member-permissions";
 import { FastApiConnectionTest } from "./components/fastapi-connection-test";
-import { Link, useRouter } from "./lib/router";
+import { DevOidcConsole } from "./components/auth/dev-oidc-console";
+import { Link, usePathname, useRouter } from "./lib/router";
+
+function AuthGuard({ children }) {
+  const { status } = useSession();
+  const pathname = usePathname();
+
+  if (!import.meta.env.DEV) {
+    return children;
+  }
+
+  if (pathname === "/dev/oidc") {
+    return children;
+  }
+
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-background text-sm text-muted-foreground">
+        Checking development session…
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return <Navigate replace to="/dev/oidc" />;
+  }
+
+  return children;
+}
 
 function ChatLayout() {
   const { data } = useSession();
@@ -133,11 +161,23 @@ function AuthPage({ mode }) {
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<ChatLayout />} path="/*" />
-        <Route element={<AuthPage mode="login" />} path="/login" />
-        <Route element={<AuthPage mode="register" />} path="/register" />
-      </Routes>
+      <AuthGuard>
+        <Routes>
+          <Route
+            element={
+              import.meta.env.DEV ? (
+                <DevOidcConsole />
+              ) : (
+                <Navigate replace to="/" />
+              )
+            }
+            path="/dev/oidc"
+          />
+          <Route element={<ChatLayout />} path="/*" />
+          <Route element={<AuthPage mode="login" />} path="/login" />
+          <Route element={<AuthPage mode="register" />} path="/register" />
+        </Routes>
+      </AuthGuard>
     </BrowserRouter>
   );
 }
