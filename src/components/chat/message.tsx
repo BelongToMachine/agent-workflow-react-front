@@ -110,8 +110,8 @@ const PurePreviewMessage = ({
   ) ?? { isStreaming: false, rendered: false, text: "" };
 
   const dynamicToolCounts = new Map<string, number>();
-  const dynamicToolLastIndexes = new Map<string, number>();
-  message.parts?.forEach((part, index) => {
+  const dynamicToolLastCallIds = new Map<string, string>();
+  message.parts?.forEach((part) => {
     if (part.type !== "dynamic-tool") {
       return;
     }
@@ -120,10 +120,15 @@ const PurePreviewMessage = ({
       part.toolName,
       (dynamicToolCounts.get(part.toolName) ?? 0) + 1
     );
-    dynamicToolLastIndexes.set(part.toolName, index);
+    dynamicToolLastCallIds.set(part.toolName, part.toolCallId);
   });
 
-  const parts = message.parts?.map((part, index) => {
+  const displayParts = [
+    ...(message.parts?.filter((part) => part.type === "dynamic-tool") ?? []),
+    ...(message.parts?.filter((part) => part.type !== "dynamic-tool") ?? []),
+  ];
+
+  const parts = displayParts.map((part, index) => {
     const { type } = part;
     const key = `message-${message.id}-part-${index}`;
 
@@ -157,7 +162,7 @@ const PurePreviewMessage = ({
     }
 
     if (type === "dynamic-tool" && part.toolName === "searchProductsTool") {
-      if (dynamicToolLastIndexes.get(part.toolName) !== index) {
+      if (dynamicToolLastCallIds.get(part.toolName) !== part.toolCallId) {
         return null;
       }
 
@@ -288,7 +293,7 @@ const PurePreviewMessage = ({
     }
 
     if (type === "dynamic-tool" && part.toolName === "searchContentTool") {
-      if (dynamicToolLastIndexes.get(part.toolName) !== index) {
+      if (dynamicToolLastCallIds.get(part.toolName) !== part.toolCallId) {
         return null;
       }
 
