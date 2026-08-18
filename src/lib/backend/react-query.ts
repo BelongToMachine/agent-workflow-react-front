@@ -1,0 +1,117 @@
+"use client";
+
+import {
+  type InfiniteData,
+  type QueryKey,
+  type UseInfiniteQueryOptions,
+  type UseQueryOptions,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+} from "@tanstack/react-query";
+import { useSession } from "@/lib/auth";
+import { type BackendRequestError, requestBackend } from "./request";
+
+export function useBackendIdentity(fallbackIdentity?: string) {
+  const { data: session } = useSession();
+  return session?.user?.id ?? fallbackIdentity ?? "anonymous";
+}
+
+export const backendQueryKeys = {
+  chatHistory: (identity: string) =>
+    ["backend", "user", identity, "chat-history"] as const,
+  chatMessages: (identity: string, chatId: string) =>
+    ["backend", "user", identity, "chat-messages", chatId] as const,
+  chatVotes: (identity: string, chatId: string) =>
+    ["backend", "user", identity, "chat-votes", chatId] as const,
+  members: (identity: string) =>
+    ["backend", "user", identity, "members"] as const,
+  models: (identity: string) =>
+    ["backend", "user", identity, "models"] as const,
+};
+
+type BackendQueryOptions<TData> = {
+  init?: RequestInit;
+  path: RequestInfo | URL;
+  queryKey: QueryKey;
+} & Omit<
+  UseQueryOptions<TData, BackendRequestError, TData, QueryKey>,
+  "queryFn" | "queryKey"
+>;
+
+export function useBackendQuery<TData>({
+  init,
+  path,
+  queryKey,
+  ...options
+}: BackendQueryOptions<TData>) {
+  return useQuery<TData, BackendRequestError, TData, QueryKey>({
+    ...options,
+    queryFn: ({ signal }) =>
+      requestBackend<TData>(path, {
+        ...init,
+        signal,
+      }),
+    queryKey,
+  });
+}
+
+type BackendInfiniteQueryOptions<TData, TPageParam> = {
+  init?: RequestInit;
+  initialPageParam: TPageParam;
+  path: (pageParam: TPageParam) => RequestInfo | URL;
+  queryKey: QueryKey;
+} & Omit<
+  UseInfiniteQueryOptions<
+    TData,
+    BackendRequestError,
+    InfiniteData<TData, TPageParam>,
+    QueryKey,
+    TPageParam
+  >,
+  "initialPageParam" | "queryFn" | "queryKey"
+>;
+
+export function useBackendInfiniteQuery<TData, TPageParam>({
+  init,
+  path,
+  queryKey,
+  ...options
+}: BackendInfiniteQueryOptions<TData, TPageParam>) {
+  return useInfiniteQuery<
+    TData,
+    BackendRequestError,
+    InfiniteData<TData, TPageParam>,
+    QueryKey,
+    TPageParam
+  >({
+    ...options,
+    queryFn: ({ pageParam, signal }) =>
+      requestBackend<TData>(path(pageParam as TPageParam), {
+        ...init,
+        signal,
+      }),
+    queryKey,
+  });
+}
+
+type BackendMutationOptions<TVariables> = {
+  mutationKey?: QueryKey;
+  request: (variables: TVariables) => {
+    init?: RequestInit;
+    path: RequestInfo | URL;
+  };
+};
+
+export function useBackendMutation<TData = unknown, TVariables = void>({
+  mutationKey,
+  request,
+}: BackendMutationOptions<TVariables>) {
+  return useMutation<TData, BackendRequestError, TVariables>({
+    mutationFn: (variables) => {
+      const target = request(variables);
+      return requestBackend<TData>(target.path, target.init);
+    },
+    mutationKey,
+  });
+}

@@ -1,0 +1,74 @@
+"use client";
+
+import {
+  type InfiniteData,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { useMemo } from "react";
+import useSWR from "swr";
+import type { ChatHistory } from "@/components/chat/sidebar-history";
+import type { VisibilityType } from "@/components/chat/visibility-selector";
+import {
+  backendQueryKeys,
+  useBackendIdentity,
+} from "@/lib/backend/react-query";
+
+export function useChatVisibility({
+  chatId,
+  initialVisibilityType,
+}: {
+  chatId: string;
+  initialVisibilityType: VisibilityType;
+}) {
+  const queryClient = useQueryClient();
+  const identity = useBackendIdentity();
+  const { data: historyData } = useQuery<InfiniteData<ChatHistory>>({
+    enabled: false,
+    queryFn: () =>
+      queryClient.getQueryData<InfiniteData<ChatHistory>>(
+        backendQueryKeys.chatHistory(identity)
+      ) ?? { pageParams: [], pages: [] },
+    queryKey: backendQueryKeys.chatHistory(identity),
+  });
+  const history = historyData
+    ? {
+        chats: historyData.pages.flatMap((page) => page.chats),
+        hasMore: historyData.pages.at(-1)?.hasMore ?? false,
+      }
+    : undefined;
+
+  const { data: localVisibility, mutate: setLocalVisibility } = useSWR(
+    `${chatId}-visibility`,
+    null,
+    {
+      fallbackData: initialVisibilityType,
+    }
+  );
+
+  const visibilityType = useMemo(() => {
+    if (!history) {
+      return localVisibility;
+    }
+    const chat = history.chats.find((currentChat) => currentChat.id === chatId);
+    if (!chat) {
+      return "private";
+    }
+    return chat.visibility;
+  }, [history, chatId, localVisibility]);
+
+  const setVisibilityType = (updatedVisibilityType: VisibilityType) => {
+    setLocalVisibility(updatedVisibilityType);
+    queryClient.invalidateQueries({
+      queryKey: backendQueryKeys.chatHistory(identity),
+    });
+
+    void fetch(`/api/knowledge-bases/${encodeURIComponent(chatId)}`, {
+      body: JSON.stringify({ visibility: updatedVisibilityType }),
+      headers: { "content-type": "application/json" },
+      method: "PATCH",
+    });
+  };
+
+  return { setVisibilityType, visibilityType };
+}
