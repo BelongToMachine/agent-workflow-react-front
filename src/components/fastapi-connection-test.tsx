@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { fastApiBrowserBaseUrl, isFastApiDirectMode } from "@/lib/backend/mode";
+import {
+  fastApiBrowserBaseUrl,
+  isFastApiDirectMode,
+  isFastApiProxyMode,
+} from "@/lib/backend/mode";
 
 type ConnectionState =
   | { status: "checking" }
@@ -20,7 +24,7 @@ export function FastApiConnectionTest() {
       const response = await fetch(
         isFastApiDirectMode
           ? `${fastApiBrowserBaseUrl}/api/v1/healthz`
-          : "/api/fastapi/health",
+          : "/api/v1/healthz",
         { cache: "no-store" }
       );
       const payload = await response.json();
@@ -29,26 +33,24 @@ export function FastApiConnectionTest() {
         setConnection({
           message: isFastApiDirectMode
             ? "浏览器无法连接到 FastAPI。"
-            : "Next.js 无法连接到 FastAPI。",
+            : "Vite 反代无法连接到 FastAPI。",
           payload,
           status: "error",
         });
         return;
       }
 
-      const isFastApi = isFastApiDirectMode || payload.backend === "fastapi";
+      const isFastApi = isFastApiDirectMode || isFastApiProxyMode;
       setConnection({
         message: isFastApiDirectMode
           ? "浏览器 → FastAPI 直连成功。"
-          : isFastApi
-            ? "Next.js → FastAPI 连接成功。"
-            : "当前仍使用 Next.js 后端，FastAPI 开关未开启。",
+          : "Vite → FastAPI 反代连接成功。",
         payload,
         status: isFastApi ? "success" : "error",
       });
     } catch {
       setConnection({
-        message: "联调请求失败，请确认 Next.js 和 FastAPI 都已启动。",
+        message: "联调请求失败，请确认 Vite 和 FastAPI 都已启动。",
         status: "error",
       });
     }
@@ -69,10 +71,10 @@ export function FastApiConnectionTest() {
       <section className="w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-sm">
         <p className="text-sm text-muted-foreground">Backend migration</p>
         <h1 className="mt-2 text-2xl font-semibold text-foreground">
-          Next.js / FastAPI 联调测试
+          React / FastAPI 联调测试
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          这个页面会按照当前传输模式检查 FastAPI，不会影响现有业务接口。
+          这个页面会通过 Vite 反代检查 FastAPI，不会绕过前端请求链路。
         </p>
 
         <div

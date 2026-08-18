@@ -1,4 +1,9 @@
-import { fastApiBrowserBaseUrl, isFastApiDirectMode } from "./mode";
+import {
+  fastApiBrowserBaseUrl,
+  fastApiWorkspaceId,
+  isFastApiDirectMode,
+  isFastApiProxyMode,
+} from "./mode";
 
 const DIRECT_TOKEN_STORAGE_KEY = "asianode.fastapi.direct-token";
 
@@ -99,7 +104,7 @@ function pathWithoutBasePath(pathname: string) {
 }
 
 function appendWorkspaceId(url: URL, token: DirectToken | null) {
-  if (!token || url.searchParams.has("workspace_id")) {
+  if (url.searchParams.has("workspace_id")) {
     return;
   }
 
@@ -117,11 +122,14 @@ function appendWorkspaceId(url: URL, token: DirectToken | null) {
     path === "/api/v1/content/search";
 
   if (isWorkspaceScoped) {
-    url.searchParams.set("workspace_id", token.workspaceId);
+    const workspaceId = token?.workspaceId ?? (isFastApiProxyMode ? fastApiWorkspaceId : null);
+    if (workspaceId) {
+      url.searchParams.set("workspace_id", workspaceId);
+    }
   }
 }
 
-function mapLegacyApiUrl(
+function mapLegacyApiPath(
   input: RequestInfo | URL,
   method: string,
   token: DirectToken | null
@@ -184,26 +192,39 @@ function mapLegacyApiUrl(
   }
 
   if (!targetPath) {
-    return source;
+    return `${source.pathname}${source.search}`;
   }
 
-  const target = new URL(targetPath, fastApiBrowserBaseUrl);
+  const target = new URL(targetPath, "http://vite-fastapi-proxy.local");
   target.search = query.toString();
   appendWorkspaceId(target, token);
-  return target;
+  return `${target.pathname}${target.search}`;
+}
+
+function mapLegacyApiUrl(
+  input: RequestInfo | URL,
+  method: string,
+  token: DirectToken | null
+) {
+  return new URL(mapLegacyApiPath(input, method, token), fastApiBrowserBaseUrl);
 }
 
 export async function apiFetch(
   input: RequestInfo | URL,
   init?: RequestInit
 ): Promise<Response> {
+  const method = (
+    init?.method ?? (input instanceof Request ? input.method : "GET")
+  ).toUpperCase();
+
+  if (isFastApiProxyMode && typeof window !== "undefined") {
+    return fetch(mapLegacyApiPath(input, method, null), init);
+  }
+
   if (!isFastApiDirectMode || typeof window === "undefined") {
     return fetch(input, init);
   }
 
-  const method = (
-    init?.method ?? (input instanceof Request ? input.method : "GET")
-  ).toUpperCase();
   const token = await getDirectToken();
   const target = mapLegacyApiUrl(input, method, token);
   const headers = new Headers(
