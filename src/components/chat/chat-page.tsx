@@ -1,4 +1,4 @@
-import { ActiveChatProvider } from "@/hooks/use-active-chat";
+import { ActiveChatProvider } from "@/hooks/useActiveChat";
 import { ChatShell } from "./shell";
 
 export function ChatPage() {

@@ -17,6 +17,10 @@ export function usePathname() {
   return useLocation().pathname;
 }
 
+export function useLocationSearch() {
+  return useLocation().search;
+}
+
 export function useRouter() {
   const navigate = useNavigate();
 

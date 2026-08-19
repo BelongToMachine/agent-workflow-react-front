@@ -1,7 +1,7 @@
 import { Link } from "@/lib/router";
 import { memo, useCallback } from "react";
-import { useChatVisibility } from "@/hooks/use-chat-visibility";
-import type { Chat } from "@/lib/db/schema";
+import { useChatVisibility } from "@/hooks/useChatVisibility";
+import type { ChatHistoryEntry } from "@/lib/backend/chat-history-cache";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,7 +32,7 @@ const PureChatItem = ({
   onDelete,
   setOpenMobile,
 }: {
-  chat: Chat;
+  chat: ChatHistoryEntry;
   isActive: boolean;
   onDelete: (chatId: string) => void;
   setOpenMobile: (open: boolean) => void;
@@ -126,6 +126,12 @@ const PureChatItem = ({
 
 export const ChatItem = memo(PureChatItem, (prevProps, nextProps) => {
   if (prevProps.isActive !== nextProps.isActive) {
+    return false;
+  }
+  if (
+    prevProps.chat.title !== nextProps.chat.title ||
+    prevProps.chat.visibility !== nextProps.chat.visibility
+  ) {
     return false;
   }
   return true;

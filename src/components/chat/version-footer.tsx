@@ -6,7 +6,7 @@ import { ChevronLeftIcon, ChevronRightIcon, DiffIcon } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useState } from "react";
 import { useSWRConfig } from "swr";
-import { useArtifact } from "@/hooks/use-artifact";
+import { useArtifact } from "@/hooks/useArtifact";
 import { requestBackend } from "@/lib/backend/request";
 import type { Document } from "@/lib/db/schema";
 import { cn, getDocumentTimestampByIndex } from "@/lib/utils";

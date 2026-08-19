@@ -14,10 +14,7 @@ import type { User } from "@/lib/auth";
 import { Link, useRouter } from "@/lib/router";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import {
-  type ChatHistory,
-  SidebarHistory,
-} from "@/components/chat/sidebar-history";
+import { SidebarHistory } from "@/components/chat/sidebar-history";
 import { SidebarUserNav } from "@/components/chat/sidebar-user-nav";
 import {
   Sidebar,
@@ -37,7 +34,13 @@ import {
   backendQueryKeys,
   useBackendIdentity,
 } from "@/lib/backend/react-query";
+import {
+  type ChatHistory,
+  type ChatHistoryEntry,
+  getLocalChatHistoryQueryKey,
+} from "@/lib/backend/chat-history-cache";
 import { requestBackend } from "@/lib/backend/request";
+import { getNewChatPath } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -75,7 +78,7 @@ export function AppSidebar({
 
   const handleNewChat = useCallback(() => {
     setOpenMobile(false);
-    router.push("/");
+    router.push(getNewChatPath());
   }, [router, setOpenMobile]);
 
   const handleShowDeleteAllDialog = useCallback(() => {
@@ -85,8 +88,9 @@ export function AppSidebar({
   const handleDeleteAll = useCallback(() => {
     setShowDeleteAllDialog(false);
     router.replace("/");
+    const historyQueryKey = backendQueryKeys.chatHistory(identity);
     queryClient.setQueryData<InfiniteData<ChatHistory>>(
-      backendQueryKeys.chatHistory(identity),
+      historyQueryKey,
       (historyData) =>
         historyData
           ? {
@@ -97,6 +101,10 @@ export function AppSidebar({
               })),
             }
           : historyData
+    );
+    queryClient.setQueryData<ChatHistoryEntry[]>(
+      getLocalChatHistoryQueryKey(historyQueryKey),
+      []
     );
 
     requestBackend(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/history`, {

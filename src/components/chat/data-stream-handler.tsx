@@ -2,7 +2,9 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { initialArtifactData, useArtifact } from "@/hooks/use-artifact";
+import { useActiveChat } from "@/hooks/useActiveChat";
+import { initialArtifactData, useArtifact } from "@/hooks/useArtifact";
+import { upsertChatHistory } from "@/lib/backend/chat-history-cache";
 import {
   backendQueryKeys,
   useBackendIdentity,
@@ -14,6 +16,7 @@ export function DataStreamHandler() {
   const { dataStream, setDataStream } = useDataStream();
   const queryClient = useQueryClient();
   const identity = useBackendIdentity();
+  const { chatId, visibilityType } = useActiveChat();
 
   const { artifact, setArtifact, setMetadata } = useArtifact();
 
@@ -27,9 +30,18 @@ export function DataStreamHandler() {
 
     for (const delta of newDeltas) {
       if (delta.type === "data-chat-title") {
-        queryClient.invalidateQueries({
-          queryKey: backendQueryKeys.chatHistory(identity),
-        });
+        upsertChatHistory(
+          queryClient,
+          backendQueryKeys.chatHistory(identity),
+          {
+            createdAt: new Date(),
+            id: chatId,
+            title: delta.data,
+            userId: identity,
+            visibility: visibilityType,
+          },
+          { replaceExistingTitle: true }
+        );
         continue;
       }
       const artifactDefinition = artifactDefinitions.find(
@@ -92,12 +104,14 @@ export function DataStreamHandler() {
     }
   }, [
     artifact,
+    chatId,
     dataStream,
     identity,
     queryClient,
     setArtifact,
     setDataStream,
     setMetadata,
+    visibilityType,
   ]);
 
   return null;

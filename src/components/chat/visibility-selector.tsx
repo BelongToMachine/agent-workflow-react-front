@@ -15,7 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useChatVisibility } from "@/hooks/use-chat-visibility";
+import { useChatVisibility } from "@/hooks/useChatVisibility";
 import { cn } from "@/lib/utils";
 import {
   CheckCircleFillIcon,

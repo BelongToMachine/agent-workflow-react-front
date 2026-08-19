@@ -11,12 +11,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useActiveChat } from "@/hooks/use-active-chat";
+import { useActiveChat } from "@/hooks/useActiveChat";
 import {
   initialArtifactData,
   useArtifact,
   useArtifactSelector,
-} from "@/hooks/use-artifact";
+} from "@/hooks/useArtifact";
 import type { Attachment, ChatMessage } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Artifact } from "./artifact";

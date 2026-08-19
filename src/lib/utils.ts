@@ -77,6 +77,10 @@ export function generateUUID(): string {
   });
 }
 
+export function getNewChatPath(): string {
+  return `/?new=${generateUUID()}`;
+}
+
 export function getDocumentTimestampByIndex(
   documents: Document[],
   index: number,

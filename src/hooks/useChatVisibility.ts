@@ -7,8 +7,8 @@ import {
 } from "@tanstack/react-query";
 import { useMemo } from "react";
 import useSWR from "swr";
-import type { ChatHistory } from "@/components/chat/sidebar-history";
 import type { VisibilityType } from "@/components/chat/visibility-selector";
+import type { ChatHistory } from "@/lib/backend/chat-history-cache";
 import {
   backendQueryKeys,
   useBackendIdentity,
@@ -31,14 +31,18 @@ export function useChatVisibility({
       ) ?? { pageParams: [], pages: [] },
     queryKey: backendQueryKeys.chatHistory(identity),
   });
-  const history = historyData
-    ? {
-        chats: historyData.pages.flatMap((page) =>
-          Array.isArray(page?.chats) ? page.chats : []
-        ),
-        hasMore: historyData.pages.at(-1)?.hasMore ?? false,
-      }
-    : undefined;
+  const history = useMemo(
+    () =>
+      historyData
+        ? {
+            chats: historyData.pages.flatMap((page) =>
+              Array.isArray(page?.chats) ? page.chats : []
+            ),
+            hasMore: historyData.pages.at(-1)?.hasMore ?? false,
+          }
+        : undefined,
+    [historyData]
+  );
 
   const { data: localVisibility, mutate: setLocalVisibility } = useSWR(
     `${chatId}-visibility`,
@@ -61,9 +65,13 @@ export function useChatVisibility({
 
   const setVisibilityType = (updatedVisibilityType: VisibilityType) => {
     setLocalVisibility(updatedVisibilityType);
-    queryClient.invalidateQueries({
-      queryKey: backendQueryKeys.chatHistory(identity),
-    });
+    void queryClient.invalidateQueries(
+      {
+        exact: true,
+        queryKey: backendQueryKeys.chatHistory(identity),
+      },
+      { cancelRefetch: false },
+    );
 
     void fetch(`/api/knowledge-bases/${encodeURIComponent(chatId)}`, {
       body: JSON.stringify({ visibility: updatedVisibilityType }),

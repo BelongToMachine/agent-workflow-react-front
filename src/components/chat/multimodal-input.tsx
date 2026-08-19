@@ -49,7 +49,7 @@ import {
 } from "@/lib/backend/react-query";
 import { requestBackend } from "@/lib/backend/request";
 import type { Attachment, ChatMessage } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, getNewChatPath } from "@/lib/utils";
 import {
   PromptInput,
   PromptInputFooter,
@@ -179,7 +179,7 @@ function PureMultimodalInput({
       setInput("");
       switch (cmd.action) {
         case "new":
-          router.push("/");
+          router.push(getNewChatPath());
           break;
         case "clear":
           setMessages(() => []);
@@ -206,7 +206,7 @@ function PureMultimodalInput({
                   `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/chat?id=${chatId}`,
                   { method: "DELETE" }
                 ).catch(() => undefined);
-                router.push("/");
+                router.push(getNewChatPath());
                 toast.success("Chat deleted");
               },
             },
@@ -223,7 +223,7 @@ function PureMultimodalInput({
                     method: "DELETE",
                   }
                 ).catch(() => undefined);
-                router.push("/");
+                router.push(getNewChatPath());
                 toast.success("All chats deleted");
               },
             },
