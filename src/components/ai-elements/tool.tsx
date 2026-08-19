@@ -18,9 +18,21 @@ import {
   WrenchIcon,
   XCircleIcon,
 } from "lucide-react";
-import { isValidElement } from "react";
+import { isValidElement, lazy, Suspense } from "react";
 
-import { CodeBlock } from "./code-block";
+const DeferredCodeBlock = lazy(() =>
+  import("./code-block").then(({ CodeBlock }) => ({ default: CodeBlock }))
+);
+
+function ToolCodeBlock({ code }: { code: string }) {
+  return (
+    <Suspense
+      fallback={<div className="min-h-20 animate-pulse rounded-md bg-muted" />}
+    >
+      <DeferredCodeBlock code={code} language="json" />
+    </Suspense>
+  );
+}
 
 export type ToolProps = ComponentProps<typeof Collapsible>;
 
@@ -123,7 +135,7 @@ export const ToolInput = ({ className, input, ...props }: ToolInputProps) => (
       Parameters
     </h4>
     <div className="rounded-md bg-muted/50">
-      <CodeBlock code={JSON.stringify(input, null, 2)} language="json" />
+      <ToolCodeBlock code={JSON.stringify(input, null, 2)} />
     </div>
   </div>
 );
@@ -147,10 +159,10 @@ export const ToolOutput = ({
 
   if (typeof output === "object" && !isValidElement(output)) {
     Output = (
-      <CodeBlock code={JSON.stringify(output, null, 2)} language="json" />
+      <ToolCodeBlock code={JSON.stringify(output, null, 2)} />
     );
   } else if (typeof output === "string") {
-    Output = <CodeBlock code={output} language="json" />;
+    Output = <ToolCodeBlock code={output} />;
   }
 
   return (

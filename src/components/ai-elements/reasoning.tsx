@@ -8,10 +8,6 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-import { cjk } from "@streamdown/cjk";
-import { code } from "@streamdown/code";
-import { math } from "@streamdown/math";
-import { mermaid } from "@streamdown/mermaid";
 import { ChevronDownIcon } from "lucide-react";
 import {
   createContext,
@@ -26,6 +22,7 @@ import {
 import { Streamdown } from "streamdown";
 
 import { Shimmer } from "./shimmer";
+import { useStreamdownPlugins } from "./use-streamdown-plugins";
 
 interface ReasoningContextValue {
   isStreaming: boolean;
@@ -201,12 +198,11 @@ export type ReasoningContentProps = HTMLAttributes<HTMLDivElement> & {
   children: string;
 };
 
-const streamdownPlugins = { cjk, code, math, mermaid };
-
 export const ReasoningContent = memo(
   ({ className, children, ...props }: ReasoningContentProps) => {
     const { isStreaming, isOpen } = useReasoning();
     const scrollRef = useRef<HTMLDivElement>(null);
+    const streamdownPlugins = useStreamdownPlugins();
     useEffect(() => {
       if (isStreaming && scrollRef.current) {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;

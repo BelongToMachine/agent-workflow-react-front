@@ -1,11 +1,5 @@
-import { useCallback } from "react";
 import { toast } from "sonner";
-import { CodeEditor } from "@/components/chat/code-editor";
-import {
-  Console,
-  type ConsoleOutput,
-  type ConsoleOutputContent,
-} from "@/components/chat/console";
+import type { ConsoleOutputContent } from "@/components/chat/console";
 import { Artifact } from "@/components/chat/create-artifact";
 import {
   CopyIcon,
@@ -16,6 +10,10 @@ import {
   UndoIcon,
 } from "@/components/chat/icons";
 import { generateUUID } from "@/lib/utils";
+import {
+  CodeArtifactContent,
+  type CodeArtifactMetadata,
+} from "./content";
 
 const OUTPUT_HANDLERS = {
   basic: `
@@ -63,36 +61,7 @@ function detectRequiredHandlers(code: string): string[] {
   return handlers;
 }
 
-type Metadata = {
-  outputs: ConsoleOutput[];
-};
-
-const codeArtifactContent: Artifact<"code", Metadata>["content"] =
-  function CodeArtifactContent({ metadata, setMetadata, ...props }) {
-    const clearConsoleOutputs = useCallback(() => {
-      setMetadata((currentMetadata) => ({
-        ...currentMetadata,
-        outputs: [],
-      }));
-    }, [setMetadata]);
-
-    return (
-      <>
-        <div className="relative min-h-[200px]">
-          <CodeEditor {...props} />
-        </div>
-
-        {metadata?.outputs ? (
-          <Console
-            consoleOutputs={metadata.outputs}
-            setConsoleOutputs={clearConsoleOutputs}
-          />
-        ) : null}
-      </>
-    );
-  };
-
-export const codeArtifact = new Artifact<"code", Metadata>({
+export const codeArtifact = new Artifact<"code", CodeArtifactMetadata>({
   actions: [
     {
       description: "Execute code",
@@ -240,7 +209,7 @@ export const codeArtifact = new Artifact<"code", Metadata>({
       },
     },
   ],
-  content: codeArtifactContent,
+  content: CodeArtifactContent,
   description:
     "Useful for code generation; Code execution is only available for python code.",
   initialize: ({ setMetadata }) => {
