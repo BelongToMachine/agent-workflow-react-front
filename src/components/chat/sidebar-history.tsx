@@ -49,6 +49,10 @@ export type ChatHistory = {
 
 const PAGE_SIZE = 20;
 
+function getChatsFromPage(page: ChatHistory | null | undefined): Chat[] {
+  return Array.isArray(page?.chats) ? page.chats : [];
+}
+
 const groupChatsByDate = (chats: Chat[]): GroupedChats => {
   const now = new Date();
   const oneWeekAgo = subWeeks(now, 1);
@@ -98,7 +102,9 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     enabled: Boolean(user),
     gcTime: 5 * 60_000,
     getNextPageParam: (lastPage) =>
-      lastPage.hasMore ? (lastPage.chats.at(-1)?.id ?? undefined) : undefined,
+      lastPage?.hasMore
+        ? (getChatsFromPage(lastPage).at(-1)?.id ?? undefined)
+        : undefined,
     initialPageParam: null,
     path: (endingBefore) => {
       const params = new URLSearchParams({ limit: String(PAGE_SIZE) });
@@ -121,11 +127,15 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const hasReachedEnd = paginatedChatHistories
-    ? paginatedChatHistories.some((page) => page.hasMore === false)
+    ? paginatedChatHistories.some(
+        (page) => page?.hasMore !== true || !Array.isArray(page?.chats)
+      )
     : false;
 
   const hasEmptyChatHistory = paginatedChatHistories
-    ? paginatedChatHistories.every((page) => page.chats.length === 0)
+    ? paginatedChatHistories.every(
+        (page) => getChatsFromPage(page).length === 0
+      )
     : false;
 
   const handleDelete = useCallback(() => {
@@ -240,7 +250,8 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
             {paginatedChatHistories
               ? (() => {
                   const chatsFromHistory = paginatedChatHistories.flatMap(
-                    (paginatedChatHistory) => paginatedChatHistory.chats
+                    (paginatedChatHistory) =>
+                      getChatsFromPage(paginatedChatHistory)
                   );
 
                   const groupedChats = groupChatsByDate(chatsFromHistory);

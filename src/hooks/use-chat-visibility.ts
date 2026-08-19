@@ -33,7 +33,9 @@ export function useChatVisibility({
   });
   const history = historyData
     ? {
-        chats: historyData.pages.flatMap((page) => page.chats),
+        chats: historyData.pages.flatMap((page) =>
+          Array.isArray(page?.chats) ? page.chats : []
+        ),
         hasMore: historyData.pages.at(-1)?.hasMore ?? false,
       }
     : undefined;
