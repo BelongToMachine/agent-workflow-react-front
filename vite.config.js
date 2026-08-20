@@ -4,7 +4,7 @@ import path from 'node:path'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
+  const env = loadEnv(mode, import.meta.dirname, '')
   const fastApiTarget =
     env.VITE_FASTAPI_URL ||
     env.NEXT_PUBLIC_FASTAPI_BASE_URL ||

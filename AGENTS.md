@@ -1,8 +1,7 @@
 # Asianode Agent Frontend Development Guide
 
-本文件适用于 `asianodeagent-front` 及其子目录。请同时遵守上层目录的
-[`../AGENTS.md`](../AGENTS.md)；如果规则冲突，以更具体的本文件为准，但不能违反上层规定的
-React/Vite + FastAPI 分离架构。
+本文件适用于 `asianodeagent-front` 及其子目录。前端必须遵守 React/Vite + FastAPI 分离架构：
+浏览器端功能放在本仓库，API、鉴权、权限和业务逻辑放在同级的 `asianode-fastapi` 仓库。
 
 ## 项目定位
 
