@@ -33,14 +33,14 @@ FastAPI 后端位于同级目录 [`../asianode-fastapi`](../asianode-fastapi)，
 
 - 浏览器端普通请求使用 `requestBackend`（`src/lib/backend/request.ts`）；React Query 请求使用
   `useBackendQuery`、`useBackendInfiniteQuery` 和 `useBackendMutation`。
-- `src/lib/backend/direct-client.ts` 的 `apiFetch` 负责 Bearer token、workspace query 参数、
+- `src/lib/backend/directClient.ts` 的 `apiFetch` 负责 Bearer token、workspace query 参数、
   Vite `/api` proxy 和可选的 FastAPI direct mode，并把现有的 `/api/*` 调用映射到 FastAPI 的
   `/api/v1/*` 路由。
 - 新增请求前先确认 FastAPI 的实际 route、method、payload 和 response；优先复用请求层和已有的
   legacy path mapping，不要在组件里重复实现鉴权头、workspace 参数或错误解析。
 - FastAPI 变化需要同步更新前端类型、请求路径、流式数据类型和错误处理；不能通过前端伪造身份字段
   绕过后端权限。
-- `src/components/fastapi-connection-test.tsx` 和开发 OIDC 页面中的直接 `fetch` 属于诊断/开发特例。
+- `src/components/fastapiConnectionTest.tsx` 和开发 OIDC 页面中的直接 `fetch` 属于诊断/开发特例。
   业务请求不要复制这种模式。
 
 ### 认证与权限
@@ -50,21 +50,21 @@ FastAPI 后端位于同级目录 [`../asianode-fastapi`](../asianode-fastapi)，
   前端解码结果来做授权。
 - 前端的条件渲染和设置页入口只是 UX 层提示，不能视为安全边界；成员、知识库、聊天、文档等权限
   必须以 FastAPI 返回的结果为准。
-- `src/lib/auth/authorization.ts`、`src/lib/auth/nextauth-bridge.ts`、`src/lib/auth/dev-oidc.ts`
-  和 `src/lib/auth/dev-direct-token.ts` 中的 server-only/NextAuth bridge 代码属于迁移兼容遗留物。
+- `src/lib/auth/authorization.ts`、`src/lib/auth/nextauthBridge.ts`、`src/lib/auth/devOidc.ts`
+  和 `src/lib/auth/devDirectToken.ts` 中的 server-only/NextAuth bridge 代码属于迁移兼容遗留物。
   新的浏览器代码不能依赖它们，也不能把 NextAuth 作为独立前端的长期运行时依赖。
 
 ### 聊天、流式数据与 Artifact
 
 - `src/hooks/useActiveChat.tsx` 负责当前 chat ID、消息加载、AI SDK `useChat`、模型选择、自动恢复、
   投票查询和聊天错误处理。
-- `src/components/chat/data-stream-provider.tsx` 保存流式 UI data；
-  `data-stream-handler.tsx` 消费数据并更新 Artifact、React Query 缓存和 waiting status。
+- `src/components/chat/dataStreamProvider.tsx` 保存流式 UI data；
+  `dataStreamHandler.tsx` 消费数据并更新 Artifact、React Query 缓存和 waiting status。
 - `src/lib/types.ts` 中的 `CustomUIDataTypes`、`ChatMessage` 和 `ChatTools` 是前后端流式消息的共享
   约定。新增或修改 `data-*` part 时，要同步更新类型、FastAPI 输出和对应的消费逻辑。
 - Artifact 注册表在 `src/components/chat/artifact.tsx`；各 Artifact 的浏览器实现位于：
   `src/artifacts/text/client.tsx`、`code/client.tsx`、`image/client.tsx`、`sheet/client.tsx`。
-  `Artifact` 抽象和编辑/保存流程位于 `src/components/chat/create-artifact.tsx` 及相关 chat 组件。
+  `Artifact` 抽象和编辑/保存流程位于 `src/components/chat/createArtifact.tsx` 及相关 chat 组件。
 - Artifact 的初始化、版本切换、保存、diff 和流式 delta 处理必须保持一致；修改 kind 或 delta 时，
   同时检查 `artifactDefinitions`、`useArtifact`、`DataStreamHandler` 和对应编辑器。
 - 代码 Artifact 的 Python 执行在浏览器端通过 Pyodide 完成。不要把不可信代码执行迁移到前端以外，
@@ -73,7 +73,7 @@ FastAPI 后端位于同级目录 [`../asianode-fastapi`](../asianode-fastapi)，
 ### 状态管理
 
 - React Query 用于 FastAPI server state、缓存、失效和 mutation；query key 应包含当前身份作用域和
-  资源 ID，参考 `src/lib/backend/react-query.ts` 的 `backendQueryKeys`。
+  资源 ID，参考 `src/lib/backend/reactQuery.ts` 的 `backendQueryKeys`。
 - SWR 当前用于 Artifact 本地状态、Artifact metadata 和部分文档版本缓存。修改 Artifact 相关代码时，
   延续该模块已有的 SWR 约定，不要无目的地把局部编辑状态提升到全局。
 - React context 只承载跨多个子组件共享的交互状态，例如当前聊天和数据流。简单的局部 UI 状态使用
@@ -96,6 +96,12 @@ FastAPI 后端位于同级目录 [`../asianode-fastapi`](../asianode-fastapi)，
 - `src/globals.css`、`src/index.css` 和现有组件 class：当前样式入口。项目使用 Tailwind CSS 4，新增样式
   优先使用现有 design token 和 utility class。
 - `public/`：静态资源和字体；`dist/` 是构建产物，不要手工编辑或提交生成内容。
+
+### 文件命名
+
+- 前端源码文件统一使用 camelCase（驼峰命名），例如 `useActiveChat.tsx`、`dataStreamHandler.tsx`、`chatHistoryCache.ts`。
+- 禁止新增或保留 kebab-case 源码文件名；新增文件名中不要使用 `-` 连接单词。
+- 第三方 vendor 资源文件名（例如 `public/fonts/` 中由上游提供的字体文件）如需保持兼容可以例外，但业务源码必须遵守 camelCase。
 
 ## 开发约定
 

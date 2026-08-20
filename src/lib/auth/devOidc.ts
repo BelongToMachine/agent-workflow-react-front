@@ -2,7 +2,7 @@ import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { Permission } from "@/lib/permissions";
-import type { DevOidcStandardScope } from "./dev-oidc-types";
+import type { DevOidcStandardScope } from "./devOidcTypes";
 
 const DEV_OIDC_CODE_TTL_MS = 5 * 60 * 1000;
 const DEV_OIDC_FALLBACK_SECRET = "atlas-trade-copilot-dev-oidc";

@@ -22,7 +22,7 @@ import {
 import { Streamdown } from "streamdown";
 
 import { Shimmer } from "./shimmer";
-import { useStreamdownPlugins } from "./use-streamdown-plugins";
+import { useStreamdownPlugins } from "./useStreamdownPlugins";
 
 interface ReasoningContextValue {
   isStreaming: boolean;

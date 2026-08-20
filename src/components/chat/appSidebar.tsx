@@ -14,8 +14,8 @@ import type { User } from "@/lib/auth";
 import { Link, useRouter } from "@/lib/router";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { SidebarHistory } from "@/components/chat/sidebar-history";
-import { SidebarUserNav } from "@/components/chat/sidebar-user-nav";
+import { SidebarHistory } from "@/components/chat/sidebarHistory";
+import { SidebarUserNav } from "@/components/chat/sidebarUserNav";
 import {
   Sidebar,
   SidebarContent,
@@ -33,12 +33,12 @@ import {
 import {
   backendQueryKeys,
   useBackendIdentity,
-} from "@/lib/backend/react-query";
+} from "@/lib/backend/reactQuery";
 import {
   type ChatHistory,
   type ChatHistoryEntry,
   getLocalChatHistoryQueryKey,
-} from "@/lib/backend/chat-history-cache";
+} from "@/lib/backend/chatHistoryCache";
 import { requestBackend } from "@/lib/backend/request";
 import { getNewChatPath } from "@/lib/utils";
 import {
@@ -50,7 +50,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "../ui/alert-dialog";
+} from "../ui/alertDialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function AppSidebar({

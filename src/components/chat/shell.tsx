@@ -10,7 +10,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alertDialog";
 import { useActiveChat } from "@/hooks/useActiveChat";
 import {
   initialArtifactData,
@@ -20,11 +20,11 @@ import {
 import type { Attachment, ChatMessage } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Artifact } from "./artifact";
-import { ChatHeader } from "./chat-header";
-import { DataStreamHandler } from "./data-stream-handler";
-import { submitEditedMessage } from "./message-editor";
+import { ChatHeader } from "./chatHeader";
+import { DataStreamHandler } from "./dataStreamHandler";
+import { submitEditedMessage } from "./messageEditor";
 import { Messages } from "./messages";
-import { MultimodalInput } from "./multimodal-input";
+import { MultimodalInput } from "./multimodalInput";
 
 export function ChatShell() {
   const {

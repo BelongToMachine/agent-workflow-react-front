@@ -7,7 +7,7 @@ import {
   backendQueryKeys,
   useBackendIdentity,
   useBackendMutation,
-} from "@/lib/backend/react-query";
+} from "@/lib/backend/reactQuery";
 import type { Vote } from "@/lib/db/schema";
 import type { ChatMessage } from "@/lib/types";
 import {

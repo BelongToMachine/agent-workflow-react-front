@@ -4,7 +4,7 @@ import { PanelLeftIcon } from "lucide-react";
 import { memo } from "react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
-import { VisibilitySelector, type VisibilityType } from "./visibility-selector";
+import { VisibilitySelector, type VisibilityType } from "./visibilitySelector";
 
 function PureChatHeader({
   chatId,

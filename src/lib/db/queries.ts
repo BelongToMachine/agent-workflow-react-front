@@ -15,7 +15,7 @@ import {
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import type { ArtifactKind } from "@/components/chat/artifact";
-import type { VisibilityType } from "@/components/chat/visibility-selector";
+import type { VisibilityType } from "@/components/chat/visibilitySelector";
 import { isMockDatabase } from "../constants";
 import { ChatbotError } from "../errors";
 import { generateUUID } from "../utils";
@@ -54,7 +54,7 @@ import {
   vote,
 } from "./schema";
 import { generateHashedPassword } from "./utils";
-import { ensureDefaultWorkspaceMembership } from "./workspace-queries";
+import { ensureDefaultWorkspaceMembership } from "./workspaceQueries";
 
 // Keep the real PostgreSQL client out of the module initialization path in
 // mock mode. This allows the app to run without POSTGRES_URL.

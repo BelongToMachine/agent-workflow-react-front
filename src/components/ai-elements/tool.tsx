@@ -21,7 +21,7 @@ import {
 import { isValidElement, lazy, Suspense } from "react";
 
 const DeferredCodeBlock = lazy(() =>
-  import("./code-block").then(({ CodeBlock }) => ({ default: CodeBlock }))
+  import("./codeBlock").then(({ CodeBlock }) => ({ default: CodeBlock }))
 );
 
 function ToolCodeBlock({ code }: { code: string }) {

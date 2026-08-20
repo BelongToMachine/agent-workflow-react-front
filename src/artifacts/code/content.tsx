@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { CodeEditor } from "@/components/chat/code-editor";
+import { CodeEditor } from "@/components/chat/codeEditor";
 import { Console, type ConsoleOutput } from "@/components/chat/console";
-import type { ArtifactContent } from "@/components/chat/create-artifact";
+import type { ArtifactContent } from "@/components/chat/createArtifact";
 
 export type CodeArtifactMetadata = {
   outputs: ConsoleOutput[];

@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { logError, logEvent, summarizeToolInput } from "@/lib/ai/logger";
-import { searchProducts } from "@/lib/db/trade-queries";
+import { searchProducts } from "@/lib/db/tradeQueries";
 
 export const createSearchProductsTool = ({
   requestId,

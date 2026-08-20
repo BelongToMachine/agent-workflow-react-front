@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   ButtonGroup,
   ButtonGroupText,
-} from "@/components/ui/button-group";
+} from "@/components/ui/buttonGroup";
 import {
   Tooltip,
   TooltipContent,
@@ -26,7 +26,7 @@ import {
   useState,
 } from "react";
 import { Streamdown } from "streamdown";
-import { useStreamdownPlugins } from "./use-streamdown-plugins";
+import { useStreamdownPlugins } from "./useStreamdownPlugins";
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
   from: UIMessage["role"];

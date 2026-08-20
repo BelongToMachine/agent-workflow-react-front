@@ -6,7 +6,7 @@ import { textDocumentHandler } from "@/artifacts/text/server";
 import type { ArtifactKind } from "@/components/chat/artifact";
 import { saveDocument } from "../db/queries";
 import type { Document } from "../db/schema";
-import { getWorkspaceMembershipForUser } from "../db/workspace-queries";
+import { getWorkspaceMembershipForUser } from "../db/workspaceQueries";
 import type { ChatMessage } from "../types";
 
 export type SaveDocumentProps = {

@@ -22,7 +22,7 @@ import {
   clearStoredDirectToken,
   setStoredDirectToken,
   type DirectToken,
-} from "@/lib/backend/direct-client";
+} from "@/lib/backend/directClient";
 import { Button } from "@/components/ui/button";
 
 const DEFAULT_WORKSPACE_ID =

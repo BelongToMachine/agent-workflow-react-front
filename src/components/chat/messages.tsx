@@ -5,7 +5,7 @@ import { useMessages } from "@/hooks/useMessages";
 import type { Vote } from "@/lib/db/schema";
 import type { ChatMessage } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { useDataStream } from "./data-stream-provider";
+import { useDataStream } from "./dataStreamProvider";
 import { Greeting } from "./greeting";
 import { PreviewMessage, ThinkingMessage } from "./message";
 

@@ -2,7 +2,7 @@ import "server-only";
 
 import { auth } from "@/app/(auth)/auth";
 import { DEFAULT_WORKSPACE_ID, isMockDatabase } from "@/lib/constants";
-import { getWorkspaceMembershipForUser } from "@/lib/db/workspace-queries";
+import { getWorkspaceMembershipForUser } from "@/lib/db/workspaceQueries";
 import { getEffectivePermissions, type Permission } from "@/lib/permissions";
 
 export type CurrentActor = {

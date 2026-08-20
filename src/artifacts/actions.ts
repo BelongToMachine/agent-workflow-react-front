@@ -2,7 +2,7 @@
 
 import { auth } from "@/app/(auth)/auth";
 import { actorHasPermission, getCurrentActor } from "@/lib/auth/authorization";
-import { createNextAuthBridgeHeaders } from "@/lib/auth/nextauth-bridge";
+import { createNextAuthBridgeHeaders } from "@/lib/auth/nextauthBridge";
 import { fetchFastApi, isFastApiBackendEnabled } from "@/lib/backend/fastapi";
 import { getDocumentsById, getSuggestionsByDocumentId } from "@/lib/db/queries";
 import type { Suggestion } from "@/lib/db/schema";

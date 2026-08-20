@@ -1,10 +1,14 @@
+import { isLogtoAuthMode } from "../auth/logtoConfig";
+
 const apiMode = process.env.NEXT_PUBLIC_API_MODE || "fastapi-proxy";
+const isProduction = import.meta.env.PROD;
 
 export const isFastApiDirectMode =
-  process.env.NODE_ENV !== "production" && apiMode === "fastapi-direct";
+  (!isProduction && apiMode === "fastapi-direct") ||
+  (isProduction && isLogtoAuthMode);
 
 export const isFastApiProxyMode =
-  process.env.NODE_ENV !== "production" && apiMode === "fastapi-proxy";
+  !isProduction && apiMode === "fastapi-proxy";
 
 export const fastApiWorkspaceId =
   process.env.NEXT_PUBLIC_WORKSPACE_ID ||

@@ -23,12 +23,12 @@ import type { Document, Vote } from "@/lib/db/schema";
 import type { Attachment, ChatMessage } from "@/lib/types";
 import { fetcher } from "@/lib/utils";
 import { useSidebar } from "../ui/sidebar";
-import { ArtifactActions } from "./artifact-actions";
-import { ArtifactCloseButton } from "./artifact-close-button";
+import { ArtifactActions } from "./artifactActions";
+import { ArtifactCloseButton } from "./artifactCloseButton";
 import { LoaderIcon } from "./icons";
 import { Toolbar } from "./toolbar";
-import { VersionFooter } from "./version-footer";
-import type { VisibilityType } from "./visibility-selector";
+import { VersionFooter } from "./versionFooter";
+import type { VisibilityType } from "./visibilitySelector";
 
 export const artifactDefinitions = [
   textArtifact,

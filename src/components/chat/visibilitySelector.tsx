@@ -14,7 +14,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdownMenu";
 import { useChatVisibility } from "@/hooks/useChatVisibility";
 import { cn } from "@/lib/utils";
 import {

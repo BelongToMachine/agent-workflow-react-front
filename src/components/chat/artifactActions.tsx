@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { artifactDefinitions, type UIArtifact } from "./artifact";
-import type { ArtifactActionContext } from "./create-artifact";
+import type { ArtifactActionContext } from "./createArtifact";
 
 type ArtifactActionsProps = {
   artifact: UIArtifact;

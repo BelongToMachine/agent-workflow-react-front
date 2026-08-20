@@ -20,7 +20,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from "@/components/ui/alertDialog";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -32,15 +32,15 @@ import {
   backendQueryKeys,
   useBackendIdentity,
   useBackendInfiniteQuery,
-} from "@/lib/backend/react-query";
+} from "@/lib/backend/reactQuery";
 import {
   type ChatHistory,
   type ChatHistoryEntry,
   getLocalChatHistoryQueryKey,
-} from "@/lib/backend/chat-history-cache";
+} from "@/lib/backend/chatHistoryCache";
 import { requestBackend } from "@/lib/backend/request";
 import { LoaderIcon } from "./icons";
-import { ChatItem } from "./sidebar-history-item";
+import { ChatItem } from "./sidebarHistoryItem";
 
 type GroupedChats = {
   today: ChatHistoryEntry[];

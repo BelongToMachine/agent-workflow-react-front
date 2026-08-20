@@ -14,8 +14,8 @@ import { useArtifact } from "@/hooks/useArtifact";
 import type { Document } from "@/lib/db/schema";
 import { cn, fetcher } from "@/lib/utils";
 import type { ArtifactKind, UIArtifact } from "./artifact";
-import { CodeEditor } from "./code-editor";
-import { InlineDocumentSkeleton } from "./document-skeleton";
+import { CodeEditor } from "./codeEditor";
+import { InlineDocumentSkeleton } from "./documentSkeleton";
 import {
   CodeIcon,
   FileIcon,
@@ -23,9 +23,9 @@ import {
   ImageIcon,
   LoaderIcon,
 } from "./icons";
-import { ImageEditor } from "./image-editor";
-import { SpreadsheetEditor } from "./sheet-editor";
-import { Editor } from "./text-editor";
+import { ImageEditor } from "./imageEditor";
+import { SpreadsheetEditor } from "./sheetEditor";
+import { Editor } from "./textEditor";
 
 type DocumentToolOutput = {
   id: string;

@@ -6,7 +6,7 @@ import { memo, useCallback } from "react";
 import { suggestions } from "@/lib/constants";
 import type { ChatMessage } from "@/lib/types";
 import { Suggestion } from "../ai-elements/suggestion";
-import type { VisibilityType } from "./visibility-selector";
+import type { VisibilityType } from "./visibilitySelector";
 
 type SuggestedActionsProps = {
   chatId: string;

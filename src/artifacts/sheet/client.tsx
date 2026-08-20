@@ -1,6 +1,6 @@
 import { parse, unparse } from "papaparse";
 import { toast } from "sonner";
-import { Artifact } from "@/components/chat/create-artifact";
+import { Artifact } from "@/components/chat/createArtifact";
 import {
   CopyIcon,
   LineChartIcon,
@@ -8,7 +8,7 @@ import {
   SparklesIcon,
   UndoIcon,
 } from "@/components/chat/icons";
-import { SpreadsheetEditor } from "@/components/chat/sheet-editor";
+import { SpreadsheetEditor } from "@/components/chat/sheetEditor";
 
 type Metadata = Record<string, never>;
 

@@ -1,4 +1,4 @@
-import { apiFetch } from "./direct-client";
+import { apiFetch } from "./directClient";
 
 export type BackendErrorPayload = {
   cause?: string;

@@ -5,7 +5,7 @@ import type {
 import { type ClassValue, clsx } from 'clsx';
 import { formatISO } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
-import { apiFetch } from './backend/direct-client';
+import { apiFetch } from './backend/directClient';
 import type { DBMessage, Document } from '@/lib/db/schema';
 import { ChatbotError, type ErrorCode } from './errors';
 import type { ChatMessage, ChatTools, CustomUIDataTypes } from './types';
@@ -92,7 +92,20 @@ export function getDocumentTimestampByIndex(
 }
 
 export function sanitizeText(text: string) {
-  return text.replace('<has_function_call>', '');
+  return text
+    .replace('<has_function_call>', '')
+    .replace(
+      /\\?<｜｜DSML｜｜tool_calls>[\s\S]*?(?:\\?<\/｜｜DSML｜｜tool_calls>|$)/gu,
+      '',
+    )
+    .replace(
+      /\\?<｜｜DSML｜｜invoke[^>]*>[\s\S]*?(?:\\?<\/｜｜DSML｜｜invoke>|$)/gu,
+      '',
+    );
+}
+
+export function hasToolControlSyntax(text: string) {
+  return text.includes('<｜｜DSML｜｜') || text.includes('</｜｜DSML｜｜');
 }
 
 export function convertToUIMessages(messages: DBMessage[]): ChatMessage[] {

@@ -14,19 +14,19 @@ useMemo,
 useRef,
 useState,
 } from "react";
-import { useDataStream } from "@/components/chat/data-stream-provider";
+import { useDataStream } from "@/components/chat/dataStreamProvider";
 import { toast } from "@/components/chat/toast";
-import type { VisibilityType } from "@/components/chat/visibility-selector";
+import type { VisibilityType } from "@/components/chat/visibilitySelector";
 import { useAutoResume } from "@/hooks/useAutoResume";
 import { getRequestIdFromError, serializeError } from "@/lib/ai/logger";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
-import { upsertChatHistory } from "@/lib/backend/chat-history-cache";
+import { upsertChatHistory } from "@/lib/backend/chatHistoryCache";
 import { isFastApiDirectMode } from "@/lib/backend/mode";
 import {
   backendQueryKeys,
 useBackendIdentity,
 useBackendQuery,
-} from "@/lib/backend/react-query";
+} from "@/lib/backend/reactQuery";
 import type { Vote } from "@/lib/db/schema";
 import { ChatbotError } from "@/lib/errors";
 import type { ChatMessage } from "@/lib/types";

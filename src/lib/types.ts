@@ -1,8 +1,8 @@
 import type { InferUITool, UIMessage } from "ai";
 import { z } from "zod";
 import type { ArtifactKind } from "@/components/chat/artifact";
-import type { createSearchContentTool } from "./ai/tools/search-content";
-import type { createSearchProductsTool } from "./ai/tools/search-products";
+import type { createSearchContentTool } from "./ai/tools/searchContent";
+import type { createSearchProductsTool } from "./ai/tools/searchProducts";
 import type { Suggestion } from "./db/schema";
 
 export const messageMetadataSchema = z.object({

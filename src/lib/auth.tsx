@@ -7,10 +7,12 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useLogto } from "@logto/react";
 import {
   clearStoredDirectToken,
   getStoredDirectToken,
-} from "./backend/direct-client";
+} from "./backend/directClient";
+import { isLogtoAuthMode } from "./auth/logtoConfig";
 
 export type User = {
   email?: string | null;
@@ -29,6 +31,12 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+let registeredSignOut: (() => Promise<void>) | null = null;
+
+function registerSignOut(handler: (() => Promise<void>) | null) {
+  registeredSignOut = handler;
+}
 
 function decodeDevelopmentUser(accessToken: string): User {
   const encodedPayload = accessToken.split(".")[1];
@@ -52,9 +60,18 @@ function decodeDevelopmentUser(accessToken: string): User {
   }
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+function DevelopmentAuthProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<Session>(null);
   const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const handler = async () => {
+      clearStoredDirectToken();
+      window.location.assign("/dev/oidc");
+    };
+    registerSignOut(handler);
+    return () => registerSignOut(null);
+  }, []);
 
   const refreshSession = useCallback(() => {
     const token = getStoredDirectToken();
@@ -94,6 +111,98 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+function LogtoAuthProvider({ children }: { children: ReactNode }) {
+  const {
+    getIdTokenClaims,
+    isAuthenticated,
+    isLoading,
+    signOut: logtoSignOut,
+  } = useLogto();
+  const [data, setData] = useState<Session>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  const readSession = useCallback(async (): Promise<Session> => {
+    if (!isAuthenticated) {
+      return null;
+    }
+
+    try {
+      const claims = await getIdTokenClaims();
+      if (!claims?.sub) {
+        return null;
+      }
+
+      return {
+        user: {
+          email: claims.email ?? null,
+          id: claims.sub,
+          image: claims.picture ?? null,
+          name: claims.name ?? claims.username ?? null,
+        },
+      };
+    } catch {
+      return null;
+    }
+  }, [getIdTokenClaims, isAuthenticated]);
+
+  useEffect(() => {
+    let active = true;
+    setIsReady(false);
+    void readSession().then((session) => {
+      if (!active) {
+        return;
+      }
+      setData(session);
+      setIsReady(true);
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [readSession]);
+
+  const update = useCallback(async () => {
+    const session = await readSession();
+    setData(session);
+    setIsReady(true);
+    return session;
+  }, [readSession]);
+
+  const signOut = useCallback(async () => {
+    await logtoSignOut(`${window.location.origin}/`);
+  }, [logtoSignOut]);
+
+  useEffect(() => {
+    registerSignOut(signOut);
+    return () => registerSignOut(null);
+  }, [signOut]);
+
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      data,
+      signOut,
+      status:
+        isLoading || !isReady
+          ? "loading"
+          : data
+            ? "authenticated"
+            : "unauthenticated",
+      update,
+    }),
+    [data, isLoading, isReady, signOut, update]
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  if (isLogtoAuthMode) {
+    return <LogtoAuthProvider>{children}</LogtoAuthProvider>;
+  }
+
+  return <DevelopmentAuthProvider>{children}</DevelopmentAuthProvider>;
+}
+
 export function useSession() {
   const context = useContext(AuthContext);
   if (!context) {
@@ -103,6 +212,11 @@ export function useSession() {
 }
 
 export async function signOut() {
+  if (registeredSignOut) {
+    await registeredSignOut();
+    return;
+  }
+
   clearStoredDirectToken();
-  window.location.assign("/dev/oidc");
+  window.location.assign(isLogtoAuthMode ? "/login" : "/dev/oidc");
 }

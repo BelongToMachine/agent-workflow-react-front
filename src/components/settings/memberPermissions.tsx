@@ -25,7 +25,7 @@ import {
   useBackendIdentity,
   useBackendMutation,
   useBackendQuery,
-} from "@/lib/backend/react-query";
+} from "@/lib/backend/reactQuery";
 import {
   defaultPermissionsByRole,
   type Permission,

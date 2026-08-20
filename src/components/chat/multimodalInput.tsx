@@ -35,7 +35,7 @@ import {
   ModelSelectorLogo,
   ModelSelectorName,
   ModelSelectorTrigger,
-} from "@/components/ai-elements/model-selector";
+} from "@/components/ai-elements/modelSelector";
 import {
   type ChatModel,
   chatModels,
@@ -46,7 +46,7 @@ import {
   backendQueryKeys,
   useBackendIdentity,
   useBackendQuery,
-} from "@/lib/backend/react-query";
+} from "@/lib/backend/reactQuery";
 import { requestBackend } from "@/lib/backend/request";
 import type { Attachment, ChatMessage } from "@/lib/types";
 import { cn, getNewChatPath } from "@/lib/utils";
@@ -56,18 +56,18 @@ import {
   PromptInputSubmit,
   PromptInputTextarea,
   PromptInputTools,
-} from "../ai-elements/prompt-input";
+} from "../ai-elements/promptInput";
 import { Button } from "../ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { PaperclipIcon, StopIcon } from "./icons";
-import { PreviewAttachment } from "./preview-attachment";
+import { PreviewAttachment } from "./previewAttachment";
 import {
   type SlashCommand,
   SlashCommandMenu,
   slashCommands,
-} from "./slash-commands";
-import { SuggestedActions } from "./suggested-actions";
-import type { VisibilityType } from "./visibility-selector";
+} from "./slashCommands";
+import { SuggestedActions } from "./suggestedActions";
+import type { VisibilityType } from "./visibilitySelector";
 
 type ModelsResponse = Record<string, ModelCapabilities> & {
   capabilities?: Record<string, ModelCapabilities>;

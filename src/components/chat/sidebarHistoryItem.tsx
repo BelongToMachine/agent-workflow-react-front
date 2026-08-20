@@ -1,7 +1,7 @@
 import { Link } from "@/lib/router";
 import { memo, useCallback } from "react";
 import { useChatVisibility } from "@/hooks/useChatVisibility";
-import type { ChatHistoryEntry } from "@/lib/backend/chat-history-cache";
+import type { ChatHistoryEntry } from "@/lib/backend/chatHistoryCache";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +11,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "../ui/dropdownMenu";
 import {
   SidebarMenuAction,
   SidebarMenuButton,

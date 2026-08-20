@@ -1,7 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { logError, logEvent, summarizeToolInput } from "@/lib/ai/logger";
-import { searchContent } from "@/lib/db/content-queries";
+import { searchContent } from "@/lib/db/contentQueries";
 
 export const createSearchContentTool = ({
   requestId,

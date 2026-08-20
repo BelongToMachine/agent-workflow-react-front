@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
-import { DraggableQueryDevtools } from "@/components/draggable-query-devtools";
+import { DraggableQueryDevtools } from "@/components/draggableQueryDevtools";
 
 export function BackendQueryProvider({
   children,

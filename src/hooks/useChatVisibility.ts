@@ -1,5 +1,3 @@
-"use client";
-
 import {
   type InfiniteData,
   useQuery,
@@ -7,12 +5,12 @@ import {
 } from "@tanstack/react-query";
 import { useMemo } from "react";
 import useSWR from "swr";
-import type { VisibilityType } from "@/components/chat/visibility-selector";
-import type { ChatHistory } from "@/lib/backend/chat-history-cache";
+import type { VisibilityType } from "@/components/chat/visibilitySelector";
+import type { ChatHistory } from "@/lib/backend/chatHistoryCache";
 import {
   backendQueryKeys,
   useBackendIdentity,
-} from "@/lib/backend/react-query";
+} from "@/lib/backend/reactQuery";
 
 export function useChatVisibility({
   chatId,

@@ -4,13 +4,13 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useActiveChat } from "@/hooks/useActiveChat";
 import { initialArtifactData, useArtifact } from "@/hooks/useArtifact";
-import { upsertChatHistory } from "@/lib/backend/chat-history-cache";
+import { upsertChatHistory } from "@/lib/backend/chatHistoryCache";
 import {
   backendQueryKeys,
   useBackendIdentity,
-} from "@/lib/backend/react-query";
+} from "@/lib/backend/reactQuery";
 import { artifactDefinitions } from "./artifact";
-import { useDataStream } from "./data-stream-provider";
+import { useDataStream } from "./dataStreamProvider";
 
 export function DataStreamHandler() {
   const { dataStream, setDataStream } = useDataStream();

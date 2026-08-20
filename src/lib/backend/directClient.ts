@@ -4,6 +4,10 @@ import {
   isFastApiDirectMode,
   isFastApiProxyMode,
 } from "./mode";
+import {
+  getLogtoAccessToken,
+} from "../auth/logtoToken";
+import { isLogtoAuthMode } from "../auth/logtoConfig";
 
 const DIRECT_TOKEN_STORAGE_KEY = "asianode.fastapi.direct-token";
 
@@ -79,21 +83,12 @@ export function getStoredDirectToken() {
   return getStoredToken();
 }
 
-async function getDirectToken(forceRefresh = false) {
-  if (!isFastApiDirectMode || typeof window === "undefined") {
-    return null;
+async function getApiAccessToken() {
+  if (isLogtoAuthMode) {
+    return getLogtoAccessToken();
   }
 
-  if (!forceRefresh) {
-    const storedToken = getStoredToken();
-    if (storedToken) {
-      return storedToken;
-    }
-  }
-
-  // Standalone React/Vite does not depend on the deprecated Next.js token
-  // route. A development token is issued explicitly from /dev/oidc instead.
-  return null;
+  return getStoredToken()?.accessToken ?? null;
 }
 
 function getInputUrl(input: RequestInfo | URL) {
@@ -131,7 +126,9 @@ function appendWorkspaceId(url: URL, token: DirectToken | null) {
     path === "/api/v1/content/search";
 
   if (isWorkspaceScoped) {
-    const workspaceId = token?.workspaceId ?? (isFastApiProxyMode ? fastApiWorkspaceId : null);
+    const workspaceId =
+      token?.workspaceId ??
+      (isFastApiProxyMode || isLogtoAuthMode ? fastApiWorkspaceId : null);
     if (workspaceId) {
       url.searchParams.set("workspace_id", workspaceId);
     }
@@ -227,13 +224,14 @@ export async function apiFetch(
   ).toUpperCase();
 
   if (isFastApiProxyMode && typeof window !== "undefined") {
-    const token = getStoredToken();
+    const token = isLogtoAuthMode ? null : getStoredToken();
+    const accessToken = await getApiAccessToken();
     const headers = new Headers(
       init?.headers ?? (input instanceof Request ? input.headers : undefined)
     );
 
-    if (token && !headers.has("authorization")) {
-      headers.set("authorization", `Bearer ${token.accessToken}`);
+    if (accessToken && !headers.has("authorization")) {
+      headers.set("authorization", `Bearer ${accessToken}`);
     }
 
     return fetch(mapLegacyApiPath(input, method, token), {
@@ -246,14 +244,15 @@ export async function apiFetch(
     return fetch(input, init);
   }
 
-  const token = await getDirectToken();
-  const target = mapLegacyApiUrl(input, method, token);
+  const storedToken = isLogtoAuthMode ? null : getStoredToken();
+  const accessToken = await getApiAccessToken();
+  const target = mapLegacyApiUrl(input, method, storedToken);
   const headers = new Headers(
     init?.headers ?? (input instanceof Request ? input.headers : undefined)
   );
 
-  if (token && !headers.has("authorization")) {
-    headers.set("authorization", `Bearer ${token.accessToken}`);
+  if (accessToken && !headers.has("authorization")) {
+    headers.set("authorization", `Bearer ${accessToken}`);
   }
 
   return fetch(target, {

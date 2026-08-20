@@ -2,7 +2,7 @@
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { Vote } from "@/lib/db/schema";
 import type { ChatMessage } from "@/lib/types";
-import { cn, sanitizeText } from "@/lib/utils";
+import { cn, hasToolControlSyntax, sanitizeText } from "@/lib/utils";
 import { MessageContent, MessageResponse } from "../ai-elements/message";
 import { Shimmer } from "../ai-elements/shimmer";
 import {
@@ -12,11 +12,11 @@ import {
   ToolInput,
   ToolOutput,
 } from "../ai-elements/tool";
-import { useDataStream } from "./data-stream-provider";
+import { useDataStream } from "./dataStreamProvider";
 import { SparklesIcon } from "./icons";
-import { MessageActions } from "./message-actions";
-import { MessageReasoning } from "./message-reasoning";
-import { PreviewAttachment } from "./preview-attachment";
+import { MessageActions } from "./messageActions";
+import { MessageReasoning } from "./messageReasoning";
+import { PreviewAttachment } from "./previewAttachment";
 
 function WaitingText() {
   const { waitingStatus } = useDataStream();
@@ -147,6 +147,22 @@ const PurePreviewMessage = ({
     }
 
     if (type === "text") {
+      const sanitizedText = sanitizeText(part.text);
+      const isHiddenToolText =
+        hasToolControlSyntax(part.text) && !sanitizedText.trim();
+
+      if (isHiddenToolText) {
+        return (
+          <MessageContent
+            className="text-[13px] leading-[1.65] text-muted-foreground"
+            data-testid="message-tool-recovery"
+            key={key}
+          >
+            本次工具调用未完成，请重新发送问题。
+          </MessageContent>
+        );
+      }
+
       return (
         <MessageContent
           className={cn("text-[13px] leading-[1.65]", {
@@ -156,7 +172,7 @@ const PurePreviewMessage = ({
           data-testid="message-content"
           key={key}
         >
-          <MessageResponse>{sanitizeText(part.text)}</MessageResponse>
+          <MessageResponse>{sanitizedText}</MessageResponse>
         </MessageContent>
       );
     }

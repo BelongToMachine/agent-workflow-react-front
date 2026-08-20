@@ -24,7 +24,7 @@ import { Label } from "@/components/ui/label";
 import {
   type DevOidcStandardScope,
   devOidcStandardScopes,
-} from "@/lib/auth/dev-oidc-types";
+} from "@/lib/auth/devOidcTypes";
 import {
   type Permission,
   permissionCatalog,

@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { ArtifactKind } from "@/components/chat/artifact";
-import type { VisibilityType } from "@/components/chat/visibility-selector";
+import type { VisibilityType } from "@/components/chat/visibilitySelector";
 import type { Chat, DBMessage, User } from "./schema";
 
 const users = new Map<string, User>();

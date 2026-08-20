@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import type { ConsoleOutputContent } from "@/components/chat/console";
-import { Artifact } from "@/components/chat/create-artifact";
+import { Artifact } from "@/components/chat/createArtifact";
 import {
   CopyIcon,
   LogsIcon,
