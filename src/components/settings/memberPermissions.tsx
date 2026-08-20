@@ -26,6 +26,7 @@ import {
   useBackendMutation,
   useBackendQuery,
 } from "@/lib/backend/reactQuery";
+import { useCurrentUserAccess } from "@/lib/auth/currentUser";
 import {
   defaultPermissionsByRole,
   type Permission,
@@ -67,6 +68,8 @@ export function MemberPermissions() {
   const [pendingMemberId, setPendingMemberId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const identity = useBackendIdentity();
+  const { hasPermission } = useCurrentUserAccess();
+  const canManageMembers = hasPermission("members.manage");
   const membersQuery = useBackendQuery<MembersResponse>({
     path: "/api/admin/members",
     queryKey: backendQueryKeys.members(identity),
@@ -145,21 +148,33 @@ export function MemberPermissions() {
     setPendingMemberId(null);
   }, []);
 
-  const changeRole = useCallback((nextRole: string) => {
-    const roleValue = nextRole as WorkspaceRole;
-    setRole(roleValue);
-    setPermissions([...defaultPermissionsByRole[roleValue]]);
-    setIsDirty(true);
-  }, []);
+  const changeRole = useCallback(
+    (nextRole: string) => {
+      if (!canManageMembers) {
+        return;
+      }
+      const roleValue = nextRole as WorkspaceRole;
+      setRole(roleValue);
+      setPermissions([...defaultPermissionsByRole[roleValue]]);
+      setIsDirty(true);
+    },
+    [canManageMembers]
+  );
 
-  const togglePermission = useCallback((permission: Permission) => {
-    setPermissions((current) =>
-      current.includes(permission)
-        ? current.filter((item) => item !== permission)
-        : [...current, permission]
-    );
-    setIsDirty(true);
-  }, []);
+  const togglePermission = useCallback(
+    (permission: Permission) => {
+      if (!canManageMembers) {
+        return;
+      }
+      setPermissions((current) =>
+        current.includes(permission)
+          ? current.filter((item) => item !== permission)
+          : [...current, permission]
+      );
+      setIsDirty(true);
+    },
+    [canManageMembers]
+  );
 
   const handlePermissionClick = useCallback(
     (event: MouseEvent<HTMLButtonElement>) => {
@@ -172,7 +187,7 @@ export function MemberPermissions() {
   );
 
   const save = useCallback(async () => {
-    if (!selectedMember) {
+    if (!selectedMember || !canManageMembers) {
       return;
     }
 
@@ -208,7 +223,7 @@ export function MemberPermissions() {
       setError(message);
       toast.error(message);
     }
-  }, [identity, permissions, queryClient, role, saveMutation, selectedMember]);
+  }, [canManageMembers, identity, permissions, queryClient, role, saveMutation, selectedMember]);
 
   const visibleError = error ?? loadError;
 
@@ -246,6 +261,13 @@ export function MemberPermissions() {
             {data.workspace.name}
           </Badge>
         </header>
+
+        {!canManageMembers ? (
+          <p className="mb-5 rounded-xl border border-border/70 bg-muted/30 px-4 py-3 text-muted-foreground text-sm">
+            You can view workspace members, but only members with manage access
+            can change roles or permissions.
+          </p>
+        ) : null}
 
         {pendingMemberId ? (
           <div className="mb-5 flex flex-col gap-3 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
@@ -331,7 +353,11 @@ export function MemberPermissions() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Select onValueChange={changeRole} value={role}>
+                    <Select
+                      disabled={!canManageMembers}
+                      onValueChange={changeRole}
+                      value={role}
+                    >
                       <SelectTrigger aria-label="Member role" className="w-40">
                         <SelectValue />
                       </SelectTrigger>
@@ -343,7 +369,10 @@ export function MemberPermissions() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <Button disabled={!isDirty || isSaving} onClick={save}>
+                    <Button
+                      disabled={!canManageMembers || !isDirty || isSaving}
+                      onClick={save}
+                    >
                       <SaveIcon />
                       {isSaving ? "Saving" : "Save changes"}
                     </Button>
@@ -377,6 +406,7 @@ export function MemberPermissions() {
                               : "border-border/70 bg-background/40 hover:bg-muted/40"
                           )}
                           data-permission={key}
+                          disabled={!canManageMembers}
                           key={key}
                           onClick={handlePermissionClick}
                           type="button"

@@ -13,12 +13,16 @@ import {
   getStoredDirectToken,
 } from "./backend/directClient";
 import { isLogtoAuthMode } from "./auth/logtoConfig";
+import type { Permission, WorkspaceRole } from "./permissions";
 
 export type User = {
   email?: string | null;
   id?: string | null;
   image?: string | null;
   name?: string | null;
+  permissions?: Permission[];
+  role?: WorkspaceRole;
+  workspaceId?: string | null;
 };
 
 export type Session = { user: User } | null;
@@ -49,11 +53,17 @@ function decodeDevelopmentUser(accessToken: string): User {
     const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
     const payload = JSON.parse(window.atob(padded)) as {
       email?: string | null;
+      permissions?: Permission[];
+      role?: WorkspaceRole;
       subject?: string;
+      workspaceId?: string | null;
     };
     return {
       email: payload.email ?? null,
       id: payload.subject ?? "authenticated-user",
+      permissions: payload.permissions,
+      role: payload.role,
+      workspaceId: payload.workspaceId,
     };
   } catch {
     return { id: "authenticated-user" };

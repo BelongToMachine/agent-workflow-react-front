@@ -6,6 +6,7 @@ import { DataStreamProvider } from "./components/chat/dataStreamProvider";
 import { Preview } from "./components/chat/preview";
 import { BackendQueryProvider } from "./components/backendQueryProvider";
 import { AuthProvider, useSession } from "./lib/auth";
+import { useCurrentUserAccess } from "./lib/auth/currentUser";
 import { useHandleSignInCallback, useLogto } from "@logto/react";
 import {
   authMode,
@@ -64,12 +65,19 @@ function AuthGuard({ children }) {
 
 function ChatLayout() {
   const { data } = useSession();
+  const { hasPermission, isLoading: isAccessLoading } = useCurrentUserAccess();
   const user = data?.user;
 
   return (
     <DataStreamProvider>
       <SidebarProvider defaultOpen>
-        <AppSidebar canManageKnowledgeBases canViewPermissions user={user} />
+        <AppSidebar
+          canManageKnowledgeBases={
+            !isAccessLoading && hasPermission("knowledge.manage")
+          }
+          canViewPermissions={!isAccessLoading && hasPermission("members.read")}
+          user={user}
+        />
         <SidebarInset>
           <Toaster
             position="top-center"
@@ -83,15 +91,33 @@ function ChatLayout() {
             <Route element={<ChatPage />} index />
             <Route element={<ChatPage />} path="chat/:id" />
             <Route
-              element={<SettingsPage title="Workspace permissions"><MemberPermissions /></SettingsPage>}
+              element={
+                <PermissionRoute permission="members.read">
+                  <SettingsPage title="Workspace permissions">
+                    <MemberPermissions />
+                  </SettingsPage>
+                </PermissionRoute>
+              }
               path="settings/members"
             />
             <Route
-              element={<SettingsPage title="Knowledge base access"><KnowledgeBaseGrants /></SettingsPage>}
+              element={
+                <PermissionRoute permission="knowledge.manage">
+                  <SettingsPage title="Knowledge base access">
+                    <KnowledgeBaseGrants />
+                  </SettingsPage>
+                </PermissionRoute>
+              }
               path="settings/knowledge-bases"
             />
             <Route
-              element={<SettingsPage title="Knowledge base files"><KnowledgeBaseFiles /></SettingsPage>}
+              element={
+                <PermissionRoute permission="knowledge.manage">
+                  <SettingsPage title="Knowledge base files">
+                    <KnowledgeBaseFiles />
+                  </SettingsPage>
+                </PermissionRoute>
+              }
               path="settings/knowledge-bases/files"
             />
             <Route
@@ -104,6 +130,33 @@ function ChatLayout() {
       </SidebarProvider>
     </DataStreamProvider>
   );
+}
+
+function PermissionRoute({ children, permission }) {
+  const { hasPermission, isLoading } = useCurrentUserAccess();
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-background text-sm text-muted-foreground">
+        Loading workspace access…
+      </div>
+    );
+  }
+
+  if (!hasPermission(permission)) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
+        <div className="max-w-md">
+          <h1 className="font-semibold text-xl">Permission required</h1>
+          <p className="mt-2 text-muted-foreground text-sm leading-6">
+            Your account does not have permission to open this workspace area.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return children;
 }
 
 function SettingsPage({ children, title }) {

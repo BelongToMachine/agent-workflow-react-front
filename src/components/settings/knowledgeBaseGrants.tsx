@@ -41,6 +41,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { requestBackend } from "@/lib/backend/request";
+import { useCurrentUserAccess } from "@/lib/auth/currentUser";
 import { cn } from "@/lib/utils";
 
 type KnowledgeBase = {
@@ -67,6 +68,8 @@ type GrantsResponse = {
 };
 
 export function KnowledgeBaseGrants() {
+  const { hasPermission } = useCurrentUserAccess();
+  const canManageKnowledgeBases = hasPermission("knowledge.manage");
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([]);
   const [grants, setGrants] = useState<Grant[]>([]);
   const [selectedKnowledgeBaseId, setSelectedKnowledgeBaseId] = useState("");
@@ -162,6 +165,9 @@ export function KnowledgeBaseGrants() {
   const createKnowledgeBase = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      if (!canManageKnowledgeBases) {
+        return;
+      }
       const displayName = newKnowledgeBaseName.trim();
       if (!displayName) {
         setError("Enter a name for the new knowledge base.");
@@ -193,12 +199,15 @@ export function KnowledgeBaseGrants() {
         setIsCreatingKnowledgeBase(false);
       }
     },
-    [newKnowledgeBaseName]
+    [canManageKnowledgeBases, newKnowledgeBaseName]
   );
 
   const renameKnowledgeBase = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      if (!canManageKnowledgeBases) {
+        return;
+      }
       const displayName = editedKnowledgeBaseName.trim();
       if (!selectedKnowledgeBaseId || !displayName) {
         setError("Enter a name for this knowledge base.");
@@ -239,11 +248,16 @@ export function KnowledgeBaseGrants() {
         setIsUpdatingKnowledgeBase(false);
       }
     },
-    [editedKnowledgeBaseName, selectedKnowledgeBase, selectedKnowledgeBaseId]
+    [
+      canManageKnowledgeBases,
+      editedKnowledgeBaseName,
+      selectedKnowledgeBase,
+      selectedKnowledgeBaseId,
+    ]
   );
 
   const deleteKnowledgeBase = useCallback(async () => {
-    if (!pendingKnowledgeBaseDelete) {
+    if (!pendingKnowledgeBaseDelete || !canManageKnowledgeBases) {
       return;
     }
 
@@ -278,13 +292,13 @@ export function KnowledgeBaseGrants() {
     } finally {
       setDeletingKnowledgeBaseId(null);
     }
-  }, [knowledgeBases, pendingKnowledgeBaseDelete]);
+  }, [canManageKnowledgeBases, knowledgeBases, pendingKnowledgeBaseDelete]);
 
   const requestKnowledgeBaseDelete = useCallback(() => {
-    if (selectedKnowledgeBase) {
+    if (selectedKnowledgeBase && canManageKnowledgeBases) {
       setPendingKnowledgeBaseDelete(selectedKnowledgeBase);
     }
-  }, [selectedKnowledgeBase]);
+  }, [canManageKnowledgeBases, selectedKnowledgeBase]);
 
   const handleKnowledgeBaseDeleteDialogChange = useCallback(
     (open: boolean) => {
@@ -325,6 +339,9 @@ export function KnowledgeBaseGrants() {
   const saveGrant = useCallback(
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+      if (!canManageKnowledgeBases) {
+        return;
+      }
       const normalizedSubjectId = subjectId.trim();
       if (!selectedKnowledgeBaseId || !normalizedSubjectId) {
         setError("Choose a knowledge base and enter a user or role ID.");
@@ -373,10 +390,19 @@ export function KnowledgeBaseGrants() {
         setIsSaving(false);
       }
     },
-    [accessLevel, selectedKnowledgeBaseId, subjectId, subjectType]
+    [
+      accessLevel,
+      canManageKnowledgeBases,
+      selectedKnowledgeBaseId,
+      subjectId,
+      subjectType,
+    ]
   );
 
   const deleteGrant = useCallback(async (grantId: string) => {
+    if (!canManageKnowledgeBases) {
+      return;
+    }
     setDeletingGrantId(grantId);
     setError(null);
     try {
@@ -398,7 +424,7 @@ export function KnowledgeBaseGrants() {
     } finally {
       setDeletingGrantId(null);
     }
-  }, []);
+  }, [canManageKnowledgeBases]);
 
   const handleDeleteClick = useCallback(
     async (event: MouseEvent<HTMLButtonElement>) => {
@@ -442,6 +468,13 @@ export function KnowledgeBaseGrants() {
           </Badge>
         </header>
 
+        {!canManageKnowledgeBases ? (
+          <p className="mb-5 rounded-xl border border-border/70 bg-muted/30 px-4 py-3 text-muted-foreground text-sm">
+            You can view knowledge-base access here, but managing bases and
+            grants requires manage permission.
+          </p>
+        ) : null}
+
         <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
           <section className="rounded-2xl border border-border/70 bg-card/50 p-2 shadow-sm">
             <div className="px-3 py-3 text-muted-foreground text-xs uppercase tracking-[0.14em]">
@@ -459,11 +492,12 @@ export function KnowledgeBaseGrants() {
                 id="new-knowledge-base-name"
                 onChange={handleNewKnowledgeBaseNameChange}
                 placeholder="New knowledge base"
+                disabled={!canManageKnowledgeBases}
                 value={newKnowledgeBaseName}
               />
               <Button
                 aria-label="Create knowledge base"
-                disabled={isCreatingKnowledgeBase}
+                disabled={!canManageKnowledgeBases || isCreatingKnowledgeBase}
                 size="icon-sm"
                 type="submit"
               >
@@ -545,14 +579,21 @@ export function KnowledgeBaseGrants() {
                         className="sm:max-w-sm"
                         id="knowledge-base-name"
                         onChange={handleEditedKnowledgeBaseNameChange}
+                        disabled={!canManageKnowledgeBases}
                         value={editedKnowledgeBaseName}
                       />
-                      <Button disabled={isUpdatingKnowledgeBase} type="submit">
+                      <Button
+                        disabled={!canManageKnowledgeBases || isUpdatingKnowledgeBase}
+                        type="submit"
+                      >
                         <SaveIcon />
                         {isUpdatingKnowledgeBase ? "Saving" : "Save name"}
                       </Button>
                       <Button
-                        disabled={deletingKnowledgeBaseId !== null}
+                        disabled={
+                          !canManageKnowledgeBases ||
+                          deletingKnowledgeBaseId !== null
+                        }
                         onClick={requestKnowledgeBaseDelete}
                         type="button"
                         variant="destructive"
@@ -571,6 +612,7 @@ export function KnowledgeBaseGrants() {
                   <div className="grid gap-2">
                     <Label htmlFor="grant-subject-type">Subject type</Label>
                     <Select
+                      disabled={!canManageKnowledgeBases}
                       onValueChange={handleSubjectTypeChange}
                       value={subjectType}
                     >
@@ -590,6 +632,7 @@ export function KnowledgeBaseGrants() {
                     <Input
                       id="grant-subject-id"
                       onChange={handleSubjectIdChange}
+                      disabled={!canManageKnowledgeBases}
                       placeholder={
                         subjectType === "role" ? "contractor" : "user UUID"
                       }
@@ -599,6 +642,7 @@ export function KnowledgeBaseGrants() {
                   <div className="grid gap-2">
                     <Label htmlFor="grant-access-level">Access</Label>
                     <Select
+                      disabled={!canManageKnowledgeBases}
                       onValueChange={handleAccessLevelChange}
                       value={accessLevel}
                     >
@@ -611,7 +655,10 @@ export function KnowledgeBaseGrants() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button disabled={isSaving} type="submit">
+                  <Button
+                    disabled={!canManageKnowledgeBases || isSaving}
+                    type="submit"
+                  >
                     <PlusIcon />
                     {isSaving ? "Saving" : "Grant access"}
                   </Button>
@@ -650,7 +697,10 @@ export function KnowledgeBaseGrants() {
                           <Button
                             aria-label={`Remove ${grant.subjectId} grant`}
                             data-grant-id={grant.grantId}
-                            disabled={deletingGrantId === grant.grantId}
+                            disabled={
+                              !canManageKnowledgeBases ||
+                              deletingGrantId === grant.grantId
+                            }
                             onClick={handleDeleteClick}
                             size="icon-sm"
                             variant="ghost"
@@ -689,11 +739,13 @@ export function KnowledgeBaseGrants() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deletingKnowledgeBaseId !== null}>
+            <AlertDialogCancel
+              disabled={!canManageKnowledgeBases || deletingKnowledgeBaseId !== null}
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              disabled={deletingKnowledgeBaseId !== null}
+              disabled={!canManageKnowledgeBases || deletingKnowledgeBaseId !== null}
               onClick={handleConfirmKnowledgeBaseDelete}
               variant="destructive"
             >
