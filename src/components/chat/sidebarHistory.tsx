@@ -135,6 +135,10 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
     ChatHistoryEntry[]
   >({
     enabled: false,
+    queryFn: () =>
+      queryClient.getQueryData<ChatHistoryEntry[]>(
+        getLocalChatHistoryQueryKey(historyQueryKey)
+      ) ?? EMPTY_CHAT_HISTORY,
     queryKey: getLocalChatHistoryQueryKey(historyQueryKey),
   });
   const chatsFromHistory = useMemo(() => {
