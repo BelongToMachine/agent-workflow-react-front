@@ -24,7 +24,7 @@ import { KnowledgeBaseGrants } from "./components/settings/knowledgeBaseGrants";
 import { MemberPermissions } from "./components/settings/memberPermissions";
 import { FastApiConnectionTest } from "./components/fastapiConnectionTest";
 import { DevOidcConsole } from "./components/auth/devOidcConsole";
-import { Link, usePathname, useRouter } from "./lib/router";
+import { Link, useLocationSearch, usePathname, useRouter } from "./lib/router";
 
 function AuthGuard({ children }) {
   const { status } = useSession();
@@ -65,8 +65,38 @@ function AuthGuard({ children }) {
 
 function ChatLayout() {
   const { data } = useSession();
-  const { hasPermission, isLoading: isAccessLoading } = useCurrentUserAccess();
+  const {
+    currentUser,
+    error: accessError,
+    hasPermission,
+    isLoading: isAccessLoading,
+  } = useCurrentUserAccess();
   const user = data?.user;
+
+  if (isLogtoAuthMode && isAccessLoading) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center text-sm text-muted-foreground">
+        Loading workspace access…
+      </div>
+    );
+  }
+
+  if (isLogtoAuthMode && accessError) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
+        <div className="max-w-md">
+          <h1 className="font-semibold text-xl">Unable to load workspace access</h1>
+          <p className="mt-2 text-muted-foreground text-sm leading-6">
+            Your Logto session is valid, but the backend could not load your workspace access.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLogtoAuthMode && currentUser?.accessState === "pending_workspace") {
+    return <WorkspaceAccessPendingPage />;
+  }
 
   return (
     <DataStreamProvider>
@@ -129,6 +159,20 @@ function ChatLayout() {
         </SidebarInset>
       </SidebarProvider>
     </DataStreamProvider>
+  );
+}
+
+function WorkspaceAccessPendingPage() {
+  return (
+    <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
+      <div className="max-w-md">
+        <h1 className="font-semibold text-xl">Account created</h1>
+        <p className="mt-2 text-muted-foreground text-sm leading-6">
+          Your Logto account is authenticated, but it has not been added to a workspace yet.
+          Ask a workspace administrator to grant access, then refresh this page.
+        </p>
+      </div>
+    </div>
   );
 }
 
@@ -214,7 +258,10 @@ function ConfiguredLogtoCallbackPage() {
 
 function LogtoAuthPage({ mode }) {
   const { signIn } = useLogto();
+  const search = useLocationSearch();
   const isRegister = mode === "register";
+  const isSessionExpired =
+    new URLSearchParams(search).get("reason") === "session_expired";
 
   function handleSignIn() {
     void signIn({
@@ -241,6 +288,15 @@ function LogtoAuthPage({ mode }) {
               Continue with Logto to use your configured sign-in methods.
             </p>
           </div>
+          {isSessionExpired ? (
+            <div
+              aria-live="polite"
+              className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-amber-800 text-sm dark:text-amber-200"
+              role="status"
+            >
+              Your login session expired. Please sign in again to continue.
+            </div>
+          ) : null}
           <button
             className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
             onClick={handleSignIn}

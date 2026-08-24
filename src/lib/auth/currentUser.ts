@@ -16,6 +16,7 @@ export type WorkspaceMembership = {
 };
 
 export type CurrentUserResponse = {
+  accessState: "ready" | "pending_workspace";
   email: string | null;
   isDevelopment: boolean;
   isGuest: boolean;
@@ -41,7 +42,8 @@ export function useCurrentUserAccess() {
   const identity = session?.user?.id ?? "anonymous";
   const currentUserQuery = useBackendQuery<CurrentUserResponse>({
     enabled: isLogtoAuthMode && status === "authenticated",
-    path: "/api/v1/me",
+    init: { method: "POST" },
+    path: "/api/v1/auth/bootstrap",
     queryKey: ["backend", "user", identity, "current-user"],
     retry: false,
   });
@@ -56,6 +58,7 @@ export function useCurrentUserAccess() {
     }
 
     return {
+      accessState: "ready",
       email: session.user.email ?? null,
       isDevelopment: true,
       isGuest: false,

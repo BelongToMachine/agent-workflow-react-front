@@ -12,7 +12,7 @@ import {
   clearStoredDirectToken,
   getStoredDirectToken,
 } from "./backend/directClient";
-import { isLogtoAuthMode } from "./auth/logtoConfig";
+import { isLogtoAuthMode, logtoAppId } from "./auth/logtoConfig";
 import type { Permission, WorkspaceRole } from "./permissions";
 
 export type User = {
@@ -123,6 +123,7 @@ function DevelopmentAuthProvider({ children }: { children: ReactNode }) {
 
 function LogtoAuthProvider({ children }: { children: ReactNode }) {
   const {
+    getIdToken,
     getIdTokenClaims,
     isAuthenticated,
     isLoading,
@@ -132,7 +133,8 @@ function LogtoAuthProvider({ children }: { children: ReactNode }) {
   const [isReady, setIsReady] = useState(false);
 
   const readSession = useCallback(async (): Promise<Session> => {
-    if (!isAuthenticated) {
+    const idToken = await getIdToken();
+    if (!idToken) {
       return null;
     }
 
@@ -153,7 +155,7 @@ function LogtoAuthProvider({ children }: { children: ReactNode }) {
     } catch {
       return null;
     }
-  }, [getIdTokenClaims, isAuthenticated]);
+  }, [getIdToken, getIdTokenClaims]);
 
   useEffect(() => {
     let active = true;
@@ -187,19 +189,36 @@ function LogtoAuthProvider({ children }: { children: ReactNode }) {
     return () => registerSignOut(null);
   }, [signOut]);
 
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (
+        !event.key ||
+        !logtoAppId ||
+        !event.key.startsWith(`logto:${logtoAppId}`)
+      ) {
+        return;
+      }
+
+      void update();
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, [update]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       data,
       signOut,
       status:
-        isLoading || !isReady
+        !isReady || (isLoading && !isAuthenticated)
           ? "loading"
           : data
             ? "authenticated"
             : "unauthenticated",
       update,
     }),
-    [data, isLoading, isReady, signOut, update]
+    [data, isAuthenticated, isLoading, isReady, signOut, update]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
