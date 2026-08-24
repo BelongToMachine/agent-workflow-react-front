@@ -46,7 +46,7 @@ export const workspaceMember = pgTable(
     createdAt: timestamp("createdAt").notNull().defaultNow(),
     id: uuid("id").primaryKey().notNull().defaultRandom(),
     role: varchar("role", {
-      enum: ["owner", "admin", "editor", "viewer"],
+      enum: ["owner", "admin", "editor", "employee", "viewer"],
       length: 16,
     })
       .notNull()

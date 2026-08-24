@@ -31,6 +31,7 @@ import {
   defaultPermissionsByRole,
   type Permission,
   permissionCatalog,
+  roleAllowsPermission,
   roleLabels,
   type WorkspaceRole,
 } from "@/lib/permissions";
@@ -55,6 +56,7 @@ type MembersResponse = {
 const roleDescriptions: Record<WorkspaceRole, string> = {
   admin: "Manage members, data, and workspace settings.",
   editor: "Work with knowledge, chats, and documents.",
+  employee: "Work with chats and documents, without knowledge-base access.",
   owner: "Full control, including workspace ownership.",
   viewer: "Read knowledge and use the assistant.",
 };
@@ -163,7 +165,7 @@ export function MemberPermissions() {
 
   const togglePermission = useCallback(
     (permission: Permission) => {
-      if (!canManageMembers) {
+      if (!canManageMembers || !roleAllowsPermission(role, permission)) {
         return;
       }
       setPermissions((current) =>
@@ -173,7 +175,7 @@ export function MemberPermissions() {
       );
       setIsDirty(true);
     },
-    [canManageMembers]
+    [canManageMembers, role]
   );
 
   const handlePermissionClick = useCallback(
@@ -396,6 +398,7 @@ export function MemberPermissions() {
                   <div className="grid gap-2 sm:grid-cols-2">
                     {permissionCatalog.map(({ description, key, label }) => {
                       const enabled = permissions.includes(key);
+                      const isAllowed = roleAllowsPermission(role, key);
                       return (
                         <button
                           aria-pressed={enabled}
@@ -406,7 +409,7 @@ export function MemberPermissions() {
                               : "border-border/70 bg-background/40 hover:bg-muted/40"
                           )}
                           data-permission={key}
-                          disabled={!canManageMembers}
+                          disabled={!canManageMembers || !isAllowed}
                           key={key}
                           onClick={handlePermissionClick}
                           type="button"

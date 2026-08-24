@@ -1,4 +1,4 @@
-export const workspaceRoles = ["owner", "admin", "editor", "viewer"] as const;
+export const workspaceRoles = ["owner", "admin", "editor", "employee", "viewer"] as const;
 
 export type WorkspaceRole = (typeof workspaceRoles)[number];
 
@@ -70,6 +70,13 @@ export const defaultPermissionsByRole: Record<WorkspaceRole, Permission[]> = {
     "document.read",
     "document.write",
   ],
+  employee: [
+    "chat.read",
+    "chat.write",
+    "chat.delete",
+    "document.read",
+    "document.write",
+  ],
   owner: allPermissions,
   viewer: ["knowledge.read", "chat.read", "chat.write", "document.read"],
 };
@@ -77,9 +84,23 @@ export const defaultPermissionsByRole: Record<WorkspaceRole, Permission[]> = {
 export const roleLabels: Record<WorkspaceRole, string> = {
   admin: "Administrator",
   editor: "Editor",
+  employee: "Employee",
   owner: "Owner",
   viewer: "Viewer",
 };
+
+export const restrictedPermissionsByRole: Partial<
+  Record<WorkspaceRole, Permission[]>
+> = {
+  employee: ["knowledge.read", "knowledge.manage"],
+};
+
+export function roleAllowsPermission(
+  role: WorkspaceRole,
+  permission: Permission
+) {
+  return !restrictedPermissionsByRole[role]?.includes(permission);
+}
 
 export function getDefaultPermissions(role: WorkspaceRole) {
   return new Set(defaultPermissionsByRole[role]);
@@ -110,6 +131,10 @@ export function getEffectivePermissions(
     } else {
       permissions.delete(permission);
     }
+  }
+
+  for (const permission of restrictedPermissionsByRole[role] ?? []) {
+    permissions.delete(permission);
   }
 
   return permissions;

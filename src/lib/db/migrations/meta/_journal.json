@@ -85,6 +85,13 @@
       "when": 1786890500000,
       "tag": "0011_restrict_legacy_guests",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1786890600000,
+      "tag": "0012_add_employee_role",
+      "breakpoints": true
     }
   ]
 }
