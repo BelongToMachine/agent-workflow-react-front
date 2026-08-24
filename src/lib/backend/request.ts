@@ -33,6 +33,16 @@ export class BackendRequestError extends Error {
   }
 }
 
+type BackendAuthorizationFailureHandler = (error: BackendRequestError) => void;
+
+let authorizationFailureHandler: BackendAuthorizationFailureHandler | null = null;
+
+export function setBackendAuthorizationFailureHandler(
+  handler: BackendAuthorizationFailureHandler | null
+) {
+  authorizationFailureHandler = handler;
+}
+
 function hasBody(init: RequestInit) {
   return init.body !== undefined && init.body !== null;
 }
@@ -62,12 +72,16 @@ export async function requestBackend<TData>(
     : await response.text();
 
   if (!response.ok) {
-    throw new BackendRequestError(
+    const error = new BackendRequestError(
       response.status,
       payload && typeof payload === "object"
         ? (payload as BackendErrorPayload)
         : null
     );
+    if (response.status === 401 || response.status === 403) {
+      authorizationFailureHandler?.(error);
+    }
+    throw error;
   }
 
   return payload as TData;

@@ -1,4 +1,5 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import { AppSidebar } from "./components/chat/appSidebar";
 import { ChatPage } from "./components/chat/chatPage";
@@ -6,7 +7,10 @@ import { DataStreamProvider } from "./components/chat/dataStreamProvider";
 import { Preview } from "./components/chat/preview";
 import { BackendQueryProvider } from "./components/backendQueryProvider";
 import { AuthProvider, useSession } from "./lib/auth";
-import { useCurrentUserAccess } from "./lib/auth/currentUser";
+import {
+  ApplicationAuthProvider,
+  useApplicationAuth,
+} from "./lib/auth/applicationAuth";
 import { useHandleSignInCallback, useLogto } from "@logto/react";
 import {
   authMode,
@@ -39,7 +43,7 @@ function AuthGuard({ children }) {
   if (!import.meta.env.DEV && !isLogtoConfigured) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center text-sm text-destructive">
-        Logto authentication is not configured for this deployment.
+        Sign-in is not configured for this deployment.
       </div>
     );
   }
@@ -66,14 +70,14 @@ function AuthGuard({ children }) {
 function ChatLayout() {
   const { data } = useSession();
   const {
-    currentUser,
     error: accessError,
     hasPermission,
-    isLoading: isAccessLoading,
-  } = useCurrentUserAccess();
+    refreshCurrentUser,
+    status: authStatus,
+  } = useApplicationAuth();
   const user = data?.user;
 
-  if (isLogtoAuthMode && isAccessLoading) {
+  if (authStatus === "loading" || authStatus === "initializing") {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center text-sm text-muted-foreground">
         Loading workspace access…
@@ -81,21 +85,36 @@ function ChatLayout() {
     );
   }
 
-  if (isLogtoAuthMode && accessError) {
+  if (authStatus === "unauthenticated") {
+    return <Navigate replace to={isLogtoAuthMode ? "/login" : "/dev/oidc"} />;
+  }
+
+  if (authStatus === "suspended") {
+    return <Navigate replace to="/account-suspended" />;
+  }
+
+  if (authStatus === "pending_workspace") {
+    return <Navigate replace to="/access-pending" />;
+  }
+
+  if (authStatus === "error" && accessError) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
         <div className="max-w-md">
           <h1 className="font-semibold text-xl">Unable to load workspace access</h1>
           <p className="mt-2 text-muted-foreground text-sm leading-6">
-            Your Logto session is valid, but the backend could not load your workspace access.
+            Your account is signed in, but workspace access could not be loaded.
           </p>
+          <button
+            className="mt-5 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
+            onClick={() => void refreshCurrentUser()}
+            type="button"
+          >
+            Try again
+          </button>
         </div>
       </div>
     );
-  }
-
-  if (isLogtoAuthMode && currentUser?.accessState === "pending_workspace") {
-    return <WorkspaceAccessPendingPage />;
   }
 
   return (
@@ -103,9 +122,11 @@ function ChatLayout() {
       <SidebarProvider defaultOpen>
         <AppSidebar
           canManageKnowledgeBases={
-            !isAccessLoading && hasPermission("knowledge.manage")
+            authStatus === "authenticated" && hasPermission("knowledge.manage")
           }
-          canViewPermissions={!isAccessLoading && hasPermission("members.read")}
+          canViewPermissions={
+            authStatus === "authenticated" && hasPermission("members.read")
+          }
           user={user}
         />
         <SidebarInset>
@@ -168,7 +189,7 @@ function WorkspaceAccessPendingPage() {
       <div className="max-w-md">
         <h1 className="font-semibold text-xl">Account created</h1>
         <p className="mt-2 text-muted-foreground text-sm leading-6">
-          Your Logto account is authenticated, but it has not been added to a workspace yet.
+          Your account is signed in, but it has not been added to a workspace yet.
           Ask a workspace administrator to grant access, then refresh this page.
         </p>
       </div>
@@ -176,10 +197,45 @@ function WorkspaceAccessPendingPage() {
   );
 }
 
-function PermissionRoute({ children, permission }) {
-  const { hasPermission, isLoading } = useCurrentUserAccess();
+function AccountSuspendedPage() {
+  const { signOut } = useApplicationAuth();
 
-  if (isLoading) {
+  return (
+    <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
+      <div className="max-w-md">
+        <h1 className="font-semibold text-xl">Account suspended</h1>
+        <p className="mt-2 text-muted-foreground text-sm leading-6">
+          This account cannot access the workspace. Contact a workspace administrator if you believe this is a mistake.
+        </p>
+        <button
+          className="mt-5 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
+          onClick={() => void signOut()}
+          type="button"
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ForbiddenPage() {
+  return (
+    <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
+      <div className="max-w-md">
+        <h1 className="font-semibold text-xl">Permission required</h1>
+        <p className="mt-2 text-muted-foreground text-sm leading-6">
+          Your account does not have permission to open this workspace area.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function PermissionRoute({ children, permission }) {
+  const { hasPermission, status } = useApplicationAuth();
+
+  if (status === "loading" || status === "initializing") {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background text-sm text-muted-foreground">
         Loading workspace access…
@@ -187,17 +243,16 @@ function PermissionRoute({ children, permission }) {
     );
   }
 
+  if (status === "suspended") {
+    return <Navigate replace to="/account-suspended" />;
+  }
+
+  if (status === "pending_workspace") {
+    return <Navigate replace to="/access-pending" />;
+  }
+
   if (!hasPermission(permission)) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
-        <div className="max-w-md">
-          <h1 className="font-semibold text-xl">Permission required</h1>
-          <p className="mt-2 text-muted-foreground text-sm leading-6">
-            Your account does not have permission to open this workspace area.
-          </p>
-        </div>
-      </div>
-    );
+    return <ForbiddenPage />;
   }
 
   return children;
@@ -229,14 +284,32 @@ function LogtoCallbackPage() {
 
 function ConfiguredLogtoCallbackPage() {
   const router = useRouter();
-  const { error, isAuthenticated, isLoading } = useHandleSignInCallback(() => {
-    router.replace("/");
-  });
+  const { refreshCurrentUser } = useApplicationAuth();
+  const { error, isAuthenticated, isLoading } = useHandleSignInCallback();
+  const [isBootstrapping, setIsBootstrapping] = useState(false);
+
+  useEffect(() => {
+    if (isLoading || !isAuthenticated) {
+      return;
+    }
+
+    let isActive = true;
+    setIsBootstrapping(true);
+    void refreshCurrentUser().finally(() => {
+      if (isActive) {
+        router.replace("/");
+      }
+    });
+
+    return () => {
+      isActive = false;
+    };
+  }, [isAuthenticated, isLoading, refreshCurrentUser, router]);
 
   if (error) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-sm text-destructive">
-        Logto sign-in failed: {error.message}
+        Sign-in failed: {error.message}
       </div>
     );
   }
@@ -251,24 +324,44 @@ function ConfiguredLogtoCallbackPage() {
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-sm text-muted-foreground">
-      Completing sign-in…
+      {isBootstrapping ? "Setting up your account…" : "Completing sign-in…"}
     </div>
   );
 }
 
 function LogtoAuthPage({ mode }) {
-  const { signIn } = useLogto();
+  const { error: logtoError, isLoading: isLogtoLoading, signIn } = useLogto();
   const search = useLocationSearch();
   const isRegister = mode === "register";
   const isSessionExpired =
     new URLSearchParams(search).get("reason") === "session_expired";
+  const [isStartingSignIn, setIsStartingSignIn] = useState(false);
+  const [signInError, setSignInError] = useState(false);
 
-  function handleSignIn() {
+  useEffect(() => {
+    if (logtoError) {
+      setIsStartingSignIn(false);
+      setSignInError(true);
+    }
+  }, [logtoError]);
+
+  function startSignIn(options = {}) {
+    setSignInError(false);
+    setIsStartingSignIn(true);
     void signIn({
+      ...options,
       postRedirectUri: `${window.location.origin}/`,
       redirectUri: `${window.location.origin}/callback`,
     });
   }
+
+  function handleLogtoSignIn() {
+    startSignIn({
+      firstScreen: isRegister ? "register" : "sign_in",
+    });
+  }
+
+  const isSignInDisabled = isStartingSignIn || isLogtoLoading;
 
   return (
     <div className="flex min-h-dvh w-full bg-sidebar">
@@ -285,7 +378,9 @@ function LogtoAuthPage({ mode }) {
               {isRegister ? "Create account" : "Welcome back"}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Continue with Logto to use your configured sign-in methods.
+              {isRegister
+                ? "Create your account to get started."
+                : "Sign in to continue to your account."}
             </p>
           </div>
           {isSessionExpired ? (
@@ -297,15 +392,27 @@ function LogtoAuthPage({ mode }) {
               Your login session expired. Please sign in again to continue.
             </div>
           ) : null}
-          <button
-            className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-            onClick={handleSignIn}
-            type="button"
-          >
-            Continue with Google or WeChat
-          </button>
+          {signInError ? (
+            <div
+              aria-live="polite"
+              className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive text-sm"
+              role="alert"
+            >
+              We couldn&apos;t start sign-in. Please try again or use email.
+            </div>
+          ) : null}
+          <div className="flex flex-col gap-3">
+            <button
+              className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isSignInDisabled}
+              onClick={handleLogtoSignIn}
+              type="button"
+            >
+              Sign in or sign up
+            </button>
+          </div>
           <p className="text-center text-xs leading-5 text-muted-foreground">
-            Google and WeChat buttons are configured in the Logto sign-in experience.
+            Use your email or a social account to continue.
           </p>
         </div>
       </div>
@@ -420,6 +527,9 @@ function App() {
             path="/dev/oidc"
           />
           <Route element={<LogtoCallbackPage />} path="/callback" />
+          <Route element={<WorkspaceAccessPendingPage />} path="/access-pending" />
+          <Route element={<AccountSuspendedPage />} path="/account-suspended" />
+          <Route element={<ForbiddenPage />} path="/forbidden" />
           <Route element={<ChatLayout />} path="/*" />
           <Route element={<AuthPage mode="login" />} path="/login" />
           <Route element={<AuthPage mode="register" />} path="/register" />
@@ -432,16 +542,18 @@ function App() {
 export default function AppRoot() {
   return (
     <LogtoAppProvider>
-      <AuthProvider>
-        <AuthModeSwitcher />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <BackendQueryProvider>
-            <TooltipProvider>
-              <App />
-            </TooltipProvider>
-          </BackendQueryProvider>
-        </ThemeProvider>
-      </AuthProvider>
+      <BackendQueryProvider>
+        <AuthProvider>
+          <ApplicationAuthProvider>
+            <AuthModeSwitcher />
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <TooltipProvider>
+                <App />
+              </TooltipProvider>
+            </ThemeProvider>
+          </ApplicationAuthProvider>
+        </AuthProvider>
+      </BackendQueryProvider>
     </LogtoAppProvider>
   );
 }

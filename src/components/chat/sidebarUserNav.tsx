@@ -2,7 +2,8 @@
 
 import { ChevronUp } from "lucide-react";
 import type { User } from "@/lib/auth";
-import { signOut, useSession } from "@/lib/auth";
+import { useSession } from "@/lib/auth";
+import { useApplicationAuth } from "@/lib/auth/applicationAuth";
 import { useTheme } from "next-themes";
 import { useCallback } from "react";
 import {
@@ -31,6 +32,7 @@ function emailToHue(email: string): number {
 
 export function SidebarUserNav({ user }: { user: User }) {
   const { data, status } = useSession();
+  const { signOut } = useApplicationAuth();
   const { setTheme, resolvedTheme } = useTheme();
 
   const isGuest = guestRegex.test(data?.user?.email ?? "");
@@ -48,10 +50,8 @@ export function SidebarUserNav({ user }: { user: User }) {
       return;
     }
 
-    signOut({
-      redirectTo: "/",
-    });
-  }, [status]);
+    void signOut();
+  }, [signOut, status]);
 
   return (
     <SidebarMenu>

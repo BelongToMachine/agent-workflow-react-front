@@ -9,6 +9,25 @@ export const logtoApiResource = readEnv(
   import.meta.env.VITE_LOGTO_API_RESOURCE
 );
 
+export function getLogtoEndSessionUri(postLogoutRedirectUri: string) {
+  if (!logtoEndpoint || !logtoAppId) {
+    return null;
+  }
+
+  try {
+    const normalizedEndpoint = logtoEndpoint.replace(/\/+$/, "");
+    const endpoint = normalizedEndpoint.endsWith("/oidc")
+      ? `${normalizedEndpoint}/session/end`
+      : `${normalizedEndpoint}/oidc/session/end`;
+    const url = new URL(endpoint);
+    url.searchParams.set("client_id", logtoAppId);
+    url.searchParams.set("post_logout_redirect_uri", postLogoutRedirectUri);
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 export const isLogtoConfigured = Boolean(
   logtoEndpoint && logtoAppId && logtoApiResource
 );

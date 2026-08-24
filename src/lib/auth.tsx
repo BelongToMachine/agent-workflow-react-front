@@ -12,7 +12,12 @@ import {
   clearStoredDirectToken,
   getStoredDirectToken,
 } from "./backend/directClient";
-import { isLogtoAuthMode, logtoAppId } from "./auth/logtoConfig";
+import {
+  getLogtoEndSessionUri,
+  isLogtoAuthMode,
+  logtoAppId,
+} from "./auth/logtoConfig";
+import { clearLogtoBrowserStorage } from "./auth/logtoStorage";
 import type { Permission, WorkspaceRole } from "./permissions";
 
 export type User = {
@@ -27,14 +32,15 @@ export type User = {
 
 export type Session = { user: User } | null;
 
-type AuthContextValue = {
+type SessionContextValue = {
   data: Session;
+  invalidate: (reason?: string) => Promise<void>;
   status: "authenticated" | "loading" | "unauthenticated";
   update: () => Promise<Session>;
   signOut: () => Promise<void>;
 };
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+const SessionContext = createContext<SessionContextValue | null>(null);
 
 let registeredSignOut: (() => Promise<void>) | null = null;
 
@@ -107,18 +113,23 @@ function DevelopmentAuthProvider({ children }: { children: ReactNode }) {
     return token ? { user: decodeDevelopmentUser(token.accessToken) } : null;
   }, [refreshSession]);
   const signOut = useCallback(async () => clearStoredDirectToken(), []);
+  const invalidate = useCallback(async () => {
+    clearStoredDirectToken();
+    window.location.assign("/dev/oidc");
+  }, []);
 
-  const value = useMemo<AuthContextValue>(
+  const value = useMemo<SessionContextValue>(
     () => ({
       data,
+      invalidate,
       signOut,
       status: data ? "authenticated" : isReady ? "unauthenticated" : "loading",
       update,
     }),
-    [data, isReady, signOut, update]
+    [data, invalidate, isReady, signOut, update]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
 
 function LogtoAuthProvider({ children }: { children: ReactNode }) {
@@ -127,6 +138,7 @@ function LogtoAuthProvider({ children }: { children: ReactNode }) {
     getIdTokenClaims,
     isAuthenticated,
     isLoading,
+    clearAllTokens,
     signOut: logtoSignOut,
   } = useLogto();
   const [data, setData] = useState<Session>(null);
@@ -171,7 +183,7 @@ function LogtoAuthProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [readSession]);
+  }, [isAuthenticated, readSession]);
 
   const update = useCallback(async () => {
     const session = await readSession();
@@ -181,8 +193,40 @@ function LogtoAuthProvider({ children }: { children: ReactNode }) {
   }, [readSession]);
 
   const signOut = useCallback(async () => {
-    await logtoSignOut(`${window.location.origin}/`);
-  }, [logtoSignOut]);
+    const postLogoutRedirectUri = `${window.location.origin}/`;
+    const fallbackLogtoLogoutUri = getLogtoEndSessionUri(
+      postLogoutRedirectUri
+    );
+    window.setTimeout(() => {
+      void (async () => {
+        await clearAllTokens();
+        clearLogtoBrowserStorage();
+        if (fallbackLogtoLogoutUri) {
+          window.location.assign(fallbackLogtoLogoutUri);
+          return;
+        }
+        window.location.assign(postLogoutRedirectUri);
+      })();
+    }, 2500);
+
+    try {
+      await logtoSignOut(postLogoutRedirectUri);
+    } finally {
+      await clearAllTokens();
+      clearLogtoBrowserStorage();
+    }
+  }, [clearAllTokens, logtoSignOut]);
+
+  const invalidate = useCallback(
+    async (reason = "session_expired") => {
+      await clearAllTokens();
+      clearLogtoBrowserStorage();
+      setData(null);
+      setIsReady(true);
+      window.location.assign(`/login?reason=${encodeURIComponent(reason)}`);
+    },
+    [clearAllTokens]
+  );
 
   useEffect(() => {
     registerSignOut(signOut);
@@ -206,9 +250,10 @@ function LogtoAuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("storage", handleStorage);
   }, [update]);
 
-  const value = useMemo<AuthContextValue>(
+  const value = useMemo<SessionContextValue>(
     () => ({
       data,
+      invalidate,
       signOut,
       status:
         !isReady || (isLoading && !isAuthenticated)
@@ -218,10 +263,10 @@ function LogtoAuthProvider({ children }: { children: ReactNode }) {
             : "unauthenticated",
       update,
     }),
-    [data, isAuthenticated, isLoading, isReady, signOut, update]
+    [data, invalidate, isAuthenticated, isLoading, isReady, signOut, update]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -233,7 +278,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export function useSession() {
-  const context = useContext(AuthContext);
+  const context = useContext(SessionContext);
   if (!context) {
     throw new Error("useSession must be used within AuthProvider");
   }
@@ -247,5 +292,11 @@ export async function signOut() {
   }
 
   clearStoredDirectToken();
-  window.location.assign(isLogtoAuthMode ? "/login" : "/dev/oidc");
+  if (isLogtoAuthMode) {
+    clearLogtoBrowserStorage();
+    window.location.assign("/login?reason=signed_out");
+    return;
+  }
+
+  window.location.assign("/dev/oidc");
 }
