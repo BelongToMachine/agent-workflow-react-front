@@ -1,6 +1,7 @@
 "use client";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { Vote } from "@/lib/db/schema";
+import type { SourceCitation } from "@/lib/knowledgeCitation";
 import type { ChatMessage } from "@/lib/types";
 import { cn, hasToolControlSyntax, sanitizeText } from "@/lib/utils";
 import { MessageContent, MessageResponse } from "../ai-elements/message";
@@ -31,6 +32,43 @@ function WaitingText() {
       >
         {waitingText}
       </Shimmer>
+    </div>
+  );
+}
+
+function SourceCitationLine({
+  citation,
+  fileName,
+  row,
+  sheet,
+}: {
+  citation?: SourceCitation | null;
+  fileName?: string | null;
+  row?: number | null;
+  sheet?: string | null;
+}) {
+  const resolvedFileName = citation?.fileName ?? fileName;
+  const resolvedSheet = citation?.sheet ?? sheet;
+  const resolvedRow = citation?.row ?? row;
+  const location = [
+    resolvedSheet,
+    resolvedRow === undefined || resolvedRow === null
+      ? null
+      : `第 ${resolvedRow} 行`,
+    citation?.page === undefined || citation.page === null
+      ? null
+      : `第 ${citation.page} 页`,
+    citation?.section,
+  ].filter(Boolean);
+
+  if (!resolvedFileName && location.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-2 border-border/50 border-t pt-2 text-muted-foreground text-xs">
+      来源：{resolvedFileName ?? "文件名未知"}
+      {location.length > 0 ? ` · ${location.join(" · ")}` : ""}
     </div>
   );
 }
@@ -215,6 +253,7 @@ const PurePreviewMessage = ({
                 sourceId?: string | null;
                 sourceSheet?: string;
                 sourceRow?: number;
+                citation?: SourceCitation;
               }>;
               source?: string;
               sourceTable?: string;
@@ -279,17 +318,12 @@ const PurePreviewMessage = ({
                           <span>{product.documentCount ?? 0} docs</span>
                         )}
                       </div>
-                      {!!(product.sourceFileName || product.sourceSheet) && (
-                        <div className="mt-2 border-border/50 border-t pt-2 text-muted-foreground text-xs">
-                          来源：{product.sourceFileName ?? "文件名未知"}
-                          {product.sourceSheet
-                            ? ` · ${product.sourceSheet}`
-                            : ""}
-                          {product.sourceRow === undefined
-                            ? ""
-                            : ` · 第 ${product.sourceRow} 行`}
-                        </div>
-                      )}
+                      <SourceCitationLine
+                        citation={product.citation}
+                        fileName={product.sourceFileName}
+                        row={product.sourceRow}
+                        sheet={product.sourceSheet}
+                      />
                     </div>
                   ))}
                 </div>
@@ -336,6 +370,7 @@ const PurePreviewMessage = ({
                 targetTopic?: string | null;
                 usageStatus?: string | null;
                 videoType?: string | null;
+                citation?: SourceCitation;
               }>;
               source?: string;
             })
@@ -392,13 +427,12 @@ const PurePreviewMessage = ({
                           </span>
                         )}
                       </div>
-                      {!!(record.sourceFileName || record.sourceSheet) && (
-                        <div className="mt-2 border-border/50 border-t pt-2 text-muted-foreground text-xs">
-                          来源：{record.sourceFileName ?? "文件名未知"}
-                          {" · "}
-                          {record.sourceSheet} · 第 {record.sourceRow} 行
-                        </div>
-                      )}
+                      <SourceCitationLine
+                        citation={record.citation}
+                        fileName={record.sourceFileName}
+                        row={record.sourceRow}
+                        sheet={record.sourceSheet}
+                      />
                     </div>
                   ))}
                 </div>

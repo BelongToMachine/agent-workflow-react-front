@@ -5,6 +5,8 @@ import type { createSearchContentTool } from "./ai/tools/searchContent";
 import type { createSearchProductsTool } from "./ai/tools/searchProducts";
 import type { Suggestion } from "./db/schema";
 
+export type { SourceCitation } from "./knowledgeCitation";
+
 export const messageMetadataSchema = z.object({
   createdAt: z.string(),
 });

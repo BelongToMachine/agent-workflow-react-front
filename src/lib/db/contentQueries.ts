@@ -4,6 +4,7 @@ import { and, asc, eq, ilike, inArray, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { logError, logEvent } from "@/lib/ai/logger";
+import type { SourceCitation } from "@/lib/knowledgeCitation";
 import { isMockDatabase } from "../constants";
 import { contentRecord, knowledgeSource } from "./schema";
 
@@ -56,6 +57,7 @@ type ContentSearchResult = {
   title: string | null;
   usageStatus: string | null;
   videoType: string | null;
+  citation: SourceCitation;
 };
 
 type SearchContentResponse = {
@@ -221,6 +223,12 @@ export async function searchContent(
           : {}),
         records: records.map((record) => ({
           ...record,
+          citation: {
+            fileName: record.sourceFileName,
+            row: record.sourceRow,
+            sheet: record.sourceSheet,
+            sourceId: record.sourceId,
+          },
           // Tool outputs must be JSON values. Drizzle returns timestamp
           // columns as Date instances, which fail AI SDK prompt validation
           // when the result is fed into the next agent step.

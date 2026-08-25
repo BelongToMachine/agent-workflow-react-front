@@ -4,6 +4,7 @@ import { and, asc, eq, ilike, inArray, or } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { logError, logEvent } from "@/lib/ai/logger";
+import type { SourceCitation } from "@/lib/knowledgeCitation";
 import { isMockDatabase } from "../constants";
 import {
   knowledgeSource,
@@ -72,6 +73,7 @@ type ProductSearchResult = {
   sourceFileName?: string | null;
   sourceSheet?: string;
   sourceRow?: number;
+  citation: SourceCitation;
 };
 
 type ProductSearchResponse = {
@@ -424,6 +426,12 @@ async function searchEnterpriseProducts(
         sourceId: research.sourceId,
         sourceRow: research.sourceRow,
         sourceSheet: research.sourceSheet,
+        citation: {
+          fileName: sourceFileName,
+          row: research.sourceRow,
+          sheet: research.sourceSheet,
+          sourceId: research.sourceId,
+        },
         supplierCity: null,
         supplierId: null,
         supplierName:
