@@ -3,6 +3,7 @@ import {
   fastApiWorkspaceId,
   isFastApiDirectMode,
   isFastApiProxyMode,
+  isSingleWorkspaceMode,
 } from "./mode";
 import {
   getLogtoAccessToken,
@@ -108,10 +109,6 @@ function pathWithoutBasePath(pathname: string) {
 }
 
 function appendWorkspaceId(url: URL, token: DirectToken | null) {
-  if (url.searchParams.has("workspace_id")) {
-    return;
-  }
-
   const path = url.pathname;
   const isWorkspaceScoped =
     path.startsWith("/api/v1/chat") ||
@@ -125,13 +122,21 @@ function appendWorkspaceId(url: URL, token: DirectToken | null) {
     path === "/api/v1/products" ||
     path === "/api/v1/content/search";
 
-  if (isWorkspaceScoped) {
-    const workspaceId =
-      token?.workspaceId ??
-      (isFastApiProxyMode || isLogtoAuthMode ? fastApiWorkspaceId : null);
-    if (workspaceId) {
-      url.searchParams.set("workspace_id", workspaceId);
-    }
+  if (!isWorkspaceScoped) {
+    return;
+  }
+
+  // In Logto mode the backend is intentionally single-workspace for the MVP.
+  // Override legacy caller-supplied values so the browser cannot accidentally
+  // switch business context before a real workspace selector exists.
+  const workspaceId =
+    isSingleWorkspaceMode && isLogtoAuthMode
+      ? fastApiWorkspaceId
+      : url.searchParams.get("workspace_id") ||
+        token?.workspaceId ||
+        (isFastApiProxyMode ? fastApiWorkspaceId : null);
+  if (workspaceId) {
+    url.searchParams.set("workspace_id", workspaceId);
   }
 }
 

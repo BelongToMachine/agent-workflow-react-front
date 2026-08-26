@@ -142,12 +142,23 @@ export function ApplicationAuthProvider({ children }: { children: ReactNode }) {
   }, [bootstrapQuery.data, currentUserQuery.data, session]);
 
   const activeMembership = useMemo(
-    () =>
-      currentUser?.memberships.find(
-        (membership) => membership.workspaceId === fastApiWorkspaceId
-      ) ?? (currentUser?.memberships.length === 1
-        ? currentUser.memberships[0]
-        : null),
+    () => {
+      if (!currentUser) {
+        return null;
+      }
+
+      if (!isLogtoAuthMode) {
+        return currentUser.memberships[0] ?? null;
+      }
+
+      // The MVP has one configured workspace. Do not silently select an
+      // unexpected membership when the backend configuration is inconsistent.
+      return (
+        currentUser.memberships.find(
+          (membership) => membership.workspaceId === fastApiWorkspaceId
+        ) ?? null
+      );
+    },
     [currentUser]
   );
 

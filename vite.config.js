@@ -14,6 +14,10 @@ export default defineConfig(({ mode }) => {
     env.VITE_WORKSPACE_ID ||
     env.NEXT_PUBLIC_WORKSPACE_ID ||
     '00000000-0000-0000-0000-000000000001'
+  const singleWorkspaceMode =
+    env.VITE_SINGLE_WORKSPACE_MODE ||
+    env.NEXT_PUBLIC_SINGLE_WORKSPACE_MODE ||
+    'true'
 
   return {
     define: {
@@ -21,6 +25,7 @@ export default defineConfig(({ mode }) => {
       'process.env.NEXT_PUBLIC_BASE_PATH': JSON.stringify(env.NEXT_PUBLIC_BASE_PATH ?? ''),
       'process.env.NEXT_PUBLIC_FASTAPI_BASE_URL': JSON.stringify(fastApiTarget),
       'process.env.NEXT_PUBLIC_WORKSPACE_ID': JSON.stringify(workspaceId),
+      'process.env.NEXT_PUBLIC_SINGLE_WORKSPACE_MODE': JSON.stringify(singleWorkspaceMode),
       'process.env.NEXT_PUBLIC_USE_FASTAPI_BACKEND': JSON.stringify(env.NEXT_PUBLIC_USE_FASTAPI_BACKEND || '1'),
     },
     plugins: [react()],
