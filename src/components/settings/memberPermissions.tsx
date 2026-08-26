@@ -4,9 +4,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   CheckIcon,
   LockKeyholeIcon,
+  PowerIcon,
   SaveIcon,
   ShieldCheckIcon,
   UserRoundIcon,
+  UserPlusIcon,
   UsersIcon,
 } from "lucide-react";
 import { type MouseEvent, useCallback, useEffect, useState } from "react";
@@ -39,7 +41,7 @@ import { cn } from "@/lib/utils";
 
 type Member = {
   effectivePermissions: Permission[];
-  email: string;
+  email: string | null;
   id: string;
   name: string | null;
   overrides: { effect: "grant" | "deny"; permission: string }[];
@@ -48,9 +50,20 @@ type Member = {
   userId: string;
 };
 
+type AccessCandidate = {
+  email: string | null;
+  name: string | null;
+  status: "active" | "suspended";
+  userId: string;
+};
+
 type MembersResponse = {
   members: Member[];
   workspace: { id: string; name: string };
+};
+
+type AccessCandidatesResponse = {
+  candidates: AccessCandidate[];
 };
 
 const roleDescriptions: Record<WorkspaceRole, string> = {
@@ -62,6 +75,8 @@ const roleDescriptions: Record<WorkspaceRole, string> = {
 };
 
 export function MemberPermissions() {
+  const [candidateId, setCandidateId] = useState<string>("");
+  const [candidateRole, setCandidateRole] = useState<WorkspaceRole>("viewer");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [role, setRole] = useState<WorkspaceRole>("viewer");
   const [permissions, setPermissions] = useState<Permission[]>([]);
@@ -76,6 +91,11 @@ export function MemberPermissions() {
     path: "/api/admin/members",
     queryKey: backendQueryKeys.members(identity),
   });
+  const candidatesQuery = useBackendQuery<AccessCandidatesResponse>({
+    enabled: canManageMembers && membersQuery.isSuccess,
+    path: "/api/admin/access-candidates",
+    queryKey: backendQueryKeys.accessCandidates(identity),
+  });
   const saveMutation = useBackendMutation<
     { member?: Member },
     { memberId: string; permissions: Permission[]; role: WorkspaceRole }
@@ -89,9 +109,37 @@ export function MemberPermissions() {
       path: "/api/admin/members",
     }),
   });
+  const addMutation = useBackendMutation<
+    { member?: Member },
+    { permissions: Permission[]; role: WorkspaceRole; userId: string }
+  >({
+    mutationKey: ["backend", "user", identity, "members", "add"],
+    request: (variables) => ({
+      init: {
+        body: JSON.stringify(variables),
+        method: "POST",
+      },
+      path: "/api/admin/members",
+    }),
+  });
+  const statusMutation = useBackendMutation<
+    { member?: Member },
+    { memberId: string; status: "active" | "suspended" }
+  >({
+    mutationKey: ["backend", "user", identity, "members", "status"],
+    request: ({ memberId, status }) => ({
+      init: {
+        body: JSON.stringify({ status }),
+        method: "PATCH",
+      },
+      path: `/api/admin/members/${memberId}/status`,
+    }),
+  });
 
   const { data, error: queryError, isLoading } = membersQuery;
   const { isPending: isSaving } = saveMutation;
+  const { isPending: isAdding } = addMutation;
+  const { isPending: isChangingStatus } = statusMutation;
   const loadError = queryError
     ? queryError.status === 403
       ? "You do not have permission to manage members."
@@ -99,6 +147,7 @@ export function MemberPermissions() {
     : null;
 
   const selectedMember = data?.members.find(({ id }) => id === selectedId);
+  const candidates = candidatesQuery.data?.candidates ?? [];
 
   useEffect(() => {
     if (data && !selectedId) {
@@ -227,6 +276,74 @@ export function MemberPermissions() {
     }
   }, [canManageMembers, identity, permissions, queryClient, role, saveMutation, selectedMember]);
 
+  const addMember = useCallback(async () => {
+    if (!candidateId || !canManageMembers) {
+      return;
+    }
+
+    setError(null);
+    try {
+      const result = await addMutation.mutateAsync({
+        permissions: defaultPermissionsByRole[candidateRole],
+        role: candidateRole,
+        userId: candidateId,
+      });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: backendQueryKeys.members(identity) }),
+        queryClient.invalidateQueries({
+          queryKey: backendQueryKeys.accessCandidates(identity),
+        }),
+      ]);
+      setCandidateId("");
+      if (result.member) {
+        setSelectedId(result.member.id);
+      }
+      toast.success("Member added");
+    } catch (addError) {
+      const message =
+        addError instanceof Error ? addError.message : "Unable to add member.";
+      setError(message);
+      toast.error(message);
+    }
+  }, [addMutation, candidateId, candidateRole, canManageMembers, identity, queryClient]);
+
+  const changeMemberStatus = useCallback(async () => {
+    if (!selectedMember || !canManageMembers) {
+      return;
+    }
+
+    const nextStatus = selectedMember.status === "active" ? "suspended" : "active";
+    setError(null);
+    try {
+      const result = await statusMutation.mutateAsync({
+        memberId: selectedMember.id,
+        status: nextStatus,
+      });
+      if (result.member) {
+        queryClient.setQueryData<MembersResponse>(
+          backendQueryKeys.members(identity),
+          (current) =>
+            current
+              ? {
+                  ...current,
+                  members: current.members.map((member) =>
+                    member.id === result.member?.id ? result.member : member
+                  ),
+                }
+              : current
+        );
+      }
+      toast.success(nextStatus === "active" ? "Member restored" : "Member suspended");
+    } catch (statusError) {
+      const message =
+        statusError instanceof Error
+          ? statusError.message
+          : "Unable to update member status.";
+      setError(message);
+      toast.error(message);
+    }
+  }, [canManageMembers, identity, queryClient, selectedMember, statusMutation]);
+
   const visibleError = error ?? loadError;
 
   if (isLoading) {
@@ -263,6 +380,72 @@ export function MemberPermissions() {
             {data.workspace.name}
           </Badge>
         </header>
+
+        {canManageMembers ? (
+          <section className="mb-5 rounded-2xl border border-border/70 bg-card/50 p-5 shadow-sm md:p-6">
+            <div className="flex flex-col gap-4 md:flex-row md:items-end">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 font-medium text-sm">
+                  <UserPlusIcon className="size-4 text-primary" />
+                  Add a registered user
+                </div>
+                <p className="mt-1 text-muted-foreground text-xs leading-5">
+                  Only users who have signed in and completed account setup appear here.
+                </p>
+                <Select
+                  disabled={candidatesQuery.isLoading || candidates.length === 0 || isAdding}
+                  onValueChange={setCandidateId}
+                  value={candidateId}
+                >
+                  <SelectTrigger aria-label="Select a registered user" className="mt-3">
+                    <SelectValue
+                      placeholder={
+                        candidatesQuery.isLoading
+                          ? "Loading users…"
+                          : candidates.length === 0
+                            ? "No users waiting for access"
+                            : "Select a user"
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {candidates.map((candidate) => (
+                      <SelectItem key={candidate.userId} value={candidate.userId}>
+                        {candidate.name || candidate.email || candidate.userId}
+                        {candidate.name && candidate.email ? ` · ${candidate.email}` : ""}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Select
+                disabled={!candidateId || isAdding}
+                onValueChange={(value) => setCandidateRole(value as WorkspaceRole)}
+                value={candidateRole}
+              >
+                <SelectTrigger aria-label="New member role" className="w-full md:w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(roleLabels).map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button disabled={!candidateId || isAdding} onClick={addMember}>
+                <UserPlusIcon />
+                {isAdding ? "Adding" : "Add member"}
+              </Button>
+            </div>
+            {candidatesQuery.error ? (
+              <p className="mt-3 text-destructive text-xs">
+                Unable to load users waiting for workspace access.
+              </p>
+            ) : null}
+          </section>
+        ) : null}
 
         {!canManageMembers ? (
           <p className="mb-5 rounded-xl border border-border/70 bg-muted/30 px-4 py-3 text-muted-foreground text-sm">
@@ -355,6 +538,18 @@ export function MemberPermissions() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
+                    <Button
+                      disabled={!canManageMembers || isChangingStatus || isSaving}
+                      onClick={changeMemberStatus}
+                      variant="outline"
+                    >
+                      <PowerIcon />
+                      {isChangingStatus
+                        ? "Updating"
+                        : selectedMember.status === "active"
+                          ? "Suspend"
+                          : "Restore"}
+                    </Button>
                     <Select
                       disabled={!canManageMembers}
                       onValueChange={changeRole}

@@ -195,6 +195,8 @@ function mapLegacyApiPath(
     path.startsWith("/api/admin/members/")
   ) {
     targetPath = path.replace(/^\/api\//, "/api/v1/");
+  } else if (path === "/api/admin/access-candidates") {
+    targetPath = path.replace(/^\/api\//, "/api/v1/");
   } else if (
     path === "/api/admin/knowledge-base-grants" ||
     path.startsWith("/api/admin/knowledge-base-grants/")
