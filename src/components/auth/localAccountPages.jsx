@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Preview } from "../chat/preview";
 import {
   activateLocalInvitation,
   changeLocalPassword,
@@ -8,32 +7,14 @@ import {
 } from "../../lib/auth/localSession";
 import { useSession } from "../../lib/auth";
 import { Link, useLocationSearch, useRouter } from "../../lib/router";
+import { AuthPageShell } from "./authPageShell";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { SettingsPanel } from "../settings/settingsPage";
 
 function LocalAccountShell({ children, eyebrow }) {
-  const { t } = useTranslation();
-  return (
-    <div className="flex min-h-dvh w-full bg-sidebar">
-      <div className="flex w-full flex-col bg-background p-8 md:p-16 xl:w-[600px] xl:shrink-0 xl:rounded-r-2xl xl:border-r xl:border-border/40">
-        <Link
-          className="flex w-fit items-center text-[13px] text-muted-foreground hover:text-foreground"
-          href="/"
-        >
-          ← {t("common.back")}
-        </Link>
-        <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-8">
-          <div>
-            <p className="text-muted-foreground text-xs font-medium uppercase tracking-[0.18em]">
-              {eyebrow}
-            </p>
-            {children}
-          </div>
-        </div>
-      </div>
-      <div className="hidden flex-1 overflow-hidden pl-12 pt-8 xl:block">
-        <Preview />
-      </div>
-    </div>
-  );
+  return <AuthPageShell eyebrow={eyebrow}>{children}</AuthPageShell>;
 }
 
 function FormMessage({ children, error = false }) {
@@ -43,13 +24,13 @@ function FormMessage({ children, error = false }) {
 
   return (
     <div
-      aria-live="polite"
+      aria-live={error ? "assertive" : "polite"}
       className={
         error
-          ? "rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive text-sm"
-          : "rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-700 text-sm dark:text-emerald-300"
+          ? "rounded-lg border border-destructive/30 bg-destructive/10 px-3.5 py-3 text-sm text-destructive"
+          : "rounded-lg border border-success/30 bg-success/10 px-3.5 py-3 text-sm text-foreground"
       }
-      role="status"
+      role={error ? "alert" : "status"}
     >
       {children}
     </div>
@@ -102,56 +83,62 @@ export function LocalActivationPage() {
 
   return (
     <LocalAccountShell eyebrow={t("auth.workspaceInvitation")}>
-      <h1 className="mt-3 text-2xl font-semibold tracking-tight">{t("auth.setUpAccount")}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        {t("auth.choosePassword")}
-      </p>
-      <form className="mt-8 flex flex-col gap-4" onSubmit={handleSubmit}>
-        <FormMessage error>{errorMessage}</FormMessage>
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          {t("auth.name")} <span className="text-muted-foreground font-normal">({t("common.optional")})</span>
-          <input
+      <header className="mb-7">
+        <h1 className="text-2xl font-semibold tracking-tight">{t("auth.setUpAccount")}</h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          {t("auth.choosePassword")}
+        </p>
+      </header>
+      <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+        <FormMessage error>
+          {errorMessage || (!token ? t("auth.invitationMissingToken") : "")}
+        </FormMessage>
+        <div className="grid gap-2">
+          <Label htmlFor="activation-name">
+            {t("auth.name")} <span className="font-normal text-muted-foreground">({t("common.optional")})</span>
+          </Label>
+          <Input
             autoComplete="name"
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            id="activation-name"
             onChange={(event) => setName(event.target.value)}
             value={name}
           />
-        </label>
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          {t("auth.password")}
-          <input
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="activation-password">{t("auth.password")}</Label>
+          <Input
             autoComplete="new-password"
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            id="activation-password"
             minLength={12}
             onChange={(event) => setPassword(event.target.value)}
             required
             type="password"
             value={password}
           />
-        </label>
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          {t("auth.confirmPassword")}
-          <input
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="activation-confirm-password">{t("auth.confirmPassword")}</Label>
+          <Input
             autoComplete="new-password"
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            id="activation-confirm-password"
             minLength={12}
             onChange={(event) => setConfirmation(event.target.value)}
             required
             type="password"
             value={confirmation}
           />
-        </label>
-        <button
-          className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        </div>
+        <Button
+          className="mt-1 h-10 w-full"
           disabled={isSubmitting || !token}
           type="submit"
         >
           {isSubmitting ? t("auth.activating") : t("auth.activateAccount")}
-        </button>
+        </Button>
       </form>
-      <p className="mt-5 text-center text-[13px] text-muted-foreground">
+      <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">
         {t("auth.alreadyActivated")}{" "}
-        <Link className="text-foreground underline-offset-4 hover:underline" href="/login">
+        <Link className="font-medium text-foreground underline-offset-4 hover:underline" href="/login">
           {t("auth.signIn")}
         </Link>
       </p>
@@ -203,66 +190,62 @@ export function LocalChangePasswordPage() {
   }
 
   return (
-    <LocalAccountShell eyebrow={t("auth.accountSecurity")}>
-      <h1 className="mt-3 text-2xl font-semibold tracking-tight">{t("auth.changePassword")}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        {t("auth.newPasswordDescription")}
-      </p>
-      <form className="mt-8 flex flex-col gap-4" onSubmit={handleSubmit}>
-        <FormMessage error>{errorMessage}</FormMessage>
-        <FormMessage>{successMessage}</FormMessage>
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          {t("auth.currentPassword")}
-          <input
+    <SettingsPanel className="max-w-2xl overflow-hidden">
+      <header className="border-b border-border/70 p-4 sm:p-5">
+        <h2 className="text-base font-medium tracking-tight">{t("auth.changePassword")}</h2>
+        <p className="mt-1 text-sm leading-5 text-muted-foreground">
+          {t("auth.newPasswordDescription")}
+        </p>
+      </header>
+      <form className="grid gap-5 p-4 sm:grid-cols-2 sm:p-5" onSubmit={handleSubmit}>
+        <div className="sm:col-span-2">
+          <FormMessage error>{errorMessage}</FormMessage>
+          <FormMessage>{successMessage}</FormMessage>
+        </div>
+        <div className="grid gap-2 sm:col-span-2">
+          <Label htmlFor="current-password">{t("auth.currentPassword")}</Label>
+          <Input
             autoComplete="current-password"
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            id="current-password"
             onChange={(event) => setCurrentPassword(event.target.value)}
             required
             type="password"
             value={currentPassword}
           />
-        </label>
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          {t("auth.newPassword")}
-          <input
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="new-password">{t("auth.newPassword")}</Label>
+          <Input
             autoComplete="new-password"
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            id="new-password"
             minLength={12}
             onChange={(event) => setNewPassword(event.target.value)}
             required
             type="password"
             value={newPassword}
           />
-        </label>
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          {t("auth.confirmNewPassword")}
-          <input
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="confirm-new-password">{t("auth.confirmNewPassword")}</Label>
+          <Input
             autoComplete="new-password"
-            className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            id="confirm-new-password"
             minLength={12}
             onChange={(event) => setConfirmation(event.target.value)}
             required
             type="password"
             value={confirmation}
           />
-        </label>
-        <div className="flex gap-3">
-          <button
-            className="h-10 flex-1 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-            disabled={isSubmitting}
-            type="submit"
-          >
-            {isSubmitting ? t("auth.saving") : t("auth.changePassword")}
-          </button>
-          <button
-            className="h-10 rounded-md border border-border px-4 text-sm font-medium transition-colors hover:bg-muted"
-            onClick={() => router.back()}
-            type="button"
-          >
+        </div>
+        <div className="flex flex-col-reverse gap-2 sm:col-span-2 sm:flex-row sm:justify-end">
+          <Button onClick={() => router.back()} type="button" variant="outline">
             {t("common.cancel")}
-          </button>
+          </Button>
+          <Button disabled={isSubmitting} type="submit">
+            {isSubmitting ? t("auth.saving") : t("auth.changePassword")}
+          </Button>
         </div>
       </form>
-    </LocalAccountShell>
+    </SettingsPanel>
   );
 }

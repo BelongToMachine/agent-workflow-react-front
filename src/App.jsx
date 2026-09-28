@@ -1,5 +1,14 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { lazy, Suspense, useEffect, useState } from "react";
+import {
+  ArrowLeftIcon,
+  CircleAlertIcon,
+  CircleHelpIcon,
+  Clock3Icon,
+  LockKeyholeIcon,
+  RefreshCwIcon,
+  ShieldAlertIcon,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { BackendQueryProvider } from "./components/backendQueryProvider";
 import { AuthProvider, useSession } from "./lib/auth";
@@ -12,8 +21,14 @@ import { ThemeProvider } from "./components/themeProvider";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { LoadingState } from "./components/ui/loadingState";
 import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
+import { Badge } from "./components/ui/badge";
+import { Button } from "./components/ui/button";
+import { Input } from "./components/ui/input";
+import { Label } from "./components/ui/label";
+import { AuthPageShell } from "./components/auth/authPageShell";
 import { Link, usePathname, useRouter } from "./lib/router";
 import { applyAccentColor, getStoredAccentColor } from "./lib/accentColor";
+import { cn } from "./lib/utils";
 import { WorkspaceHeader } from "./components/chat/workspaceHeader";
 import { SettingsPage } from "./components/settings/settingsPage";
 
@@ -32,10 +47,6 @@ const ChatPage = lazyNamed(
 const AppSidebar = lazyNamed(
   () => import("./components/chat/appSidebar"),
   "AppSidebar"
-);
-const Preview = lazyNamed(
-  () => import("./components/chat/preview"),
-  "Preview"
 );
 const Toaster = lazyNamed(() => import("sonner"), "Toaster");
 const KnowledgeBaseWorkspace = lazyNamed(
@@ -104,71 +115,78 @@ function NotFoundPage() {
   const { t } = useTranslation();
 
   return (
-    <main
-      aria-labelledby="not-found-title"
-      className="relative isolate flex min-h-dvh items-center overflow-hidden bg-background px-6 py-12 text-foreground"
+    <StatusPage
+      code="404"
+      description={t("app.notFoundDescription")}
+      eyebrow={t("app.error404")}
+      icon={CircleHelpIcon}
+      title={t("app.notFoundTitle")}
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-48 -top-48 h-[34rem] w-[34rem] rounded-full border border-border/60"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-56 -left-48 h-[28rem] w-[28rem] rounded-full border border-border/40"
-      />
-      <div className="relative mx-auto grid w-full max-w-5xl items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)] lg:gap-20">
-        <section className="max-w-xl">
-          <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-foreground" />
-            {t("app.name")}
-          </div>
-          <p className="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
-            {t("app.error404")}
-          </p>
-          <h1
-            className="mt-4 max-w-lg text-balance text-4xl font-semibold tracking-[-0.04em] sm:text-5xl"
-            id="not-found-title"
-          >
-            {t("app.notFoundTitle")}
-          </h1>
-          <p className="mt-5 max-w-md text-sm leading-7 text-muted-foreground sm:text-base">
-            {t("app.notFoundDescription")}
-          </p>
-          <div className="mt-9 flex flex-wrap items-center gap-3">
-            <Link
-              className="inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-              href="/"
-            >
-              {t("common.backToWorkspace")}
-            </Link>
-            <button
-              className="inline-flex h-10 items-center rounded-md border border-border px-4 text-sm font-medium transition-colors hover:bg-muted"
-              onClick={() => router.back()}
-              type="button"
-            >
-              {t("common.previousPage")}
-            </button>
-          </div>
-        </section>
-
-        <section
-          aria-hidden="true"
-          className="relative min-h-[18rem] overflow-hidden rounded-[2rem] border border-border/60 bg-card/50 px-8 py-10 shadow-[var(--shadow-card)] sm:min-h-[22rem]"
-        >
-          <div className="absolute inset-x-8 top-8 flex items-center justify-between border-b border-border/60 pb-3 text-[10px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            <span>{t("app.routeStatus")}</span>
-            <span>{t("app.missing")}</span>
-          </div>
-          <div className="absolute inset-x-8 bottom-8 flex items-end justify-between gap-6">
-            <span className="text-[clamp(9rem,22vw,15rem)] font-semibold leading-[0.72] tracking-[-0.12em] text-foreground/[0.07]">
-              404
-            </span>
-            <span className="mb-1 max-w-[7rem] text-right font-mono text-[10px] leading-5 text-muted-foreground">
-              {t("app.requestedRouteMissing")}
-            </span>
-          </div>
-        </section>
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <Button onClick={() => router.back()} type="button" variant="outline">
+          <ArrowLeftIcon />
+          {t("common.previousPage")}
+        </Button>
+        <Button asChild>
+          <Link href="/">{t("common.backToWorkspace")}</Link>
+        </Button>
       </div>
+    </StatusPage>
+  );
+}
+
+function StatusPage({
+  children,
+  code,
+  description,
+  eyebrow,
+  fullScreen = true,
+  icon: Icon = CircleAlertIcon,
+  title,
+  tone = "neutral",
+}) {
+  const toneClass = {
+    destructive: "bg-destructive/10 text-destructive",
+    info: "bg-primary/10 text-primary",
+    neutral: "bg-muted text-muted-foreground",
+    success: "bg-success/10 text-success",
+    warning: "bg-warning/20 text-foreground",
+  }[tone];
+
+  return (
+    <main
+      aria-labelledby="status-page-title"
+      className={cn(
+        "flex w-full items-center justify-center bg-muted/20 p-4 sm:p-8",
+        fullScreen ? "min-h-dvh" : "min-h-full"
+      )}
+    >
+      <section className="w-full max-w-xl overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+        <div className="flex flex-col gap-4 p-5 sm:flex-row sm:gap-5 sm:p-6">
+          <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-lg", toneClass)}>
+            <Icon aria-hidden="true" className="size-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                {eyebrow}
+              </p>
+              {code ? <Badge variant="outline">{code}</Badge> : null}
+            </div>
+            <h1 className="text-balance text-xl font-semibold tracking-tight" id="status-page-title">
+              {title}
+            </h1>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {description}
+            </p>
+          </div>
+        </div>
+        {children ? (
+          <div className="border-t border-border/70 bg-muted/15 p-4 sm:px-6 sm:py-4">
+            {children}
+          </div>
+        ) : null}
+      </section>
     </main>
   );
 }
@@ -242,21 +260,20 @@ function ChatLayout() {
 
   if (authStatus === "error" && accessError) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
-        <div className="max-w-md">
-          <h1 className="font-semibold text-xl">{t("app.unableToLoadAccess")}</h1>
-          <p className="mt-2 text-muted-foreground text-sm leading-6">
-            {t("app.accessLoadDescription")}
-          </p>
-          <button
-            className="mt-5 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            onClick={() => void refreshCurrentUser()}
-            type="button"
-          >
+      <StatusPage
+        description={t("app.accessLoadDescription")}
+        eyebrow={t("app.routeStatus")}
+        icon={CircleAlertIcon}
+        title={t("app.unableToLoadAccess")}
+        tone="destructive"
+      >
+        <div className="flex justify-end">
+          <Button onClick={() => void refreshCurrentUser()} type="button" variant="outline">
+            <RefreshCwIcon />
             {t("app.retry")}
-          </button>
+          </Button>
         </div>
-      </div>
+      </StatusPage>
     );
   }
 
@@ -422,16 +439,23 @@ function AccentColorSync() {
 }
 
 function WorkspaceAccessPendingPage() {
+  const router = useRouter();
   const { t } = useTranslation();
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
-      <div className="max-w-md">
-        <h1 className="font-semibold text-xl">{t("app.accountCreated")}</h1>
-        <p className="mt-2 text-muted-foreground text-sm leading-6">
-          {t("app.accountCreatedDescription")}
-        </p>
+    <StatusPage
+      description={t("app.accountCreatedDescription")}
+      eyebrow={t("app.routeStatus")}
+      icon={Clock3Icon}
+      title={t("app.accountCreated")}
+      tone="warning"
+    >
+      <div className="flex justify-end">
+        <Button onClick={() => router.refresh()} type="button" variant="outline">
+          <RefreshCwIcon />
+          {t("app.retry")}
+        </Button>
       </div>
-    </div>
+    </StatusPage>
   );
 }
 
@@ -440,55 +464,60 @@ function AccountSuspendedPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
-      <div className="max-w-md">
-        <h1 className="font-semibold text-xl">{t("app.accountSuspended")}</h1>
-        <p className="mt-2 text-muted-foreground text-sm leading-6">
-          {t("app.accountSuspendedDescription")}
-        </p>
-        <button
-          className="mt-5 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-          onClick={() => void signOut()}
-          type="button"
-        >
+    <StatusPage
+      description={t("app.accountSuspendedDescription")}
+      eyebrow={t("app.routeStatus")}
+      icon={LockKeyholeIcon}
+      title={t("app.accountSuspended")}
+      tone="destructive"
+    >
+      <div className="flex justify-end">
+        <Button onClick={() => void signOut()} type="button" variant="outline">
+          <ArrowLeftIcon />
           {t("sidebar.signOut")}
-        </button>
+        </Button>
       </div>
-    </div>
+    </StatusPage>
   );
 }
 
 function PasswordHelpPage() {
   const { t } = useTranslation();
   return (
-    <div className="flex min-h-dvh w-full items-center justify-center bg-background px-6 text-center">
-      <div className="max-w-md">
-        <h1 className="font-semibold text-xl">{t("auth.noPasswordReset")}</h1>
-        <p className="mt-2 text-muted-foreground text-sm leading-6">
-          {t("auth.contactAdmin")}
-        </p>
-        <Link
-          className="mt-5 inline-flex rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted"
-          href="/login"
-        >
-          {t("auth.backToSignIn")}
-        </Link>
+    <StatusPage
+      description={t("auth.contactAdmin")}
+      eyebrow={t("auth.accountSecurity")}
+      icon={ShieldAlertIcon}
+      title={t("auth.noPasswordReset")}
+      tone="info"
+    >
+      <div className="flex justify-end">
+        <Button asChild variant="outline">
+          <Link href="/login">{t("auth.backToSignIn")}</Link>
+        </Button>
       </div>
-    </div>
+    </StatusPage>
   );
 }
 
-function ForbiddenPage() {
+function ForbiddenPage({ inline = false }) {
   const { t } = useTranslation();
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-6 text-center">
-      <div className="max-w-md">
-        <h1 className="font-semibold text-xl">{t("app.permissionRequired")}</h1>
-        <p className="mt-2 text-muted-foreground text-sm leading-6">
-          {t("app.permissionRequiredDescription")}
-        </p>
+    <StatusPage
+      code="403"
+      description={t("app.permissionRequiredDescription")}
+      eyebrow={t("app.routeStatus")}
+      fullScreen={!inline}
+      icon={LockKeyholeIcon}
+      title={t("app.permissionRequired")}
+      tone="destructive"
+    >
+      <div className="flex justify-end">
+        <Button asChild variant="outline">
+          <Link href="/">{t("common.backToWorkspace")}</Link>
+        </Button>
       </div>
-    </div>
+    </StatusPage>
   );
 }
 
@@ -509,7 +538,7 @@ function PermissionRoute({ children, permission }) {
   }
 
   if (!hasPermission(permission)) {
-    return <ForbiddenPage />;
+    return <ForbiddenPage inline />;
   }
 
   return children;
@@ -553,103 +582,90 @@ function LocalSessionAuthPage({ mode }) {
   }
 
   return (
-    <div className="flex min-h-dvh w-full bg-sidebar">
-      <div className="flex w-full flex-col bg-background p-8 md:p-16 xl:w-[600px] xl:shrink-0 xl:rounded-r-2xl xl:border-r xl:border-border/40">
-        <div className="mx-auto w-full max-w-md">
-          <div className="flex items-center gap-2.5">
-            <span
-              aria-hidden="true"
-              className="size-2.5 rounded-full bg-primary"
+    <AuthPageShell eyebrow={t("auth.productEyebrow")}>
+      <header className="mb-7">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          {isLogin ? t("auth.welcomeBack") : t("auth.invitationRequired")}
+        </h1>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          {isLogin ? t("auth.signInOrganization") : t("auth.invitationOnly")}
+        </p>
+      </header>
+
+      {errorMessage ? (
+        <div
+          aria-live="assertive"
+          className="mb-5 rounded-lg border border-destructive/30 bg-destructive/10 px-3.5 py-3 text-sm text-destructive"
+          id="login-error"
+          role="alert"
+        >
+          {errorMessage}
+        </div>
+      ) : null}
+
+      {isLogin ? (
+        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+          <div className="grid gap-2">
+            <Label htmlFor="login-email">{t("auth.email")}</Label>
+            <Input
+              aria-describedby={errorMessage ? "login-error" : undefined}
+              aria-invalid={Boolean(errorMessage)}
+              autoComplete="email"
+              id="login-email"
+              onChange={(event) => setEmail(event.target.value)}
+              required
+              type="email"
+              value={email}
             />
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-              {t("auth.productEyebrow")}
-            </p>
           </div>
-          <h1 className="mt-4 text-3xl font-semibold tracking-[-0.04em] text-foreground md:text-4xl">
-            Asianode Copilot
-          </h1>
-          <p className="mt-4 max-w-sm text-sm leading-6 text-muted-foreground">
-            {t("auth.productDescription")}
+          <div className="grid gap-2">
+            <Label htmlFor="login-password">{t("auth.password")}</Label>
+            <Input
+              aria-describedby={errorMessage ? "login-error" : undefined}
+              aria-invalid={Boolean(errorMessage)}
+              autoComplete="current-password"
+              id="login-password"
+              minLength={12}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+              type="password"
+              value={password}
+            />
+          </div>
+          <Button className="mt-1 h-10 w-full" disabled={isSubmitting} type="submit">
+            {isSubmitting ? t("auth.signingIn") : t("auth.signIn")}
+          </Button>
+          <p className="text-center text-xs leading-5 text-muted-foreground">
+            {t("auth.forgotPassword")}
           </p>
-        </div>
-        <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-8">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {isLogin ? t("auth.welcomeBack") : t("auth.invitationRequired")}
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {isLogin
-                ? t("auth.signInOrganization")
-                : t("auth.invitationOnly")}
+        </form>
+      ) : (
+        <div className="rounded-lg border border-border bg-muted/25 p-4">
+          <div className="flex items-start gap-3">
+            <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+              <LockKeyholeIcon aria-hidden="true" className="size-4" />
+            </span>
+            <p className="text-sm leading-6 text-muted-foreground">
+              {t("auth.invitationOnly")}
             </p>
           </div>
-          {errorMessage ? (
-            <div
-              aria-live="polite"
-              className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-destructive text-sm"
-              role="alert"
-            >
-              {errorMessage}
-            </div>
-          ) : null}
-          {isLogin ? (
-            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-              <label className="flex flex-col gap-2 text-sm font-medium">
-                {t("auth.email")}
-                <input
-                  autoComplete="email"
-                  className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-                  onChange={(event) => setEmail(event.target.value)}
-                  required
-                  type="email"
-                  value={email}
-                />
-              </label>
-              <label className="flex flex-col gap-2 text-sm font-medium">
-                {t("auth.password")}
-                <input
-                  autoComplete="current-password"
-                  className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-                  minLength={12}
-                  onChange={(event) => setPassword(event.target.value)}
-                  required
-                  type="password"
-                  value={password}
-                />
-              </label>
-              <button
-                className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                disabled={isSubmitting}
-                type="submit"
-              >
-                {isSubmitting ? t("auth.signingIn") : t("auth.signIn")}
-              </button>
-              <p className="text-center text-[13px] text-muted-foreground">
-                {t("auth.forgotPassword")}
-              </p>
-            </form>
-          ) : null}
-          {isLogin ? (
-            <p className="text-center text-[13px] text-muted-foreground">
-              {t("auth.needAccess")}
-            </p>
-          ) : (
-            <button
-              className="h-10 rounded-md border border-border px-4 text-sm font-medium transition-colors hover:bg-muted"
-              onClick={() => router.replace("/login")}
-              type="button"
-            >
-              {t("auth.backToSignIn")}
-            </button>
-          )}
+          <Button
+            className="mt-4 w-full"
+            onClick={() => router.replace("/login")}
+            type="button"
+            variant="outline"
+          >
+            {t("auth.backToSignIn")}
+          </Button>
         </div>
-      </div>
-      <div className="hidden flex-1 overflow-hidden pl-12 pt-8 xl:block">
-        <RouteSuspense>
-          <Preview />
-        </RouteSuspense>
-      </div>
-    </div>
+      )}
+
+      {isLogin ? (
+        <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">
+          {t("auth.needAccess")}
+        </p>
+      ) : null}
+    </AuthPageShell>
   );
 }
 
