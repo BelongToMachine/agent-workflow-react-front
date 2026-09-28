@@ -22,7 +22,7 @@ export function ImageEditor({
     <div
       className={cn("flex w-full flex-row items-center justify-center", {
         "h-[200px]": isInline,
-        "h-[calc(100dvh-60px)]": !isInline,
+        "min-h-full py-6": !isInline,
       })}
     >
       {status === "streaming" ? (
@@ -38,8 +38,8 @@ export function ImageEditor({
         <picture>
           <img
             alt={title}
-            className={cn("h-fit w-full max-w-[800px]", {
-              "p-0 md:p-20": !isInline,
+            className={cn("h-fit max-h-full w-full max-w-[800px] object-contain", {
+              "p-0 sm:p-4 lg:p-8": !isInline,
             })}
             src={`data:image/png;base64,${content}`}
           />

@@ -570,7 +570,7 @@ function PureMultimodalInput({
       </div>
 
       <PromptInput
-        className="[&>div]:h-auto [&>div]:items-stretch [&>div]:flex-col [&>div]:rounded-[2rem] [&>div]:border [&>div]:border-border/30 [&>div]:bg-card/70 [&>div]:shadow-[var(--shadow-composer)] [&>div]:transition-shadow [&>div]:duration-300 [&>div]:focus-within:!border-border/30 [&>div]:focus-within:!shadow-none [&>div]:focus-within:!ring-0"
+        className="[&>div]:h-auto [&>div]:items-stretch [&>div]:flex-col [&>div]:rounded-2xl [&>div]:border-border/70 [&>div]:bg-card [&>div]:shadow-sm [&>div]:transition-shadow [&>div]:duration-200 [&>div]:focus-within:shadow-md"
         onSubmit={handlePromptSubmit}
       >
         {(attachments.length > 0 || uploadQueue.length > 0) && (
@@ -602,7 +602,7 @@ function PureMultimodalInput({
         )}
         <div className="flex min-w-0 w-full items-center">
           <PromptInputTextarea
-            className="min-h-16 max-h-48 min-w-0 flex-1 self-stretch overflow-y-auto px-4 py-5 text-base leading-normal placeholder:text-foreground/45 md:text-[15px]"
+            className="min-h-16 max-h-48 min-w-0 flex-1 self-stretch overflow-y-auto px-4 pt-4 pb-3 text-base leading-6 placeholder:text-muted-foreground/70 md:text-sm"
             data-testid="multimodal-input"
             enterKeyHint="send"
             onChange={handleInput}
@@ -637,7 +637,7 @@ function PureMultimodalInput({
             <PromptInputSubmit
               aria-busy={isGenerating}
               className={cn(
-                "size-11 rounded-2xl transition-all duration-200 md:size-7 md:rounded-xl",
+                "size-11 rounded-xl transition-all duration-200 md:size-9 md:rounded-lg",
                 isGenerating
                   ? "bg-[var(--message-accent-background)] text-[var(--message-accent-foreground)] hover:opacity-85 active:scale-95"
                   : input.trim()
@@ -862,7 +862,7 @@ function PureModelSelectorCompact({
           <ModelSelectorTrigger asChild>
             <Button
               aria-label={t("chat.selectModel")}
-              className="size-11 shrink-0 rounded-lg p-0 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground active:translate-y-0 md:size-8"
+              className="size-11 shrink-0 rounded-lg p-0 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground active:translate-y-0 md:size-9"
               data-testid="model-selector"
               variant="ghost"
             >

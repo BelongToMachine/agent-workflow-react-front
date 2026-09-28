@@ -17,6 +17,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useOnClickOutside } from "usehooks-ts";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -416,7 +417,7 @@ const PureToolbar = ({
     <TooltipProvider delayDuration={0}>
       <motion.div
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="fixed right-6 bottom-6 z-50 flex cursor-pointer flex-col items-center rounded-3xl border bg-background py-1 shadow-lg"
+        className="fixed right-3 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-50 flex cursor-pointer flex-col items-center rounded-2xl border border-border/70 bg-popover py-1 shadow-xl md:right-6 md:bottom-6"
         exit={{ opacity: 0, transition: { duration: 0.1 }, y: -20 }}
         initial={{ opacity: 0, scale: 1, y: -20 }}
         onAnimationComplete={handleAnimationComplete}
@@ -427,13 +428,16 @@ const PureToolbar = ({
         transition={{ damping: 25, stiffness: 300, type: "spring" }}
       >
         {onClose ? (
-          <motion.div
-            animate={{ opacity: 1 }}
-            className="p-3 text-muted-foreground transition-colors hover:text-foreground"
-            initial={{ opacity: 0 }}
-            onClick={onClose}
-          >
-            <XIcon className="size-4" />
+          <motion.div animate={{ opacity: 1 }} initial={{ opacity: 0 }}>
+            <Button
+              aria-label={t("common.close")}
+              className="m-1 size-10 text-muted-foreground hover:text-foreground md:size-8"
+              onClick={onClose}
+              size="icon"
+              variant="ghost"
+            >
+              <XIcon className="size-4" />
+            </Button>
           </motion.div>
         ) : null}
 

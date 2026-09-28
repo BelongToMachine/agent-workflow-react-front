@@ -195,7 +195,7 @@ const PurePreviewMessage = ({
       return (
         <MessageContent
           className={cn("text-[13px] leading-[1.65]", {
-            "user-message-bubble w-fit max-w-[min(80%,56ch)] overflow-hidden break-words rounded-xl rounded-br-md px-3.5 py-2":
+            "user-message-bubble w-fit max-w-[min(84%,60ch)] overflow-hidden break-words rounded-2xl rounded-br-md px-4 py-2.5 shadow-sm":
               message.role === "user",
           })}
           data-testid="message-content"

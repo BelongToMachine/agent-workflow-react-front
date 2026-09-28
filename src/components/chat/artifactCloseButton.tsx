@@ -20,7 +20,7 @@ function PureArtifactCloseButton() {
 
   return (
     <button
-      className="group flex size-8 items-center justify-center rounded-lg border border-transparent text-muted-foreground transition-all duration-150 hover:border-border hover:bg-muted hover:text-foreground active:scale-95"
+      className="group flex size-10 shrink-0 items-center justify-center rounded-lg border border-transparent text-muted-foreground transition-colors hover:border-border/70 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-95 md:size-8"
       data-testid="artifact-close-button"
       aria-label={t("common.close")}
       onClick={handleClick}

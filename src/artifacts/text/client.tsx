@@ -106,14 +106,14 @@ export const textArtifact = new Artifact<"text", TextArtifactMetadata>({
           : selectedContent;
 
       return (
-        <div className="flex flex-row px-4 py-8 md:px-16 md:py-12 lg:px-20">
+        <div className="mx-auto flex w-full max-w-4xl flex-row px-4 py-8 sm:px-6 md:py-10">
           <DiffView newContent={selectedContent} oldContent={prevContent} />
         </div>
       );
     }
 
     return (
-      <div className="flex flex-row px-4 py-8 md:px-16 md:py-12 lg:px-20">
+      <div className="mx-auto flex w-full max-w-4xl flex-row px-4 py-8 sm:px-6 md:py-10">
         <Editor
           content={content}
           currentVersionIndex={currentVersionIndex}

@@ -39,7 +39,10 @@ export type ToolProps = ComponentProps<typeof Collapsible>;
 
 export const Tool = ({ className, ...props }: ToolProps) => (
   <Collapsible
-    className={cn("group not-prose mb-4 w-full rounded-md border", className)}
+    className={cn(
+      "group not-prose mb-4 w-full overflow-hidden rounded-xl border border-border/70 bg-card/60 shadow-sm",
+      className
+    )}
     {...props}
   />
 );
@@ -69,13 +72,13 @@ const statusLabels: Record<ToolPart["state"], string> = {
 };
 
 const statusIcons: Record<ToolPart["state"], ReactNode> = {
-  "approval-requested": <ClockIcon className="size-4 text-yellow-600" />,
-  "approval-responded": <CheckCircleIcon className="size-4 text-blue-600" />,
-  "input-available": <ClockIcon className="size-4 animate-pulse" />,
+  "approval-requested": <ClockIcon className="size-4 text-amber-600 dark:text-amber-400" />,
+  "approval-responded": <CheckCircleIcon className="size-4 text-primary" />,
+  "input-available": <ClockIcon className="size-4 animate-pulse text-primary" />,
   "input-streaming": <CircleIcon className="size-4" />,
-  "output-available": <CheckCircleIcon className="size-4 text-green-600" />,
-  "output-denied": <XCircleIcon className="size-4 text-orange-600" />,
-  "output-error": <XCircleIcon className="size-4 text-red-600" />,
+  "output-available": <CheckCircleIcon className="size-4 text-emerald-600 dark:text-emerald-400" />,
+  "output-denied": <XCircleIcon className="size-4 text-amber-600 dark:text-amber-400" />,
+  "output-error": <XCircleIcon className="size-4 text-destructive" />,
 };
 
 export const getStatusBadge = (
@@ -103,15 +106,15 @@ export const ToolHeader = ({
   return (
     <CollapsibleTrigger
       className={cn(
-        "flex w-full items-center justify-between gap-4 p-3",
+        "flex w-full items-center justify-between gap-3 px-3.5 py-3 text-left transition-colors hover:bg-muted/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
         className
       )}
       {...props}
     >
-      <div className="flex items-center gap-2">
-        <WrenchIcon className="size-4 text-muted-foreground" />
-        <span className="font-medium text-sm">{title ?? derivedName}</span>
-        {getStatusBadge(state, t)}
+      <div className="flex min-w-0 items-center gap-2">
+        <WrenchIcon className="size-4 shrink-0 text-muted-foreground" />
+        <span className="truncate font-medium text-sm">{title ?? derivedName}</span>
+        <span className="shrink-0">{getStatusBadge(state, t)}</span>
       </div>
       <ChevronDownIcon className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
     </CollapsibleTrigger>
@@ -123,7 +126,7 @@ export type ToolContentProps = ComponentProps<typeof CollapsibleContent>;
 export const ToolContent = ({ className, ...props }: ToolContentProps) => (
   <CollapsibleContent
     className={cn(
-      "data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 space-y-4 p-4 text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in",
+      "data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 space-y-4 border-t border-border/60 bg-background/70 p-3.5 text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in sm:p-4",
       className
     )}
     {...props}
@@ -142,7 +145,7 @@ export const ToolInput = ({ className, input, ...props }: ToolInputProps) => {
       <h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
         {t("common.parameters")}
       </h4>
-      <div className="rounded-md bg-muted/50">
+      <div className="overflow-hidden rounded-lg border border-border/60 bg-muted/30">
         <ToolCodeBlock code={JSON.stringify(input, null, 2)} />
       </div>
     </div>
@@ -182,7 +185,7 @@ export const ToolOutput = ({
       </h4>
       <div
         className={cn(
-          "overflow-x-auto rounded-md text-xs [&_table]:w-full",
+          "overflow-x-auto rounded-lg border border-border/60 bg-muted/20 text-xs [&_table]:w-full",
           errorText && "bg-destructive/10 text-destructive"
         )}
       >

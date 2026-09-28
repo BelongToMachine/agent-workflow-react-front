@@ -12,12 +12,14 @@
 - [x] 阶段 1：主题 token 与基础组件
 - [x] 阶段 2：应用侧栏与顶部栏
 - [x] 阶段 3：以外观设置和成员设置作为页面样板
-- [ ] 阶段 4：聊天主界面与 Artifact
+- [x] 阶段 4：聊天主界面与 Artifact
 - [ ] 阶段 5：知识库、上传和业务数据页面
 - [ ] 阶段 6：认证、异常与收尾页面
 - [ ] 阶段 7：清理与最终验收
 
-> 阶段 3 页面改造已完成并通过 lint/build；由于当前浏览器没有可用的登录会话，尚未在真实成员数据下人工核对浅/深色及手机/桌面交互。
+> 阶段 3 页面改造已完成并通过 lint/build；阶段 3 验收时没有可用的登录会话，因此未在真实成员数据下人工核对浅/深色及手机/桌面交互。
+
+> 阶段 4 聊天与 Artifact 的视觉适配已完成并通过 lint/build；已在带登录会话的本地桌面浏览器加载新聊天和历史消息，控制台无错误。未发送新消息或保存/恢复 Artifact 版本，以免对真实工作区产生写入；浏览器未能应用 390px 视口，因此手机布局及 Artifact 的写入流程仍需人工验收。
 
 ## 1. 目标与范围
 
@@ -96,7 +98,7 @@
 
 **工作**
 
-1. 调整 `src/components/chat/shell.tsx`、`chatHeader.tsx`、`messages.tsx`、`multimodalInput.tsx`、`sidebarHistory.tsx` 的视觉层级、间距、输入区和操作反馈，让聊天与新应用外壳形成同一风格。
+1. 调整 `src/components/chat/shell.tsx`、`messages.tsx`、`multimodalInput.tsx`、`sidebarHistory.tsx` 的视觉层级、间距、输入区和操作反馈，让聊天与新应用外壳形成同一风格。页面标题和账户操作已由阶段 2 的全局顶部栏承载；`chatHeader.tsx` 当前无引用，暂不重复迁移。
 2. 对 `src/components/ai-elements/` 的消息、reasoning、tool、Markdown/代码块统一字体、边框、状态色与展开样式；保持流式内容稳定滚动。
 3. 调整 `src/components/chat/artifact.tsx` 及文本、代码、图片、表格编辑器的面板、工具栏、版本切换和保存反馈；保持桌面分屏与移动端覆盖模式。
 4. 对长消息、代码块、表格、附件、SSE 等待状态和错误提示逐一检查，确保新容器宽度不会影响交互。

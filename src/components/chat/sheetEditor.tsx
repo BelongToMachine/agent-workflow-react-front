@@ -45,10 +45,10 @@ const PureSpreadsheetEditor = ({ content, saveContent }: SheetEditorProps) => {
 
   const columns = useMemo(() => {
     const rowNumberColumn = {
-      cellClass: "border-t border-r dark:bg-neutral-950 dark:text-neutral-50",
+      cellClass: "border-t border-r border-border bg-background text-foreground",
       frozen: true,
       headerCellClass:
-        "border-t border-r dark:bg-neutral-900 dark:text-neutral-50",
+        "border-t border-r border-border bg-muted text-muted-foreground font-medium",
       key: "rowNumber",
       name: "",
       renderCell: ({ rowIdx }: { rowIdx: number }) => rowIdx + 1,
@@ -56,10 +56,10 @@ const PureSpreadsheetEditor = ({ content, saveContent }: SheetEditorProps) => {
     };
 
     const dataColumns = Array.from({ length: MIN_COLS }, (_, i) => ({
-      cellClass: cn("border-t dark:bg-neutral-950 dark:text-neutral-50", {
+      cellClass: cn("border-t border-border bg-background text-foreground", {
         "border-l": i !== 0,
       }),
-      headerCellClass: cn("border-t dark:bg-neutral-900 dark:text-neutral-50", {
+      headerCellClass: cn("border-t border-border bg-muted text-muted-foreground font-medium", {
         "border-l": i !== 0,
       }),
       key: i.toString(),
@@ -121,7 +121,10 @@ const PureSpreadsheetEditor = ({ content, saveContent }: SheetEditorProps) => {
 
   return (
     <DataGrid
-      className={resolvedTheme === "dark" ? "rdg-dark" : "rdg-light"}
+      className={cn(
+        resolvedTheme === "dark" ? "rdg-dark" : "rdg-light",
+        "min-h-full overflow-auto border-x-0 border-y border-border/70 text-sm"
+      )}
       columns={columns}
       defaultColumnOptions={{
         resizable: true,
