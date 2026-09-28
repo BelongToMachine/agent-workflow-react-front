@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alertDialog";
 import { useActiveChat } from "@/hooks/useActiveChat";
-import { LoadingState } from "@/components/ui/loadingState";
+import { InlineLoadingState } from "@/components/ui/loadingState";
 import {
   initialArtifactData,
   useArtifact,
@@ -21,7 +21,6 @@ import {
 } from "@/hooks/useArtifact";
 import type { Attachment, ChatMessage } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { ChatHeader } from "./chatHeader";
 import { DataStreamHandler } from "./dataStreamHandler";
 import { submitEditedMessage } from "./messageEditor";
 import { Messages } from "./messages";
@@ -120,7 +119,10 @@ export function ChatShell() {
   if (isLoading) {
     return (
       <>
-        <LoadingState message={t("common.loading")} />
+        <InlineLoadingState
+          className="h-full min-h-0 flex-1"
+          message={t("common.loading")}
+        />
         <DataStreamHandler />
       </>
     );
@@ -128,19 +130,13 @@ export function ChatShell() {
 
   return (
     <>
-      <div className="flex h-dvh min-h-0 w-full flex-row overflow-hidden">
+      <div className="flex h-full min-h-0 w-full flex-row overflow-hidden">
         <div
           className={cn(
             "flex min-w-0 flex-col bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
             isArtifactVisible ? "w-[40%]" : "w-full"
           )}
         >
-          <ChatHeader
-            chatId={chatId}
-            isReadonly={isReadonly}
-            selectedVisibilityType={visibilityType}
-          />
-
           <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background md:rounded-tl-[12px] md:border-t md:border-l md:border-border/40">
             <Messages
               addToolApprovalResponse={addToolApprovalResponse}
@@ -186,7 +182,14 @@ export function ChatShell() {
         </div>
 
         {isArtifactVisible ? (
-          <Suspense fallback={<LoadingState message={t("common.loading")} />}>
+          <Suspense
+            fallback={
+              <InlineLoadingState
+                className="h-full min-h-0 flex-1"
+                message={t("common.loading")}
+              />
+            }
+          >
             <Artifact
               addToolApprovalResponse={addToolApprovalResponse}
               attachments={attachments}

@@ -14,6 +14,7 @@ import { LoadingState } from "./components/ui/loadingState";
 import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
 import { Link, usePathname, useRouter } from "./lib/router";
 import { applyAccentColor, getStoredAccentColor } from "./lib/accentColor";
+import { WorkspaceHeader } from "./components/chat/workspaceHeader";
 
 function lazyNamed(loader, exportName) {
   return lazy(() =>
@@ -259,7 +260,11 @@ function ChatLayout() {
   }
 
   return (
-    <SidebarProvider defaultOpen>
+    <SidebarProvider
+      className="h-dvh min-h-0 overflow-hidden"
+      defaultOpen
+      style={{ "--sidebar-width-icon": "3.25rem" }}
+    >
       <RouteSuspense>
         <AppSidebar
           canManageKnowledgeBases={
@@ -271,7 +276,9 @@ function ChatLayout() {
           user={user}
         />
       </RouteSuspense>
-      <SidebarInset>
+      <SidebarInset className="m-2 h-[calc(100dvh-1rem)] min-h-0 overflow-hidden rounded-xl border border-border bg-background shadow-sm max-md:m-0 max-md:h-dvh max-md:rounded-none max-md:border-0">
+        <WorkspaceHeader user={user} />
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-background">
           <RouteSuspense>
             <Toaster
               position="top-center"
@@ -396,6 +403,7 @@ function ChatLayout() {
             />
             <Route element={<NotFoundPage />} path="*" />
           </Routes>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );
@@ -510,7 +518,7 @@ function SettingsPage({
 }) {
   const { t } = useTranslation();
   return (
-    <main className="min-h-dvh overflow-y-auto bg-background px-4 py-8 md:px-8">
+    <main className="min-h-full bg-background px-4 py-6 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{t(titleKey)}</h1>

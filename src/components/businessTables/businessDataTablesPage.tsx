@@ -575,7 +575,7 @@ export function BusinessDataTablesPage() {
   const contentGroup = tables.filter((table) => table.category === "content");
 
   return (
-    <main className="business-data-page min-h-dvh bg-background px-4 py-6 text-foreground md:px-8 md:py-8">
+    <main className="business-data-page min-h-full bg-background px-4 py-6 text-foreground md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-5">
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div>

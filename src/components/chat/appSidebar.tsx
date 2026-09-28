@@ -4,7 +4,6 @@ import { type InfiniteData, useQueryClient } from "@tanstack/react-query";
 import {
   DatabaseIcon,
   MessageSquareIcon,
-  PanelLeftIcon,
   PenSquareIcon,
   ShieldCheckIcon,
   TrashIcon,
@@ -16,11 +15,9 @@ import { type MouseEvent, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { SidebarHistory } from "@/components/chat/sidebarHistory";
-import { SidebarUserNav } from "@/components/chat/sidebarUserNav";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
@@ -28,7 +25,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import {
@@ -53,7 +49,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../ui/alertDialog";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Spinner } from "../ui/spinner";
 
 export function AppSidebar({
@@ -67,8 +62,8 @@ export function AppSidebar({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { i18n, t } = useTranslation();
-  const { setOpenMobile, toggleSidebar } = useSidebar();
+  const { t } = useTranslation();
+  const { setOpenMobile } = useSidebar();
   const queryClient = useQueryClient();
   const identity = useBackendIdentity(user?.id);
   const activePathname = pathname.replace(/\/+$/, "") || "/";
@@ -85,10 +80,6 @@ export function AppSidebar({
   const closeMobile = useCallback(() => {
     setOpenMobile(false);
   }, [setOpenMobile]);
-
-  const handleToggleSidebar = useCallback(() => {
-    toggleSidebar();
-  }, [toggleSidebar]);
 
   const handleNewChat = useCallback(() => {
     setOpenMobile(false);
@@ -141,37 +132,28 @@ export function AppSidebar({
 
   return (
     <>
-      <Sidebar collapsible="icon">
-        <SidebarHeader className="pb-0 pt-3">
+      <Sidebar
+        className="**:data-[slot=sidebar-inner]:rounded-xl **:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:border-sidebar-border"
+        collapsible="icon"
+        variant="inset"
+      >
+        <SidebarHeader className="border-b border-sidebar-border/70 p-3">
           <SidebarMenu>
-            <SidebarMenuItem className="flex flex-row items-center justify-between">
-              <div className="group/logo relative flex items-center justify-center">
-                <SidebarMenuButton
-                  asChild
-                  className="size-8 !px-0 items-center justify-center group-data-[collapsible=icon]:group-hover/logo:opacity-0"
-                  tooltip={t("app.name")}
-                >
-                  <Link href="/" onClick={closeMobile}>
-                    <MessageSquareIcon className="size-4 text-sidebar-foreground/50" />
-                  </Link>
-                </SidebarMenuButton>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <SidebarMenuButton
-                      className="pointer-events-none absolute inset-0 size-8 opacity-0 group-data-[collapsible=icon]:pointer-events-auto group-data-[collapsible=icon]:group-hover/logo:opacity-100"
-                      onClick={handleToggleSidebar}
-                    >
-                      <PanelLeftIcon className="size-4" />
-                    </SidebarMenuButton>
-                  </TooltipTrigger>
-                  <TooltipContent className="hidden md:block" side="right">
-                    {t("sidebar.open")}
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-              <div className="group-data-[collapsible=icon]:hidden">
-                <SidebarTrigger className="text-sidebar-foreground/60 transition-colors duration-150 hover:text-sidebar-foreground" />
-              </div>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                className="h-10 gap-2.5 rounded-lg px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
+                tooltip={t("app.name")}
+              >
+                <Link href="/" onClick={closeMobile}>
+                  <span className="grid size-7 shrink-0 place-items-center rounded-md bg-sidebar-accent text-sidebar-accent-foreground">
+                    <MessageSquareIcon className="size-4" />
+                  </span>
+                  <span className="truncate font-semibold tracking-tight group-data-[collapsible=icon]:hidden">
+                    {t("app.name")}
+                  </span>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
@@ -255,7 +237,7 @@ export function AppSidebar({
                       className={getSidebarNavigationItemClassName(isBusinessDataActive)}
                       isActive={isBusinessDataActive}
                       onClick={closeMobile}
-                      tooltip={i18n.language.toLowerCase().startsWith("zh") ? "业务数据表" : "Business data tables"}
+                      tooltip={t("sidebar.businessData")}
                     >
                       <Link
                         aria-current={isBusinessDataActive ? "page" : undefined}
@@ -263,7 +245,7 @@ export function AppSidebar({
                       >
                         <DatabaseIcon className="size-4" />
                         <span className="text-[13px]">
-                          {i18n.language.toLowerCase().startsWith("zh") ? "业务数据表" : "Business data"}
+                          {t("sidebar.businessData")}
                         </span>
                       </Link>
                     </SidebarMenuButton>
@@ -286,9 +268,6 @@ export function AppSidebar({
           </SidebarGroup>
           <SidebarHistory user={user} />
         </SidebarContent>
-        <SidebarFooter className="border-t border-sidebar-border pt-2 pb-3">
-          {user ? <SidebarUserNav user={user} /> : null}
-        </SidebarFooter>
         <SidebarRail />
       </Sidebar>
 
