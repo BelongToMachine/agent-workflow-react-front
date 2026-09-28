@@ -258,21 +258,21 @@ export function KnowledgeBaseGrants() {
 
   return (
     <>
-      <header className="mb-8 flex flex-col gap-5 border-b border-border/70 pb-7 md:flex-row md:items-end md:justify-between">
-        <div>
-          <div className="mb-3 flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-[0.18em]">
-            <ShieldCheckIcon className="size-4 text-primary" />
+      <header className="mb-5 flex flex-col gap-3 border-b border-border/70 pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <div className="mb-1.5 flex items-center gap-2 text-muted-foreground text-[11px] font-medium uppercase tracking-[0.14em]">
+            <ShieldCheckIcon className="size-3.5 text-primary" />
             {t("settings.knowledgeAccess")}
           </div>
-          <h2 className="font-semibold text-3xl tracking-tight md:text-4xl">
+          <h2 className="font-semibold text-lg tracking-tight">
             {t("settings.knowledgeGrants")}
           </h2>
-          <p className="mt-2 max-w-xl text-muted-foreground text-sm leading-6">
+          <p className="mt-1 max-w-xl text-muted-foreground text-sm leading-5">
             {t("settings.knowledgeGrantDescription")}
           </p>
         </div>
-        <Badge className="w-fit gap-1.5 px-3 py-1.5" variant="outline">
-          <KeyRoundIcon className="size-3.5" />
+        <Badge className="w-fit shrink-0 gap-1.5" variant="outline">
+          <KeyRoundIcon className="size-3" />
           {t("settings.activeGrants", { count: grants.length })}
         </Badge>
       </header>
@@ -283,9 +283,9 @@ export function KnowledgeBaseGrants() {
         </p>
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
-        <section className="rounded-2xl border border-border/70 bg-card/50 p-2 shadow-sm">
-          <div className="px-3 py-3 text-muted-foreground text-xs uppercase tracking-[0.14em]">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <section className="min-w-0 rounded-xl border border-border bg-card p-2">
+          <div className="border-b border-border/70 px-3 py-3 text-muted-foreground text-[11px] font-medium uppercase tracking-[0.12em]">
             {t("settings.knowledgeBasesCount", { count: knowledgeBases.length })}
           </div>
           {knowledgeBases.length === 0 ? (
@@ -293,7 +293,7 @@ export function KnowledgeBaseGrants() {
               {t("settings.noKnowledgeBases")}
             </p>
           ) : (
-            <div className="space-y-1">
+            <div className="space-y-0.5 pt-2">
               {knowledgeBases.map((knowledgeBase) => {
                 const isSelected =
                   knowledgeBase.knowledgeBaseId === selectedKnowledgeBaseId;
@@ -305,18 +305,18 @@ export function KnowledgeBaseGrants() {
                   <button
                     aria-pressed={isSelected}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors",
+                      "flex w-full items-center gap-3 rounded-md border-l-2 px-2.5 py-2.5 text-left transition-colors",
                       isSelected
-                        ? "bg-primary/10 text-foreground"
-                        : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                        ? "border-primary bg-muted/70 text-foreground"
+                        : "border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     )}
                     data-knowledge-base-id={knowledgeBase.knowledgeBaseId}
                     key={knowledgeBase.knowledgeBaseId}
                     onClick={selectKnowledgeBase}
                     type="button"
                   >
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                      <DatabaseIcon className="size-4" />
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground">
+                      <DatabaseIcon className="size-3.5" />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium text-sm">
@@ -336,16 +336,16 @@ export function KnowledgeBaseGrants() {
           )}
         </section>
 
-        <section className="min-w-0 rounded-2xl border border-border/70 bg-card/50 shadow-sm">
+        <section className="min-w-0 rounded-xl border border-border bg-card">
           {selectedKnowledgeBase ? (
             <>
-              <div className="border-b border-border/70 p-5 md:p-7">
+              <div className="border-b border-border/70 p-4 sm:p-5">
                 <div className="flex items-start gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <DatabaseIcon className="size-5" />
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                    <DatabaseIcon className="size-4" />
                   </span>
-                  <div>
-                    <h2 className="font-semibold text-xl tracking-tight">
+                  <div className="min-w-0">
+                    <h2 className="truncate font-semibold text-lg tracking-tight">
                       {selectedKnowledgeBase.displayName}
                     </h2>
                     <p className="mt-1 text-muted-foreground text-sm">
@@ -356,7 +356,7 @@ export function KnowledgeBaseGrants() {
               </div>
 
               <form
-                className="grid min-w-0 gap-4 border-b border-border/70 p-5 sm:grid-cols-2 md:p-7 2xl:grid-cols-[130px_minmax(0,1fr)_130px_auto] 2xl:items-end"
+                className="grid min-w-0 gap-3 border-b border-border/70 p-4 sm:grid-cols-2 sm:gap-4 sm:p-5 xl:grid-cols-[150px_minmax(0,1fr)_150px_auto] xl:items-end"
                 onSubmit={saveGrant}
               >
                 <div className="grid gap-2">
@@ -422,29 +422,29 @@ export function KnowledgeBaseGrants() {
                 </Button>
               </form>
 
-              <div className="p-5 md:p-7">
-                <div className="mb-4 flex items-center gap-2 font-medium text-sm">
+              <div className="p-4 sm:p-5">
+                <div className="mb-3 flex items-center gap-2 font-medium text-sm">
                   <UsersRoundIcon className="size-4 text-primary" />
                   {t("settings.currentGrants")}
                 </div>
                 {selectedGrants.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-border/80 px-4 py-8 text-center text-muted-foreground text-sm">
+                  <div className="rounded-lg border border-dashed border-border px-4 py-8 text-center text-muted-foreground text-sm">
                     {t("settings.noExplicitGrants")}
                   </div>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="divide-y divide-border/70">
                     {selectedGrants.map((grant) => (
                       <div
-                        className="flex flex-col gap-3 rounded-xl border border-border/70 bg-background/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+                        className="flex flex-col gap-3 px-1 py-3 sm:flex-row sm:items-center sm:justify-between"
                         key={grant.grantId}
                       >
-                        <div className="flex min-w-0 items-center gap-3">
-                          <Badge variant="secondary">
+                        <div className="flex min-w-0 flex-wrap items-center gap-2.5">
+                          <Badge className="shrink-0" variant="secondary">
                             {grant.subjectType === "role"
                               ? t("settings.role")
                               : t("settings.user")}
                           </Badge>
-                          <span className="truncate font-medium text-sm">
+                          <span className="min-w-0 flex-1 truncate font-medium text-sm">
                             {grant.subjectId}
                           </span>
                           <Badge variant="outline">
@@ -496,9 +496,9 @@ export function KnowledgeBaseGrants() {
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex items-center justify-center px-4 py-10">
-      <div className="max-w-md rounded-2xl border border-border/70 bg-card/50 px-6 py-8 text-center shadow-sm">
-        <ShieldCheckIcon className="mx-auto size-8 text-muted-foreground" />
+    <div className="grid min-h-64 place-items-center rounded-lg border border-dashed border-border px-5 py-10 text-center">
+      <div className="max-w-md">
+        <ShieldCheckIcon className="mx-auto size-6 text-muted-foreground" />
         <p className="mt-3 text-muted-foreground text-sm leading-6">
           {message}
         </p>

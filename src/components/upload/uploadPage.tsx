@@ -217,16 +217,6 @@ export function UploadPage() {
     [addFiles]
   );
 
-  const handleDropzoneKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        fileInputRef.current?.click();
-      }
-    },
-    []
-  );
-
   const removeItem = useCallback((id: string) => {
     setItems((current) => current.filter((item) => item.id !== id));
   }, []);
@@ -346,18 +336,18 @@ export function UploadPage() {
   }
 
   return (
-    <main className="min-h-full overflow-y-auto bg-background px-4 py-8 md:px-8 md:py-10">
+    <main className="min-h-full overflow-y-auto bg-background px-4 py-6 md:px-8 md:py-8">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-8 flex flex-col gap-6 border-b border-border/70 pb-8 md:flex-row md:items-end md:justify-between">
+        <header className="mb-6 flex flex-col gap-4 border-b border-border/70 pb-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
-            <div className="mb-3 flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-[0.18em]">
+            <div className="mb-2 flex items-center gap-2 text-muted-foreground text-[11px] font-medium uppercase tracking-[0.14em]">
               <span aria-hidden="true" className="size-2 rounded-full bg-primary" />
               {t("upload.eyebrow")}
             </div>
-            <h1 className="text-balance font-semibold text-3xl tracking-[-0.04em] md:text-5xl">
+            <h1 className="text-balance font-semibold text-2xl tracking-tight sm:text-3xl">
               {t("upload.title")}
             </h1>
-            <p className="mt-3 max-w-xl text-muted-foreground text-sm leading-7 md:text-base">
+            <p className="mt-2 max-w-xl text-muted-foreground text-sm leading-6">
               {t(
                 activeTab === "manual"
                   ? "upload.description"
@@ -365,9 +355,9 @@ export function UploadPage() {
               )}
             </p>
           </div>
-          <div className="flex items-center gap-3 text-muted-foreground text-xs">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs">
             <span className="font-mono text-foreground">01</span>
-            <span aria-hidden="true" className="h-px w-8 bg-border" />
+            <span aria-hidden="true" className="h-px w-6 bg-border" />
             <span>
               {t(
                 activeTab === "manual"
@@ -399,7 +389,7 @@ export function UploadPage() {
         <div className="w-full">
           <div
             aria-label={t("upload.modeLabel")}
-            className="mb-5 flex border-b border-border/70"
+            className="mb-4 flex overflow-x-auto border-b border-border/70"
             onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
               if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
                 return;
@@ -423,7 +413,7 @@ export function UploadPage() {
                 aria-controls={`upload-panel-${tab}`}
                 aria-selected={activeTab === tab}
                 className={cn(
-                  "-mb-px min-h-11 border-b-2 px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "-mb-px min-h-10 shrink-0 border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   activeTab === tab
                     ? "border-foreground text-foreground"
                     : "border-transparent text-muted-foreground hover:text-foreground"
@@ -447,8 +437,8 @@ export function UploadPage() {
             role="tabpanel"
             tabIndex={0}
           >
-          <section className="w-full rounded-2xl border border-border/70 bg-card/50 shadow-[var(--shadow-card)]">
-            <div className="border-b border-border/70 p-5 md:p-7">
+          <section className="w-full overflow-hidden rounded-xl border border-border bg-card">
+            <div className="border-b border-border/70 p-4 sm:p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-muted-foreground text-xs uppercase tracking-[0.16em]">
@@ -458,7 +448,7 @@ export function UploadPage() {
                     <span className="sr-only">{t("upload.destinationLabel")}</span>
                     <select
                       aria-label={t("upload.destinationLabel")}
-                      className="h-10 max-w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-shadow focus:ring-2 focus:ring-ring"
+                      className="mt-1 h-9 w-full max-w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-ring sm:w-auto sm:min-w-56"
                       disabled={knowledgeBases.length === 0 || isUploading}
                       onChange={(event) => setSelectedKnowledgeBaseId(event.target.value)}
                       value={selectedKnowledgeBaseId}
@@ -484,10 +474,10 @@ export function UploadPage() {
               </div>
             </div>
 
-            <div className="p-5 md:p-7">
+            <div className="p-4 sm:p-5">
               {knowledgeBases.length === 0 ? (
-                <div className="rounded-xl border border-dashed border-border/80 px-6 py-14 text-center">
-                  <DatabaseIcon className="mx-auto size-8 text-muted-foreground" />
+                <div className="rounded-lg border border-dashed border-border px-5 py-10 text-center sm:px-6">
+                  <DatabaseIcon className="mx-auto size-6 text-muted-foreground" />
                   <p className="mt-3 font-medium text-sm">{t("upload.noKnowledgeBase")}</p>
                   <p className="mx-auto mt-2 max-w-sm text-muted-foreground text-sm leading-6">
                     {t("upload.noKnowledgeBaseDescription")}
@@ -502,13 +492,11 @@ export function UploadPage() {
               ) : (
                 <>
                   <div
-                    aria-describedby="upload-dropzone-hint"
-                    aria-label={t("upload.dropTitle")}
                     className={cn(
-                      "group relative flex min-h-72 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border border-dashed px-6 py-12 text-center outline-none transition-colors",
+                      "group relative flex min-h-60 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-lg border border-dashed px-5 py-9 text-center transition-colors sm:px-6",
                       isDragging
-                        ? "border-foreground bg-muted/70"
-                        : "border-border/90 bg-background/35 hover:border-foreground/50 hover:bg-muted/30",
+                        ? "border-primary bg-primary/[0.04]"
+                        : "border-border bg-muted/15 hover:border-foreground/35 hover:bg-muted/35",
                       isUploading && "pointer-events-none opacity-70"
                     )}
                     onClick={() => fileInputRef.current?.click()}
@@ -522,20 +510,23 @@ export function UploadPage() {
                     }}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={handleDrop}
-                    onKeyDown={handleDropzoneKeyDown}
-                    role="button"
-                    tabIndex={0}
                   >
-                    <div className="mb-5 flex size-14 items-center justify-center rounded-full border border-border bg-muted/60 text-foreground transition-transform duration-300 group-hover:-translate-y-1">
-                      <UploadCloudIcon className="size-6" strokeWidth={1.5} />
+                    <div className="mb-4 flex size-10 items-center justify-center rounded-lg bg-muted text-foreground">
+                      <UploadCloudIcon className="size-5" strokeWidth={1.5} />
                     </div>
-                    <h2 className="font-medium text-lg tracking-tight">{t("upload.dropTitle")}</h2>
-                    <p className="mt-2 text-muted-foreground text-sm">{t("upload.dropDescription")}</p>
-                    <Button className="mt-5" disabled={isUploading} type="button" variant="outline">
+                    <h2 className="font-medium text-base tracking-tight">{t("upload.dropTitle")}</h2>
+                    <p className="mt-1 max-w-lg text-muted-foreground text-sm leading-5">{t("upload.dropDescription")}</p>
+                    <Button
+                      aria-describedby="upload-dropzone-hint"
+                      className="mt-4"
+                      disabled={isUploading}
+                      type="button"
+                      variant="outline"
+                    >
                       <FileUpIcon />
                       {t("upload.chooseFiles")}
                     </Button>
-                    <p className="mt-5 max-w-sm text-muted-foreground text-xs leading-5" id="upload-dropzone-hint">
+                    <p className="mt-4 max-w-sm text-muted-foreground text-xs leading-5" id="upload-dropzone-hint">
                       {t("upload.formats")}
                     </p>
                     <input
@@ -549,7 +540,7 @@ export function UploadPage() {
                     />
                   </div>
 
-                  <div className="mt-7 flex flex-col gap-3 border-b border-border/70 pb-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="mt-6 flex flex-col gap-3 border-b border-border/70 pb-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <h2 className="font-medium text-sm">{t("upload.reviewTitle")}</h2>
                       <p className="mt-1 text-muted-foreground text-xs">{t("upload.reviewDescription")}</p>
@@ -562,8 +553,8 @@ export function UploadPage() {
                   </div>
 
                   {items.length === 0 ? (
-                    <div className="flex flex-col items-center px-4 py-10 text-center">
-                      <FileArchiveIcon className="size-7 text-muted-foreground/70" />
+                    <div className="flex flex-col items-center px-4 py-8 text-center">
+                      <FileArchiveIcon className="size-6 text-muted-foreground/70" />
                       <p className="mt-3 text-muted-foreground text-sm">{t("upload.emptyQueue")}</p>
                     </div>
                   ) : (
@@ -583,7 +574,7 @@ export function UploadPage() {
             </div>
 
             {knowledgeBases.length > 0 ? (
-              <div className="flex flex-col gap-4 border-t border-border/70 bg-muted/20 px-5 py-4 md:flex-row md:items-center md:justify-between md:px-7">
+              <div className="flex flex-col gap-4 border-t border-border/70 bg-muted/20 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                 <div className="min-w-0 flex-1 text-muted-foreground text-xs">
                   {isUploading ? (
                     <div className="max-w-sm space-y-2" role="status">
@@ -842,8 +833,8 @@ function AutomatedUploadPanel({
   ];
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-border/70 bg-card/50 shadow-[var(--shadow-card)]">
-      <div className="flex flex-col gap-4 border-b border-border/70 p-5 sm:flex-row sm:items-end sm:justify-between md:p-7">
+    <section className="overflow-hidden rounded-xl border border-border bg-card">
+      <div className="flex flex-col gap-4 border-b border-border/70 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-5">
         <div>
           <p className="text-muted-foreground text-xs uppercase tracking-[0.16em]">
             {t("upload.destinationLabel")}
@@ -873,9 +864,9 @@ function AutomatedUploadPanel({
         </p>
       </div>
 
-      <div className="p-5 md:p-7">
+      <div className="p-4 sm:p-5">
         {knowledgeBases.length === 0 ? (
-          <div className="mb-6 flex flex-col items-start gap-3 rounded-xl border border-dashed border-border/80 px-5 py-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-5 flex flex-col items-start gap-3 rounded-lg border border-dashed border-border px-4 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-medium text-sm">{t("upload.noKnowledgeBase")}</p>
               <p className="mt-1 text-muted-foreground text-xs leading-5">
@@ -1046,8 +1037,6 @@ function AutomatedUploadPanel({
         ) : null}
 
         <div
-          aria-describedby="automation-dropzone-hint"
-          aria-label={t("upload.automationDropTitle")}
           className={cn(
             "group mx-auto mt-6 flex min-h-40 max-w-2xl cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-6 py-7 text-center outline-none transition-colors",
             isDragging
@@ -1056,7 +1045,6 @@ function AutomatedUploadPanel({
             (disabled || isRunning) && "pointer-events-none opacity-60",
             selectedFile && "min-h-28"
           )}
-          aria-disabled={disabled || isRunning}
           onClick={() => fileInputRef.current?.click()}
           onDragEnter={(event: DragEvent<HTMLDivElement>) => {
             event.preventDefault();
@@ -1072,14 +1060,6 @@ function AutomatedUploadPanel({
             setIsDragging(false);
             selectFile(event.dataTransfer.files[0]);
           }}
-          onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              fileInputRef.current?.click();
-            }
-          }}
-          role="button"
-          tabIndex={disabled || isRunning ? -1 : 0}
         >
           {!selectedFile ? (
             <>
@@ -1088,13 +1068,26 @@ function AutomatedUploadPanel({
               <p className="mt-1 text-muted-foreground text-xs">
                 {t("upload.dropDescription")}
               </p>
-              <Button className="mt-4" disabled={disabled || isRunning} type="button" variant="outline">
+              <Button
+                aria-describedby="automation-dropzone-hint"
+                className="mt-4"
+                disabled={disabled || isRunning}
+                type="button"
+                variant="outline"
+              >
                 <FileUpIcon />
                 {t("upload.chooseFiles")}
               </Button>
             </>
           ) : (
-            <p className="font-medium text-sm">{t("upload.automationChooseAnother")}</p>
+            <Button
+              aria-describedby="automation-dropzone-hint"
+              disabled={disabled || isRunning}
+              type="button"
+              variant="outline"
+            >
+              {t("upload.automationChooseAnother")}
+            </Button>
           )}
           <p className="mt-3 max-w-sm text-muted-foreground text-xs leading-5" id="automation-dropzone-hint">
             {t("upload.formats")} · {t("upload.maxFileSize")}
@@ -1113,7 +1106,7 @@ function AutomatedUploadPanel({
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 border-t border-border/70 bg-muted/20 px-5 py-4 sm:flex-row sm:items-center sm:justify-between md:px-7">
+      <div className="flex flex-col gap-3 border-t border-border/70 bg-muted/20 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <span className="text-muted-foreground text-xs">
           {selectedFile ? t("upload.maxFileSize") : t("upload.automationQueueHint")}
         </span>
@@ -1168,12 +1161,12 @@ function UploadItemRow({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 rounded-xl border px-3 py-3",
+        "flex items-center gap-3 rounded-lg border px-3 py-2.5",
         item.status === "failed"
           ? "border-destructive/25 bg-destructive/[0.035]"
           : item.status === "uploaded"
             ? "border-emerald-500/20 bg-emerald-500/[0.035]"
-            : "border-border/70 bg-background/45"
+            : "border-border bg-background/60"
       )}
     >
       <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">

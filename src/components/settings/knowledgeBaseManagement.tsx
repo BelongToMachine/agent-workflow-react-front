@@ -301,10 +301,10 @@ export function KnowledgeBaseManagement() {
         </div>
       ) : null}
 
-      <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
-        <section className="rounded-2xl border border-border/70 bg-card/50 p-2 shadow-sm">
-          <div className="flex items-center justify-between px-3 py-3">
-            <div className="text-muted-foreground text-xs uppercase tracking-[0.14em]">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <section className="min-w-0 rounded-xl border border-border bg-card p-2">
+          <div className="flex items-center justify-between border-b border-border/70 px-3 py-3">
+            <div className="text-muted-foreground text-[11px] font-medium uppercase tracking-[0.12em]">
               {t("settings.knowledgeBasesCount", {
                 count: knowledgeBases.length,
               })}
@@ -312,7 +312,7 @@ export function KnowledgeBaseManagement() {
             <DatabaseIcon className="size-4 text-muted-foreground" />
           </div>
           <form
-            className="flex gap-2 border-b border-border/70 px-2 pb-3"
+            className="flex gap-2 border-b border-border/70 px-2 py-3"
             onSubmit={createKnowledgeBase}
           >
             <Label className="sr-only" htmlFor="new-knowledge-base-name">
@@ -340,7 +340,7 @@ export function KnowledgeBaseManagement() {
               {t("settings.noKnowledgeBases")}
             </p>
           ) : (
-            <div className="space-y-1 pt-2">
+              <div className="space-y-0.5 pt-2">
               {knowledgeBases.map((knowledgeBase) => {
                 const isSelected =
                   knowledgeBase.knowledgeBaseId === selectedKnowledgeBaseId;
@@ -348,18 +348,18 @@ export function KnowledgeBaseManagement() {
                   <button
                     aria-pressed={isSelected}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors",
+                      "flex w-full items-center gap-3 rounded-md border-l-2 px-2.5 py-2.5 text-left transition-colors",
                       isSelected
-                        ? "bg-primary/10 text-foreground"
-                        : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                        ? "border-primary bg-muted/70 text-foreground"
+                        : "border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     )}
                     data-knowledge-base-id={knowledgeBase.knowledgeBaseId}
                     key={knowledgeBase.knowledgeBaseId}
                     onClick={selectKnowledgeBase}
                     type="button"
                   >
-                    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-                      <DatabaseIcon className="size-4" />
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground">
+                      <DatabaseIcon className="size-3.5" />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium text-sm">
@@ -376,29 +376,29 @@ export function KnowledgeBaseManagement() {
           )}
         </section>
 
-        <section className="rounded-2xl border border-border/70 bg-card/50 shadow-sm">
+        <section className="min-w-0 rounded-xl border border-border bg-card">
           {selectedKnowledgeBase ? (
             <>
-              <div className="border-b border-border/70 p-5 md:p-7">
+              <div className="border-b border-border/70 p-4 sm:p-5">
                 <div className="flex items-start gap-3">
-                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <DatabaseIcon className="size-5" />
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                    <DatabaseIcon className="size-4" />
                   </span>
-                  <div>
-                    <p className="text-muted-foreground text-xs uppercase tracking-[0.14em]">
+                  <div className="min-w-0">
+                    <p className="text-muted-foreground text-[11px] font-medium uppercase tracking-[0.12em]">
                       {t("settings.knowledgeBaseManagement")}
                     </p>
-                    <h2 className="mt-2 font-semibold text-xl tracking-tight">
+                    <h2 className="mt-1 truncate font-semibold text-lg tracking-tight">
                       {selectedKnowledgeBase.displayName}
                     </h2>
-                    <p className="mt-1 text-muted-foreground text-sm">
+                    <p className="mt-1 text-muted-foreground text-sm leading-5">
                       {t("settings.knowledgeBaseManagementSelectedDescription")}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="p-5 md:p-7">
+              <div className="p-4 sm:p-5">
                 <form
                   className="flex flex-col gap-2 sm:flex-row sm:items-end"
                   onSubmit={renameKnowledgeBase}
@@ -483,9 +483,9 @@ export function KnowledgeBaseManagement() {
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex min-h-80 flex-col items-center justify-center rounded-2xl border border-border/70 bg-card/50 px-6 py-10 text-center shadow-sm">
-      <DatabaseIcon className="size-8 text-muted-foreground" />
-      <p className="mt-3 max-w-md text-muted-foreground text-sm leading-6">
+    <div className="flex min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/10 px-6 py-10 text-center">
+      <DatabaseIcon className="size-6 text-muted-foreground" />
+      <p aria-live="polite" className="mt-3 max-w-md text-muted-foreground text-sm leading-6" role="status">
         {message}
       </p>
     </div>

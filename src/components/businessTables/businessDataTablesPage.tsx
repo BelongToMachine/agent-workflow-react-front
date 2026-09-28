@@ -31,6 +31,7 @@ import { useTranslation } from "react-i18next";
 import { useApplicationAuth } from "@/lib/auth/applicationAuth";
 import { useSession } from "@/lib/auth";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Input } from "@/components/ui/input";
 import mockBusinessTables from "@/data/businessTables.mock.json";
 import { requestBackend } from "@/lib/backend/request";
 import { queryMockRows } from "@/lib/businessTables/mockQuery.mjs";
@@ -576,17 +577,17 @@ export function BusinessDataTablesPage() {
 
   return (
     <main className="business-data-page min-h-full bg-background px-4 py-6 text-foreground md:px-8 md:py-8">
-      <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-5">
+      <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-4">
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <div className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            <div className="mb-1.5 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
               <DatabaseIcon aria-hidden="true" className="size-3.5" />
               <span>{locale === "zh" ? "Asianode · 数据浏览" : "Asianode · Data explorer"}</span>
             </div>
-            <h1 className="m-0 text-2xl font-semibold tracking-tight text-foreground md:text-[28px]">
+            <h1 className="m-0 text-2xl font-semibold tracking-tight text-foreground">
               {copy.title}
             </h1>
-            <p className="mt-1.5 text-sm text-muted-foreground">{copy.subtitle}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{copy.subtitle}</p>
           </div>
           <span className="business-mock-badge">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-current" />
@@ -594,8 +595,8 @@ export function BusinessDataTablesPage() {
           </span>
         </header>
 
-        <section aria-label={locale === "zh" ? "业务表选择" : "Business table selector"} className="flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        <section aria-label={locale === "zh" ? "业务表选择" : "Business table selector"} className="flex flex-col gap-2.5">
+          <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
             <span>{copy.productGroup}</span>
             <span aria-hidden="true" className="h-px flex-1 bg-border" />
           </div>
@@ -610,7 +611,7 @@ export function BusinessDataTablesPage() {
               />
             ))}
           </div>
-          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+          <div className="mt-1 flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
             <span>{copy.contentGroup}</span>
             <span aria-hidden="true" className="h-px flex-1 bg-border" />
           </div>
@@ -635,13 +636,13 @@ export function BusinessDataTablesPage() {
           </span>
         </div>
 
-        <section className="overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)]">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-3 py-3 md:px-4">
-            <div className="relative min-w-[220px] flex-1 sm:max-w-[420px]">
+        <section className="overflow-hidden rounded-xl border border-border bg-card">
+          <div className="flex flex-col gap-3 border-b border-border px-3 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between md:px-4">
+            <div className="relative w-full min-w-0 flex-1 sm:min-w-[220px] sm:max-w-[420px]">
               <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <input
+              <Input
                 aria-label={copy.searchLabel}
-                className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-9 text-sm text-foreground outline-none transition-shadow placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-ring/40"
+                className="h-9 rounded-md pl-9 pr-9 text-sm placeholder:text-muted-foreground/70"
                 onChange={(event) => setSearchValue(event.target.value)}
                 placeholder={copy.searchPlaceholder}
                 ref={searchInputRef}

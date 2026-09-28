@@ -570,21 +570,21 @@ export function KnowledgeFileLibrary({
     selectableFiles.length > 0 && selectedFileIds.size === selectableFiles.length;
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-border/70 bg-card/50 shadow-[var(--shadow-card)]">
-      <div className="flex flex-col gap-4 border-b border-border/70 p-5 md:flex-row md:items-start md:justify-between md:p-7">
+    <div className="space-y-4">
+      <section className="overflow-hidden rounded-xl border border-border bg-card">
+      <div className="flex flex-col gap-4 border-b border-border/70 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
         <div className="flex items-start gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <FileArchiveIcon className="size-5" />
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <FileArchiveIcon className="size-4" />
           </span>
           <div>
-            <p className="text-muted-foreground text-xs uppercase tracking-[0.14em]">
+            <p className="text-muted-foreground text-[11px] font-medium uppercase tracking-[0.12em]">
               {t("settings.knowledgeFilesStoredTitle")}
             </p>
-            <h2 className="mt-2 font-semibold text-xl tracking-tight">
+            <h2 className="mt-1 font-semibold text-base tracking-tight">
               {t("settings.knowledgeFilesStoredHeading")}
             </h2>
-            <p className="mt-1 max-w-2xl text-muted-foreground text-sm leading-6">
+            <p className="mt-1 max-w-2xl text-muted-foreground text-sm leading-5">
               {t("settings.knowledgeFilesStoredDescription")}
             </p>
           </div>
@@ -636,12 +636,12 @@ export function KnowledgeFileLibrary({
         </div>
       ) : null}
 
-      {isFilesOpen ? <div className="p-5 md:p-7">
+      {isFilesOpen ? <div className="p-4 sm:p-5">
         {isLoading ? (
           <InlineLoadingState message={t("common.loading")} />
         ) : files.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border/80 px-4 py-12 text-center">
-            <FileArchiveIcon className="mx-auto size-8 text-muted-foreground" />
+          <div className="rounded-lg border border-dashed border-border px-4 py-10 text-center">
+            <FileArchiveIcon className="mx-auto size-6 text-muted-foreground" />
             <p className="mt-3 font-medium text-sm">
               {t("settings.noFilesInKnowledgeBase")}
             </p>
@@ -651,7 +651,7 @@ export function KnowledgeFileLibrary({
           </div>
         ) : (
           <>
-            <div className="mb-4 flex flex-col gap-3 border-b border-border/70 pb-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-3 flex flex-col gap-3 border-b border-border/70 pb-3 sm:flex-row sm:items-center sm:justify-between">
               <label className="flex items-center gap-2 text-muted-foreground text-sm">
                 <input
                   checked={allSelectableSelected}
@@ -712,7 +712,7 @@ export function KnowledgeFileLibrary({
                 </Button>
               </div>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {files.map((file) => (
                 <StoredFileRow
                   file={file}
@@ -791,8 +791,8 @@ function StoredFileRow({
   return (
     <div
       className={cn(
-        "flex flex-col gap-3 rounded-xl border border-border/70 bg-background/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between",
-        selected && "border-primary/50 bg-primary/[0.04]",
+        "flex flex-col gap-3 rounded-lg border border-border bg-background/60 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between",
+        selected && "border-primary/40 bg-primary/[0.035]",
         processing && "opacity-75"
       )}
     >
@@ -804,7 +804,7 @@ function StoredFileRow({
           onChange={() => onToggle(file.fileId)}
           type="checkbox"
         />
-        <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+        <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
           {ready ? (
             <CheckCircle2Icon className="size-4 text-emerald-600" />
           ) : processing ? (
@@ -863,17 +863,17 @@ function ParsedDocumentLibrary({
   t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   return (
-    <section className="rounded-2xl border border-primary/20 bg-primary/[0.025]">
-      <div className="flex flex-col gap-3 border-b border-border/70 p-5 md:flex-row md:items-start md:justify-between">
+    <section className="overflow-hidden rounded-xl border border-border bg-card">
+      <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
         <div className="flex items-start gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <DatabaseIcon className="size-5" />
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <DatabaseIcon className="size-4" />
           </span>
           <div>
-            <p className="text-muted-foreground text-xs uppercase tracking-[0.14em]">
+            <p className="text-muted-foreground text-[11px] font-medium uppercase tracking-[0.12em]">
               {t("settings.parsedDocumentsTitle")}
             </p>
-            <h2 className="mt-1 font-semibold text-lg tracking-tight">
+            <h2 className="mt-1 font-semibold text-base tracking-tight">
               {t("settings.parsedDocumentsHeading")}
             </h2>
             <p className="mt-1 text-muted-foreground text-sm">
@@ -924,7 +924,7 @@ function ParsedDocumentLibrary({
         </p>
       ) : (
         <>
-          <div className="space-y-4 p-5">
+          <div className="space-y-3 p-4 sm:p-5">
             {data.items.map((item) => (
               <ParsedDocumentCard
                 disabled={disabled}
@@ -939,7 +939,7 @@ function ParsedDocumentLibrary({
               />
             ))}
           </div>
-          <div className="flex flex-col gap-3 border-t border-border/70 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 border-t border-border/70 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
             <span className="text-muted-foreground text-xs">
               {t("settings.parsedDocumentsPage", {
                 from: data.offset + 1,
@@ -1046,7 +1046,7 @@ function ParsedDocumentCard({
   }, [document.blocks.length, document.totalBlocks, isExpanded, item.fileId, knowledgeBaseId, t]);
 
   return (
-    <article className="overflow-hidden rounded-xl border border-border/70 bg-background/60">
+    <article className="overflow-hidden rounded-lg border border-border bg-background">
       <div className="flex flex-col gap-3 border-b border-border/70 p-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
           <h4 className="truncate font-semibold text-base">{item.fileName}</h4>

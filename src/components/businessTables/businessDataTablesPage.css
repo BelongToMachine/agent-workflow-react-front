@@ -9,7 +9,7 @@
   border: 1px solid color-mix(in oklch, var(--primary) 16%, var(--border));
   border-radius: 999px;
   background: color-mix(in oklch, var(--primary) 4%, var(--card));
-  padding: 0.4rem 0.7rem;
+  padding: 0.35rem 0.6rem;
   color: var(--foreground);
   font-size: 0.7rem;
   font-weight: 600;
@@ -22,9 +22,9 @@
   justify-content: space-between;
   gap: 1.25rem;
   border: 1px solid var(--border);
-  border-radius: 0.65rem;
+  border-radius: 0.5rem;
   background: var(--card);
-  padding: 0.62rem 0.75rem;
+  padding: 0.55rem 0.65rem;
   color: var(--foreground);
   text-align: left;
   transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
@@ -38,7 +38,9 @@
 .business-table-button:focus-visible,
 .business-toolbar-button:focus-visible,
 .business-mini-button:focus-visible,
-.business-text-button:focus-visible {
+.business-text-button:focus-visible,
+.business-pin-select:focus-visible,
+.business-detail-tab:focus-visible {
   outline: 2px solid color-mix(in oklch, var(--primary) 65%, transparent);
   outline-offset: 2px;
 }
@@ -55,14 +57,14 @@
 
 .business-toolbar-button {
   display: inline-flex;
-  min-height: 2.25rem;
+  min-height: 2.1rem;
   align-items: center;
   justify-content: center;
   gap: 0.45rem;
   border: 1px solid var(--border);
-  border-radius: 0.45rem;
+  border-radius: 0.4rem;
   background: var(--card);
-  padding: 0.4rem 0.65rem;
+  padding: 0.35rem 0.6rem;
   color: var(--foreground);
   font-size: 0.72rem;
   font-weight: 500;
@@ -86,7 +88,7 @@
   z-index: 30;
   top: calc(100% + 0.5rem);
   right: 0;
-  width: min(34rem, calc(100vw - 2rem));
+  width: min(30rem, calc(100vw - 2rem));
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 0.75rem;
@@ -128,6 +130,12 @@
   opacity: 0.35;
 }
 
+.business-toolbar-button:disabled,
+.business-text-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .business-pin-select {
   max-width: 5.75rem;
   height: 1.65rem;
@@ -163,23 +171,23 @@
 }
 
 .business-status-positive {
-  background: color-mix(in oklch, #18865c 11%, var(--card));
-  color: color-mix(in oklch, #08774d 86%, var(--foreground));
+  background: color-mix(in oklch, var(--success) 12%, var(--card));
+  color: color-mix(in oklch, var(--success) 84%, var(--foreground));
 }
 
 .dark .business-status-positive {
-  background: color-mix(in oklch, #46bc89 14%, var(--card));
-  color: #8fdfbc;
+  background: color-mix(in oklch, var(--success) 17%, var(--card));
+  color: color-mix(in oklch, var(--success) 72%, var(--foreground));
 }
 
 .business-status-pending {
-  background: color-mix(in oklch, #b58118 12%, var(--card));
-  color: color-mix(in oklch, #865c0d 88%, var(--foreground));
+  background: color-mix(in oklch, var(--warning) 14%, var(--card));
+  color: color-mix(in oklch, var(--warning) 88%, var(--foreground));
 }
 
 .dark .business-status-pending {
-  background: color-mix(in oklch, #e1ae39 15%, var(--card));
-  color: #e9c66e;
+  background: color-mix(in oklch, var(--warning) 18%, var(--card));
+  color: color-mix(in oklch, var(--warning) 64%, var(--foreground));
 }
 
 .business-status-muted {
@@ -189,7 +197,7 @@
 
 .business-detail-tab {
   flex: 1;
-  border-radius: 0.4rem;
+  border-radius: 0.35rem;
   padding: 0.42rem 0.6rem;
   color: var(--muted-foreground);
   font-size: 0.72rem;
@@ -268,7 +276,7 @@
 
 @media (max-width: 640px) {
   .business-table-button {
-    min-width: min(100%, 164px);
+    min-width: min(100%, 150px);
     flex: 1 1 calc(50% - 0.5rem);
   }
 

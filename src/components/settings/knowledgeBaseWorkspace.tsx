@@ -15,15 +15,15 @@ export function KnowledgeBaseWorkspace() {
     <div className="flex flex-col gap-6">
       <nav
         aria-label={t("settings.knowledgeBases")}
-        className="flex w-fit max-w-full flex-wrap gap-1 rounded-2xl border border-border/70 bg-muted/30 p-1"
+        className="flex max-w-full overflow-x-auto border-b border-border"
       >
         <Link
           aria-current={activeSection === "management" ? "page" : undefined}
           className={cn(
-            "inline-flex min-h-10 items-center justify-center rounded-xl px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "-mb-px inline-flex min-h-10 shrink-0 items-center justify-center border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             activeSection === "management"
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+              ? "border-foreground text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           )}
           href="/settings/knowledge-bases/files"
         >
@@ -32,10 +32,10 @@ export function KnowledgeBaseWorkspace() {
         <Link
           aria-current={activeSection === "access" ? "page" : undefined}
           className={cn(
-            "inline-flex min-h-10 items-center justify-center rounded-xl px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            "-mb-px inline-flex min-h-10 shrink-0 items-center justify-center border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             activeSection === "access"
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+              ? "border-foreground text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           )}
           href="/settings/knowledge-bases"
         >
