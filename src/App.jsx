@@ -15,6 +15,7 @@ import { SidebarInset, SidebarProvider } from "./components/ui/sidebar";
 import { Link, usePathname, useRouter } from "./lib/router";
 import { applyAccentColor, getStoredAccentColor } from "./lib/accentColor";
 import { WorkspaceHeader } from "./components/chat/workspaceHeader";
+import { SettingsPage } from "./components/settings/settingsPage";
 
 function lazyNamed(loader, exportName) {
   return lazy(() =>
@@ -320,7 +321,10 @@ function ChatLayout() {
               element={
                 <PermissionRoute permission="members.read">
                   <RouteSuspense>
-                    <SettingsPage titleKey="settings.workspacePermissions">
+                    <SettingsPage
+                      descriptionKey="settings.decideAccess"
+                      titleKey="settings.workspacePermissions"
+                    >
                       <MemberPermissions />
                     </SettingsPage>
                   </RouteSuspense>
@@ -509,27 +513,6 @@ function PermissionRoute({ children, permission }) {
   }
 
   return children;
-}
-
-function SettingsPage({
-  children,
-  descriptionKey = "settings.manageDescription",
-  titleKey,
-}) {
-  const { t } = useTranslation();
-  return (
-    <main className="min-h-full bg-background px-4 py-6 md:px-8 md:py-8">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t(titleKey)}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t(descriptionKey)}
-          </p>
-        </div>
-        {children}
-      </div>
-    </main>
-  );
 }
 
 function AuthPage({ mode }) {

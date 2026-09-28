@@ -6,6 +6,7 @@ import {
   CopyIcon,
   LinkIcon,
   LockKeyholeIcon,
+  MoreHorizontalIcon,
   PowerIcon,
   RefreshCwIcon,
   SaveIcon,
@@ -24,8 +25,26 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alertDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdownMenu";
 import { Input } from "@/components/ui/input";
 import { InlineLoadingState } from "@/components/ui/loadingState";
 import {
@@ -53,6 +72,11 @@ import {
   type WorkspaceRole,
 } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
+import {
+  SettingsEmptyState,
+  SettingsPanel,
+  SettingsPanelHeader,
+} from "@/components/settings/settingsPage";
 
 type Member = {
   effectivePermissions: Permission[];
@@ -170,6 +194,8 @@ export function MemberPermissions() {
   const [error, setError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [pendingMemberId, setPendingMemberId] = useState<string | null>(null);
+  const [isStatusConfirmationOpen, setIsStatusConfirmationOpen] = useState(false);
+  const [revocationTarget, setRevocationTarget] = useState<Invitation | null>(null);
   const queryClient = useQueryClient();
   const identity = useBackendIdentity();
   const agentToolLanguage = i18n.language.toLowerCase().startsWith("zh")
@@ -579,7 +605,7 @@ export function MemberPermissions() {
 
   const revokeInvitation = useCallback(
     async (invitationId: string) => {
-      if (!canManageMembers || !window.confirm(t("settings.revokeInvitationConfirm"))) {
+      if (!canManageMembers) {
         return;
       }
 
@@ -592,6 +618,7 @@ export function MemberPermissions() {
         await queryClient.invalidateQueries({
           queryKey: backendQueryKeys.invitations(identity),
         });
+        setRevocationTarget(null);
         toast.success(t("settings.invitationRevoked"));
       } catch (invitationError) {
         const message =
@@ -656,57 +683,66 @@ export function MemberPermissions() {
   const visibleError = error ?? loadError;
 
   if (isLoading) {
-    return <InlineLoadingState message={t("common.loading")} />;
+    return (
+      <InlineLoadingState
+        className="min-h-64 rounded-xl border border-border/70 bg-card/50"
+        message={t("common.loading")}
+      />
+    );
   }
 
   if (visibleError && !data) {
-    return <EmptyState message={visibleError} />;
+    return (
+      <SettingsEmptyState
+        description={visibleError}
+        icon={<ShieldCheckIcon />}
+        title={t("settings.permissionsUnavailable")}
+      />
+    );
   }
 
   if (!data || data.members.length === 0) {
-    return <EmptyState message={t("settings.noMembers")} />;
+    return (
+      <SettingsEmptyState
+        description={t("settings.noMembers")}
+        icon={<UsersIcon />}
+        title={t("settings.noMembersTitle")}
+      />
+    );
   }
 
   return (
-    <main className="min-h-full bg-background px-4 py-8 md:px-8 md:py-10">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-8 flex flex-col gap-5 border-b border-border/70 pb-7 md:flex-row md:items-end md:justify-between">
-          <div>
-            <div className="mb-3 flex items-center gap-2 text-muted-foreground text-xs uppercase tracking-[0.18em]">
-              <ShieldCheckIcon className="size-4 text-primary" />
-              {t("settings.accessControl")}
-            </div>
-            <h1 className="font-semibold text-3xl tracking-tight md:text-4xl">
-              {t("settings.workspacePermissions")}
-            </h1>
-            <p className="mt-2 max-w-xl text-muted-foreground text-sm leading-6">
-              {t("settings.decideAccess")}
-            </p>
-          </div>
+    <div className="space-y-5">
+      <SettingsPanel className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium uppercase tracking-[0.14em]">
+          <ShieldCheckIcon className="size-4 text-primary" />
+          {t("settings.accessControl")}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
           <Badge className="w-fit gap-1.5 px-3 py-1.5" variant="outline">
             <UsersIcon className="size-3.5" />
             {data.workspace.name}
           </Badge>
-        </header>
+          <Badge className="w-fit" variant="secondary">
+            {t("settings.membersCount", { count: data.members.length })}
+          </Badge>
+        </div>
+      </SettingsPanel>
 
         {canManageMembers ? (
           <>
-            <section className="mb-5 rounded-2xl border border-primary/20 bg-primary/[0.035] p-5 shadow-sm md:p-6">
+            <SettingsPanel className="border-primary/15 p-5 md:p-6">
               <div className="flex flex-col gap-5">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <div className="flex items-center gap-2 font-medium text-sm">
-                      <LinkIcon className="size-4 text-primary" />
-                      {t("settings.inviteTeammate")}
-                    </div>
-                    <p className="mt-1 max-w-2xl text-muted-foreground text-xs leading-5">
-                      {t("settings.inviteDescription")}
-                    </p>
-                  </div>
-                  <Badge className="w-fit" variant="secondary">
-                    {t("settings.manualLink")}
-                  </Badge>
-                </div>
+                <SettingsPanelHeader
+                  action={
+                    <Badge className="w-fit" variant="secondary">
+                      {t("settings.manualLink")}
+                    </Badge>
+                  }
+                  description={t("settings.inviteDescription")}
+                  icon={<LinkIcon />}
+                  title={t("settings.inviteTeammate")}
+                />
 
                 <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_auto] md:items-end" onSubmit={createInvitation}>
                   <label className="grid gap-1.5 text-xs" htmlFor="invite-email">
@@ -852,7 +888,7 @@ export function MemberPermissions() {
                               {invitation.status === "pending" ? (
                                 <Button
                                   disabled={isRegeneratingInvitation || isRevokingInvitation}
-                                  onClick={() => revokeInvitation(invitation.invitationId)}
+                                  onClick={() => setRevocationTarget(invitation)}
                                   size="sm"
                                   type="button"
                                   variant="ghost"
@@ -878,18 +914,16 @@ export function MemberPermissions() {
                   ) : null}
                 </div>
               </div>
-            </section>
+            </SettingsPanel>
 
-            <section className="mb-5 rounded-2xl border border-border/70 bg-card/50 p-5 shadow-sm md:p-6">
+            <SettingsPanel className="p-5 md:p-6">
               <div className="flex flex-col gap-4 md:flex-row md:items-end">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 font-medium text-sm">
-                    <UserPlusIcon className="size-4 text-primary" />
-                    {t("settings.addRegisteredUser")}
-                  </div>
-                  <p className="mt-1 text-muted-foreground text-xs leading-5">
-                    {t("settings.registeredUserDescription")}
-                  </p>
+                  <SettingsPanelHeader
+                    description={t("settings.registeredUserDescription")}
+                    icon={<UserPlusIcon />}
+                    title={t("settings.addRegisteredUser")}
+                  />
                   <Select
                     disabled={candidatesQuery.isLoading || candidates.length === 0 || isAdding}
                     onValueChange={setCandidateId}
@@ -956,18 +990,18 @@ export function MemberPermissions() {
                   {t("settings.unableToLoadWaitingUsers")}
                 </p>
               ) : null}
-            </section>
+            </SettingsPanel>
           </>
         ) : null}
 
         {!canManageMembers ? (
-          <p className="mb-5 rounded-xl border border-border/70 bg-muted/30 px-4 py-3 text-muted-foreground text-sm">
+          <p className="rounded-xl border border-border/70 bg-muted/30 px-4 py-3 text-muted-foreground text-sm">
             {t("settings.viewOnlyMembers")}
           </p>
         ) : null}
 
         {pendingMemberId ? (
-          <div className="mb-5 flex flex-col gap-3 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 rounded-xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
             <span>
               {t("settings.unsavedChangesDiscarded")}
             </span>
@@ -986,10 +1020,10 @@ export function MemberPermissions() {
           </div>
         ) : null}
 
-        <div className="grid gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
-          <section className="rounded-2xl border border-border/70 bg-card/50 p-2 shadow-sm">
-            <div className="px-3 py-3 text-muted-foreground text-xs uppercase tracking-[0.14em]">
-              {t("settings.membersCount", { count: data.members.length })}
+        <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+          <SettingsPanel className="p-2">
+            <div className="border-b border-border/60 px-3 py-3 text-muted-foreground text-xs font-medium uppercase tracking-[0.12em]">
+              {t("settings.memberDirectory")}
             </div>
             <div className="space-y-1">
               {data.members.map((member) => {
@@ -1007,7 +1041,7 @@ export function MemberPermissions() {
                   <button
                     aria-pressed={isSelected}
                     className={cn(
-                      "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors",
+                      "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors",
                       isSelected
                         ? "bg-primary/10 text-foreground"
                         : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
@@ -1030,18 +1064,18 @@ export function MemberPermissions() {
                         </span>
                       ) : null}
                     </span>
-                    <span className="text-muted-foreground text-[11px]">
+                    <Badge className="max-w-24 truncate text-[10px]" variant="outline">
                       {displayedRole === "custom"
                         ? t("roles.custom")
                         : t("roles." + displayedRole)}
-                    </span>
+                    </Badge>
                   </button>
                 );
               })}
             </div>
-          </section>
+          </SettingsPanel>
 
-          <section className="min-w-0 rounded-2xl border border-border/70 bg-card/50 shadow-sm">
+          <SettingsPanel className="overflow-hidden">
             {selectedMember ? (
               <>
                 <div className="flex flex-col gap-5 border-b border-border/70 p-5 md:p-7 2xl:flex-row 2xl:items-start 2xl:justify-between">
@@ -1055,6 +1089,22 @@ export function MemberPermissions() {
                           {t("settings.unsaved")}
                         </Badge>
                       ) : null}
+                      <Badge variant="outline">
+                        {t(`roles.${isCustomRole ? "custom" : role}`)}
+                      </Badge>
+                      <Badge
+                        variant={
+                          selectedMember.status === "active"
+                            ? "secondary"
+                            : "destructive"
+                        }
+                      >
+                        {t(
+                          selectedMember.status === "active"
+                            ? "settings.memberActive"
+                            : "settings.memberSuspendedStatus"
+                        )}
+                      </Badge>
                     </div>
                     <p className="mt-1 break-words text-muted-foreground text-sm">
                       {selectedMember.name
@@ -1063,18 +1113,37 @@ export function MemberPermissions() {
                     </p>
                   </div>
                   <div className="flex min-w-0 max-w-full flex-wrap items-center gap-2 2xl:justify-end">
-                    <Button
-                      disabled={!canManageMembers || isChangingStatus || isSaving}
-                      onClick={changeMemberStatus}
-                      variant="outline"
-                    >
-                      {isChangingStatus ? <Spinner /> : <PowerIcon />}
-                      {isChangingStatus
-                        ? t("settings.updating")
-                        : selectedMember.status === "active"
-                          ? t("settings.suspend")
-                          : t("settings.restoreMember")}
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          aria-label={t("settings.memberActions")}
+                          disabled={!canManageMembers || isChangingStatus || isSaving}
+                          size="icon"
+                          variant="outline"
+                        >
+                          <MoreHorizontalIcon />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-52">
+                        <DropdownMenuLabel>
+                          {t("settings.memberActions")}
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onSelect={() => setIsStatusConfirmationOpen(true)}
+                          variant={
+                            selectedMember.status === "active"
+                              ? "destructive"
+                              : "default"
+                          }
+                        >
+                          <PowerIcon />
+                          {selectedMember.status === "active"
+                            ? t("settings.suspend")
+                            : t("settings.restoreMember")}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     <Select
                       disabled={
                         !canManageMembers ||
@@ -1220,27 +1289,85 @@ export function MemberPermissions() {
                 ) : null}
               </>
             ) : null}
-          </section>
+          </SettingsPanel>
         </div>
-      </div>
-    </main>
-  );
-}
+      <AlertDialog
+        onOpenChange={setIsStatusConfirmationOpen}
+        open={isStatusConfirmationOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {selectedMember?.status === "active"
+                ? t("settings.suspendMemberTitle")
+                : t("settings.restoreMemberTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedMember?.status === "active"
+                ? t("settings.suspendMemberDescription")
+                : t("settings.restoreMemberDescription")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isChangingStatus}>
+              {t("common.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isChangingStatus}
+              onClick={(event) => {
+                event.preventDefault();
+                void changeMemberStatus().then(() =>
+                  setIsStatusConfirmationOpen(false)
+                );
+              }}
+              variant={selectedMember?.status === "active" ? "destructive" : "default"}
+            >
+              {isChangingStatus ? <Spinner /> : <PowerIcon />}
+              {selectedMember?.status === "active"
+                ? t("settings.suspend")
+                : t("settings.restoreMember")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-function EmptyState({ message }: { message: string }) {
-  const { t } = useTranslation();
-
-  return (
-    <main className="grid min-h-full place-items-center bg-background px-6">
-      <div className="max-w-md text-center">
-        <ShieldCheckIcon className="mx-auto mb-4 size-8 text-muted-foreground" />
-        <h1 className="font-semibold text-xl">
-          {t("settings.permissionsUnavailable")}
-        </h1>
-        <p className="mt-2 text-muted-foreground text-sm leading-6">
-          {message}
-        </p>
-      </div>
-    </main>
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open) {
+            setRevocationTarget(null);
+          }
+        }}
+        open={Boolean(revocationTarget)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("settings.revokeInvitationConfirm")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("settings.revokeInvitationDescription", {
+                email: revocationTarget?.email ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isRevokingInvitation}>
+              {t("common.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isRevokingInvitation}
+              onClick={(event) => {
+                event.preventDefault();
+                if (revocationTarget) {
+                  void revokeInvitation(revocationTarget.invitationId);
+                }
+              }}
+              variant="destructive"
+            >
+              {isRevokingInvitation ? <Spinner /> : <XCircleIcon />}
+              {isRevokingInvitation ? t("settings.revoking") : t("settings.revoke")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 }
