@@ -784,14 +784,14 @@ textarea:focus-visible {
 }
 
 .message-response-markdown [data-streamdown="table-wrapper"] {
-  border-color: var(--brand-primary-border);
-  background-color: color-mix(in oklch, var(--card) 92%, var(--primary) 8%);
+  border-color: var(--border);
+  background-color: var(--card);
 }
 
 .message-response-markdown [data-streamdown="table"] {
-  border-color: var(--brand-primary-border);
+  border-color: var(--border);
 }
 
 .message-response-markdown [data-streamdown="table-header"] {
-  background-color: var(--brand-primary-soft);
+  background-color: var(--card);
 }
