@@ -109,7 +109,7 @@ function PureMessages({
 
       <button
         aria-label={t("chat.scrollToBottom")}
-        className={`absolute bottom-4 left-1/2 z-10 flex h-10 -translate-x-1/2 items-center rounded-full border border-border/70 bg-card/95 px-3.5 text-xs font-medium shadow-md backdrop-blur-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+        className={`absolute bottom-4 left-1/2 z-10 flex h-10 -translate-x-1/2 items-center rounded-lg border border-border/70 bg-card px-3.5 text-xs font-medium shadow-none transition-colors duration-150 hover:border-primary/30 hover:bg-primary/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 focus-visible:ring-offset-2 ${
           isAtBottom
             ? "pointer-events-none scale-90 opacity-0"
             : "pointer-events-auto scale-100 opacity-100"

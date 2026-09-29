@@ -322,7 +322,7 @@ function PureArtifact({
   const artifactPanel = (
     <>
       {(sidebarState !== "collapsed" || isMobile) && (
-        <div className="flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-border/60 bg-sidebar/90 px-3 backdrop-blur-sm sm:px-4">
+        <div className="flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-border/60 bg-background px-3 sm:px-4">
           <div className="flex min-w-0 items-center gap-3">
             <ArtifactCloseButton />
             <div className="flex min-w-0 flex-col gap-0.5">
@@ -448,7 +448,7 @@ function PureArtifact({
           x: 0,
           y: 0,
         }}
-        className="fixed inset-0 z-50 flex h-dvh flex-col overflow-hidden bg-sidebar pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
+        className="fixed inset-0 z-50 flex h-dvh flex-col overflow-hidden bg-background pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
         data-testid="artifact"
         exit={{ opacity: 0, scale: 0.95 }}
         initial={{
@@ -468,7 +468,7 @@ function PureArtifact({
 
   return (
     <div
-      className="flex h-full w-[60%] shrink-0 flex-col overflow-hidden border-l border-border/60 bg-sidebar transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      className="flex h-full w-[60%] shrink-0 flex-col overflow-hidden border-l border-border/60 bg-background transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
       data-testid="artifact"
     >
       {artifactPanel}

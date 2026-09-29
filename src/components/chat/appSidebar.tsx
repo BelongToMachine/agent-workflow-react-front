@@ -133,11 +133,11 @@ export function AppSidebar({
   return (
     <>
       <Sidebar
-        className="**:data-[slot=sidebar-inner]:rounded-xl **:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:border-sidebar-border"
+        className="**:data-[slot=sidebar-inner]:rounded-lg **:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:border-sidebar-border/70 **:data-[slot=sidebar-inner]:shadow-none"
         collapsible="icon"
         variant="inset"
       >
-        <SidebarHeader className="border-b border-sidebar-border/70 p-3">
+        <SidebarHeader className="border-b border-sidebar-border/60 p-3">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
@@ -146,7 +146,7 @@ export function AppSidebar({
                 tooltip={t("app.name")}
               >
                 <Link href="/" onClick={closeMobile}>
-                  <span className="grid size-7 shrink-0 place-items-center rounded-md bg-sidebar-accent text-sidebar-accent-foreground">
+                  <span className="grid size-7 shrink-0 place-items-center rounded-md bg-sidebar-primary/10 text-sidebar-primary">
                     <MessageSquareIcon className="size-4" />
                   </span>
                   <span className="truncate font-semibold tracking-tight group-data-[collapsible=icon]:hidden">

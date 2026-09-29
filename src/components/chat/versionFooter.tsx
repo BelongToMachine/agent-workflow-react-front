@@ -104,7 +104,7 @@ export const VersionFooter = ({
   return (
     <motion.div
       animate={{ opacity: 1 }}
-      className="z-50 flex w-full shrink-0 flex-col gap-2 border-t border-border/60 bg-background/95 px-3 py-2.5 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between sm:px-4"
+      className="z-50 flex w-full shrink-0 flex-col gap-2 border-t border-border/60 bg-background px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4"
       exit={{ opacity: 0, transition: { duration: 0 } }}
       initial={{ opacity: 0 }}
       transition={{ duration: 0.2 }}
@@ -113,7 +113,7 @@ export const VersionFooter = ({
         <div className="flex items-center gap-1">
           <button
             aria-label={t("artifacts.viewPreviousVersion")}
-            className="flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 sm:size-8"
+            className="flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 disabled:pointer-events-none disabled:opacity-30 sm:size-8"
             disabled={isFirst}
             onClick={handlePrevious}
             type="button"
@@ -128,7 +128,7 @@ export const VersionFooter = ({
           </span>
           <button
             aria-label={t("artifacts.viewNextVersion")}
-            className="flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-30 sm:size-8"
+            className="flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 disabled:pointer-events-none disabled:opacity-30 sm:size-8"
             disabled={isLast}
             onClick={handleNext}
             type="button"
@@ -139,7 +139,7 @@ export const VersionFooter = ({
 
         <button
           className={cn(
-            "flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:size-8",
+            "flex size-10 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 sm:size-8",
             mode === "diff" && "bg-muted text-foreground"
           )}
           aria-pressed={mode === "diff"}
@@ -153,7 +153,7 @@ export const VersionFooter = ({
 
       <div className="flex justify-end gap-2">
         <button
-          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-primary px-3.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-primary px-3.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
           disabled={isMutating}
           onClick={handleRestore}
           type="button"
@@ -166,7 +166,7 @@ export const VersionFooter = ({
           ) : null}
         </button>
         <button
-          className="inline-flex min-h-10 items-center justify-center rounded-lg border border-border/70 bg-background px-3.5 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="inline-flex min-h-10 items-center justify-center rounded-lg border border-border/70 bg-background px-3.5 text-sm font-medium transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 focus-visible:ring-offset-2"
           onClick={handleLatest}
           type="button"
         >

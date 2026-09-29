@@ -56,9 +56,10 @@ function ArtifactActionButton({
       <TooltipTrigger asChild>
         <button
           className={cn(
-            "flex items-center justify-center rounded-full p-3 text-muted-foreground transition-all duration-150",
-            "hover:text-foreground",
-            "active:scale-95",
+            "flex items-center justify-center rounded-lg p-3 text-muted-foreground transition-colors duration-150",
+            "hover:bg-muted hover:text-foreground",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35",
+            "active:bg-muted",
             "disabled:pointer-events-none disabled:opacity-30",
             {
               "text-foreground": isActive,

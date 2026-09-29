@@ -40,7 +40,7 @@ export type ToolProps = ComponentProps<typeof Collapsible>;
 export const Tool = ({ className, ...props }: ToolProps) => (
   <Collapsible
     className={cn(
-      "group not-prose mb-4 w-full overflow-hidden rounded-xl border border-border/70 bg-card/60 shadow-sm",
+      "group not-prose mb-4 w-full overflow-hidden rounded-lg border border-border/70 bg-card/40 shadow-none",
       className
     )}
     {...props}

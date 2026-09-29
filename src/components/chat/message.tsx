@@ -195,7 +195,7 @@ const PurePreviewMessage = ({
       return (
         <MessageContent
           className={cn("text-[13px] leading-[1.65]", {
-            "user-message-bubble w-fit max-w-[min(84%,60ch)] overflow-hidden break-words rounded-2xl border border-border/70 px-4 py-2.5":
+            "user-message-bubble w-fit max-w-[min(84%,60ch)] overflow-hidden break-words rounded-xl border border-border/70 px-4 py-2.5":
               message.role === "user",
           })}
           data-testid="message-content"
@@ -272,7 +272,7 @@ const PurePreviewMessage = ({
                 <div className="grid gap-2">
                   {output.products?.map((product) => (
                     <div
-                      className="rounded-md border bg-muted/30 p-3 text-sm"
+                      className="rounded-lg border border-border/70 bg-muted/30 p-3 text-sm"
                       key={product.productId}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -390,7 +390,7 @@ const PurePreviewMessage = ({
                 <div className="grid gap-2">
                   {output.records?.map((record) => (
                     <div
-                      className="rounded-md border bg-muted/30 p-3 text-sm"
+                      className="rounded-lg border border-border/70 bg-muted/30 p-3 text-sm"
                       key={`${record.sourceSheet}-${record.sourceRow}`}
                     >
                       <div className="font-medium">
@@ -550,7 +550,7 @@ const PurePreviewMessage = ({
 
                     return (
                       <div
-                        className="rounded-md border bg-muted/30 p-3 text-sm"
+                        className="rounded-lg border border-border/70 bg-muted/30 p-3 text-sm"
                         key={result.chunkId}
                       >
                         <div className="mb-2 flex items-center justify-between gap-3 text-muted-foreground text-xs">

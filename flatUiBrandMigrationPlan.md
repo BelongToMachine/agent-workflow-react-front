@@ -79,9 +79,9 @@
 
 涉及 `src/components/chat/appSidebar.tsx`、`shell.tsx`、`message.tsx`、`messages.tsx`、`multimodalInput.tsx`、`artifact.tsx`、`src/components/ai-elements/` 与相关 Artifact 客户端。
 
-- [ ] 统一侧栏、顶部栏、当前导航和内容区的边框、背景与间距，保持 Shadcn Dashboard 的结构和 Asianode 现有权限入口。
-- [ ] 统一消息卡片、建议问题、引用来源、Reasoning、Tool、代码块和 Composer；清理常规项的 hover 投影/位移，保留明确的焦点与错误状态。
-- [ ] 让 Artifact 面板、工具栏、版本切换、编辑/保存反馈沿用同一扁平规则，并检查聊天分屏及手机覆盖模式。
+- [x] 统一侧栏、顶部栏、当前导航和内容区的边框、背景与间距，保持 Shadcn Dashboard 的结构和 Asianode 现有权限入口。
+- [x] 统一消息卡片、建议问题、引用来源、Reasoning、Tool、代码块和 Composer；清理常规项的 hover 投影/位移，保留明确的焦点与错误状态。
+- [x] 让 Artifact 面板、工具栏、版本切换、编辑/保存反馈沿用同一扁平规则，并检查聊天分屏及手机覆盖模式。
 
 **完成标准**：聊天发送/停止/重试、历史切换、SSE 渲染、附件和 Artifact 操作保持可用；composer 在 hover、focus、禁用及多行状态无异常轮廓或偏移。
 

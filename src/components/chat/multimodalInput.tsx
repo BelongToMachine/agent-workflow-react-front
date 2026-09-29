@@ -570,7 +570,7 @@ function PureMultimodalInput({
       </div>
 
       <PromptInput
-        className="[&>div]:h-auto [&>div]:items-stretch [&>div]:flex-col [&>div]:rounded-2xl [&>div]:border-border/70 [&>div]:bg-muted/20 [&>div]:shadow-none [&>div]:ring-0 [&>div]:transition-colors [&>div]:duration-200 [&>div]:has-[[data-slot=input-group-control]:focus-visible]:!border-[var(--message-accent-background)] [&>div]:has-[[data-slot=input-group-control]:focus-visible]:!ring-0"
+        className="[&>div]:h-auto [&>div]:items-stretch [&>div]:flex-col [&>div]:rounded-xl [&>div]:border-border/70 [&>div]:bg-card/40 [&>div]:shadow-none [&>div]:ring-0 [&>div]:transition-colors [&>div]:duration-200 [&>div]:has-[[data-slot=input-group-control]:focus-visible]:!border-[var(--message-accent-background)] [&>div]:has-[[data-slot=input-group-control]:focus-visible]:!ring-0"
         onSubmit={handlePromptSubmit}
       >
         {(attachments.length > 0 || uploadQueue.length > 0) && (
@@ -637,7 +637,7 @@ function PureMultimodalInput({
             <PromptInputSubmit
               aria-busy={isGenerating}
               className={cn(
-                "size-11 rounded-xl bg-transparent p-0 transition-colors duration-200 hover:bg-muted/50 active:scale-95 md:size-9 md:rounded-lg",
+                "size-11 rounded-lg bg-transparent p-0 shadow-none transition-colors duration-200 hover:bg-primary/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 active:bg-primary/[0.12] md:size-9",
                 isGenerating
                   ? "text-[var(--message-accent-background)]"
                   : input.trim()
