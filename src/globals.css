@@ -214,9 +214,9 @@
 }
 
 :root[data-accent-color="amber"] {
-  --brand-primary: hsl(38 92% 36%);
+  --brand-primary: hsl(38 92% 33%);
   --brand-primary-foreground: hsl(0 0% 100%);
-  --brand-ring: hsl(38 92% 36%);
+  --brand-ring: hsl(38 92% 33%);
   --brand-secondary: hsl(43 92% 82%);
   --brand-secondary-foreground: hsl(34 80% 18%);
 }

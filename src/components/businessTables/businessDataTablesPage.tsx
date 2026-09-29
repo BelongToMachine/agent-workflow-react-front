@@ -1,8 +1,10 @@
 import {
   ColumnApiModule,
   InfiniteRowModelModule,
+  LocaleModule,
   NumberFilterModule,
   TextFilterModule,
+  TooltipModule,
   themeQuartz,
   type ColDef,
   type ColumnState,
@@ -76,7 +78,14 @@ type StoredColumnState = ColumnState[];
 type OrderedColumn = { field: BusinessField; state: ColumnState };
 
 const tables = mockBusinessTables.tables as BusinessTable[];
-const modules = [InfiniteRowModelModule, ColumnApiModule, TextFilterModule, NumberFilterModule];
+const modules = [
+  InfiniteRowModelModule,
+  ColumnApiModule,
+  TextFilterModule,
+  NumberFilterModule,
+  LocaleModule,
+  TooltipModule,
+];
 const statusFields = new Set([
   "operationStatus",
   "promotionStatus",

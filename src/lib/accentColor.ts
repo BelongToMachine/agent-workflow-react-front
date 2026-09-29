@@ -33,7 +33,7 @@ export const accentColorOptions: Array<{
   },
   {
     labelKey: "settings.accentColorAmber",
-    swatch: "oklch(0.64 0.16 80)",
+    swatch: "hsl(38 92% 33%)",
     value: "amber",
   },
   {
