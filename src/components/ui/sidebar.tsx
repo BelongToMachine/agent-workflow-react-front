@@ -23,11 +23,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { PanelLeftIcon } from "lucide-react"
+import { GripVerticalIcon, PanelLeftIcon } from "lucide-react"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+const SIDEBAR_WIDTH_COOKIE_NAME = "sidebar_width"
+const SIDEBAR_WIDTH = 256
+const SIDEBAR_MIN_WIDTH = 192
+const SIDEBAR_MAX_WIDTH = 384
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
@@ -38,15 +41,58 @@ type SidebarContextProps = {
   openMobile: boolean
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
+  sidebarId: string
   toggleSidebar: () => void
 }
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
 
+type SidebarResizeContextProps = {
+  width: number
+  setWidth: (width: number) => void
+  isResizing: boolean
+  setIsResizing: (isResizing: boolean) => void
+}
+
+const SidebarResizeContext =
+  React.createContext<SidebarResizeContextProps | null>(null)
+
+function clampSidebarWidth(width: number) {
+  return Math.min(
+    SIDEBAR_MAX_WIDTH,
+    Math.max(SIDEBAR_MIN_WIDTH, Math.round(width))
+  )
+}
+
+function readSidebarWidth() {
+  if (typeof document === "undefined") {
+    return SIDEBAR_WIDTH
+  }
+
+  const cookie = document.cookie
+    .split(";")
+    .map((value) => value.trim())
+    .find((value) => value.startsWith(`${SIDEBAR_WIDTH_COOKIE_NAME}=`))
+  const storedWidth = Number(cookie?.split("=")[1])
+
+  return cookie && Number.isFinite(storedWidth)
+    ? clampSidebarWidth(storedWidth)
+    : SIDEBAR_WIDTH
+}
+
 function useSidebar() {
   const context = React.useContext(SidebarContext)
   if (!context) {
     throw new Error("useSidebar must be used within a SidebarProvider.")
+  }
+
+  return context
+}
+
+function useSidebarResize() {
+  const context = React.useContext(SidebarResizeContext)
+  if (!context) {
+    throw new Error("useSidebarResize must be used within a SidebarProvider.")
   }
 
   return context
@@ -67,6 +113,13 @@ function SidebarProvider({
 }) {
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
+  const sidebarId = React.useId()
+  const [sidebarWidth, _setSidebarWidth] = React.useState(readSidebarWidth)
+  const [isResizing, setIsResizing] = React.useState(false)
+
+  const setSidebarWidth = React.useCallback((width: number) => {
+    _setSidebarWidth(clampSidebarWidth(width))
+  }, [])
 
   const [_open, _setOpen] = React.useState(defaultOpen)
   const open = openProp ?? _open
@@ -113,30 +166,47 @@ function SidebarProvider({
       isMobile,
       openMobile,
       setOpenMobile,
+      sidebarId,
       toggleSidebar,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    [state, open, setOpen, isMobile, openMobile, setOpenMobile, sidebarId, toggleSidebar]
   )
+
+  const resizeContextValue = React.useMemo<SidebarResizeContextProps>(
+    () => ({
+      width: sidebarWidth,
+      setWidth: setSidebarWidth,
+      isResizing,
+      setIsResizing,
+    }),
+    [sidebarWidth, setSidebarWidth, isResizing]
+  )
+
+  React.useEffect(() => {
+    document.cookie = `${SIDEBAR_WIDTH_COOKIE_NAME}=${sidebarWidth}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+  }, [sidebarWidth])
 
   return (
     <SidebarContext.Provider value={contextValue}>
-      <div
-        data-slot="sidebar-wrapper"
-        style={
-          {
-            "--sidebar-width": SIDEBAR_WIDTH,
-            "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
-            ...style,
-          } as React.CSSProperties
-        }
-        className={cn(
-          "group/sidebar-wrapper flex min-h-svh w-full bg-sidebar",
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
+      <SidebarResizeContext.Provider value={resizeContextValue}>
+        <div
+          data-slot="sidebar-wrapper"
+          style={
+            {
+              "--sidebar-width": `${sidebarWidth}px`,
+              "--sidebar-width-icon": SIDEBAR_WIDTH_ICON,
+              ...style,
+            } as React.CSSProperties
+          }
+          className={cn(
+            "group/sidebar-wrapper flex min-h-svh w-full bg-sidebar",
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </div>
+      </SidebarResizeContext.Provider>
     </SidebarContext.Provider>
   )
 }
@@ -155,7 +225,8 @@ function Sidebar({
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
   const { t } = useTranslation()
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const { isMobile, state, openMobile, setOpenMobile, sidebarId } = useSidebar()
+  const { isResizing } = useSidebarResize()
 
   if (collapsible === "none") {
     return (
@@ -206,6 +277,7 @@ function Sidebar({
     >
       <div
         data-slot="sidebar-gap"
+        style={{ transitionDuration: isResizing ? "0ms" : undefined }}
         className={cn(
           "relative w-(--sidebar-width) bg-transparent transition-[width] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
           "group-data-[collapsible=offcanvas]:w-0",
@@ -216,6 +288,7 @@ function Sidebar({
         )}
       />
       <div
+        id={sidebarId}
         data-slot="sidebar-container"
         data-side={side}
         className={cn(
@@ -226,6 +299,12 @@ function Sidebar({
           className
         )}
         {...props}
+        style={{
+          ...props.style,
+          transitionDuration: isResizing
+            ? "0ms"
+            : props.style?.transitionDuration,
+        }}
       >
         <div
           data-sidebar="sidebar"
@@ -266,49 +345,162 @@ function SidebarTrigger({
   )
 }
 
-function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
+function SidebarRail({
+  className,
+  onKeyDown,
+  onLostPointerCapture,
+  onPointerCancel,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
+  ...props
+}: React.ComponentProps<"div">) {
   const { t } = useTranslation()
-  const { toggleSidebar, state } = useSidebar()
-  const isCollapsed = state === "collapsed"
+  const { state, sidebarId } = useSidebar()
+  const { width, setWidth, isResizing, setIsResizing } = useSidebarResize()
+  const dragState = React.useRef<{
+    pointerId: number
+    startX: number
+    startWidth: number
+    side: "left" | "right"
+  } | null>(null)
+
+  const getSide = (element: HTMLElement): "left" | "right" =>
+    element.closest<HTMLElement>('[data-slot="sidebar"]')?.dataset.side === "right"
+      ? "right"
+      : "left"
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    onPointerDown?.(event)
+    if (event.defaultPrevented || event.button !== 0) {
+      return
+    }
+
+    dragState.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startWidth: width,
+      side: getSide(event.currentTarget),
+    }
+    event.currentTarget.setPointerCapture(event.pointerId)
+    event.preventDefault()
+    setIsResizing(true)
+  }
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    onPointerMove?.(event)
+    const drag = dragState.current
+    if (event.defaultPrevented || !drag || drag.pointerId !== event.pointerId) {
+      return
+    }
+
+    const direction = drag.side === "left" ? 1 : -1
+    setWidth(drag.startWidth + (event.clientX - drag.startX) * direction)
+  }
+
+  const finishResizing = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (dragState.current?.pointerId !== event.pointerId) {
+      return
+    }
+
+    dragState.current = null
+    setIsResizing(false)
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+  }
+
+  const handlePointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    onPointerUp?.(event)
+    finishResizing(event)
+  }
+
+  const handlePointerCancel = (event: React.PointerEvent<HTMLDivElement>) => {
+    onPointerCancel?.(event)
+    finishResizing(event)
+  }
+
+  const handleLostPointerCapture = (
+    event: React.PointerEvent<HTMLDivElement>
+  ) => {
+    onLostPointerCapture?.(event)
+    if (dragState.current?.pointerId === event.pointerId) {
+      dragState.current = null
+      setIsResizing(false)
+    }
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    onKeyDown?.(event)
+    if (event.defaultPrevented) {
+      return
+    }
+
+    const side = getSide(event.currentTarget)
+    const step = event.shiftKey ? 32 : 16
+    let nextWidth: number | undefined
+
+    if (event.key === "Home") {
+      nextWidth = SIDEBAR_MIN_WIDTH
+    } else if (event.key === "End") {
+      nextWidth = SIDEBAR_MAX_WIDTH
+    } else if (event.key === "ArrowLeft") {
+      nextWidth = width + (side === "right" ? step : -step)
+    } else if (event.key === "ArrowRight") {
+      nextWidth = width + (side === "left" ? step : -step)
+    }
+
+    if (nextWidth !== undefined) {
+      event.preventDefault()
+      setWidth(nextWidth)
+    }
+  }
+
+  if (state === "collapsed") {
+    return null
+  }
 
   return (
     <div
+      {...props}
       data-slot="sidebar-rail"
+      data-resizing={isResizing ? "true" : "false"}
+      role="separator"
+      aria-label={t("ui.resizeSidebar")}
+      aria-controls={sidebarId}
+      aria-orientation="vertical"
+      aria-valuemin={SIDEBAR_MIN_WIDTH}
+      aria-valuemax={SIDEBAR_MAX_WIDTH}
+      aria-valuenow={width}
+      aria-valuetext={t("ui.sidebarWidthValue", { width })}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      onLostPointerCapture={handleLostPointerCapture}
       className={cn(
-        "group/rail absolute inset-y-0 z-20 hidden w-4 overflow-visible group-data-[side=left]:-right-4 sm:block",
+        "group/rail absolute inset-y-0 z-20 hidden w-4 touch-none select-none cursor-col-resize outline-none md:flex md:items-center md:justify-center group-data-[side=left]:-right-2 group-data-[side=right]:-left-2",
         className
       )}
     >
-      <button
-        data-sidebar="rail"
-        aria-label={t("ui.toggleSidebar")}
-        tabIndex={-1}
-        onClick={toggleSidebar}
-        className="absolute inset-y-0 left-0 w-4 cursor-w-resize [[data-side=left][data-state=collapsed]_&]:cursor-e-resize"
-        {...props}
-      />
-      <button
-        aria-label={t("ui.toggleSidebar")}
-        tabIndex={-1}
-        onClick={toggleSidebar}
+      <span
+        aria-hidden="true"
         className={cn(
-          "absolute left-0 h-3 w-3 cursor-e-resize",
-          isCollapsed ? "top-0" : "top-[calc(3.5rem-6px)] cursor-w-resize"
+          "pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-sidebar-border opacity-0 transition-opacity duration-150 group-hover/rail:opacity-100 group-focus-visible/rail:opacity-100",
+          isResizing && "bg-primary/60 opacity-100"
         )}
       />
-      <button
-        aria-label={t("ui.toggleSidebar")}
-        tabIndex={-1}
-        onClick={toggleSidebar}
+      <span
+        aria-hidden="true"
         className={cn(
-          "absolute left-3 h-[6px] w-[100vw] cursor-e-resize",
-          isCollapsed ? "top-0" : "top-[calc(3.5rem-6px)] cursor-w-resize"
+          "pointer-events-none absolute left-1/2 top-1/2 grid size-6 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-md border border-sidebar-border bg-sidebar text-sidebar-foreground shadow-sm opacity-0 transition-all duration-150 group-hover/rail:opacity-100 group-focus-visible/rail:opacity-100",
+          isResizing && "scale-105 border-primary text-primary opacity-100"
         )}
-      />
-      <div className={cn(
-        "pointer-events-none absolute bottom-0 left-0 w-[100vw] rounded-tl-[12px] border-t border-l border-sidebar-border opacity-0 transition-opacity duration-150 group-hover/rail:opacity-100",
-        isCollapsed ? "top-0" : "top-14"
-      )} />
+      >
+        <GripVerticalIcon className="size-3.5" />
+      </span>
     </div>
   )
 }

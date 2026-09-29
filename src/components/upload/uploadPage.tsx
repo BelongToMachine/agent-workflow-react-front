@@ -336,7 +336,7 @@ export function UploadPage() {
   }
 
   return (
-    <main className="min-h-full overflow-y-auto bg-background px-4 py-6 md:px-8 md:py-8">
+    <main className="min-h-full overflow-y-auto bg-workspace-background px-4 py-6 md:px-8 md:py-8">
       <div className="mx-auto max-w-6xl">
         <header className="mb-6 flex flex-col gap-4 border-b border-border/70 pb-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
@@ -389,7 +389,7 @@ export function UploadPage() {
         <div className="w-full">
           <div
             aria-label={t("upload.modeLabel")}
-            className="mb-4 flex overflow-x-auto border-b border-border/70"
+            className="app-tab-list mb-4"
             onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
               if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
                 return;
@@ -412,12 +412,7 @@ export function UploadPage() {
               <button
                 aria-controls={`upload-panel-${tab}`}
                 aria-selected={activeTab === tab}
-                className={cn(
-                  "-mb-px min-h-10 shrink-0 border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  activeTab === tab
-                    ? "border-primary bg-primary/[0.04] text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                )}
+                className="app-tab"
                 id={`upload-tab-${tab}`}
                 key={tab}
                 onClick={() => setActiveTab(tab)}

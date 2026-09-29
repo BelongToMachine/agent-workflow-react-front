@@ -294,9 +294,9 @@ function ChatLayout() {
           user={user}
         />
       </RouteSuspense>
-      <SidebarInset className="m-2 h-[calc(100dvh-1rem)] min-h-0 overflow-hidden rounded-lg border border-border/70 bg-background max-md:m-0 max-md:h-dvh max-md:rounded-none max-md:border-0">
+      <SidebarInset className="m-2 h-[calc(100dvh-1rem)] min-h-0 overflow-hidden rounded-l-none rounded-r-lg border border-border/70 bg-workspace-background max-md:m-0 max-md:h-dvh max-md:rounded-none max-md:border-0">
         <WorkspaceHeader user={user} />
-        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-background">
+        <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-workspace-background">
           <RouteSuspense>
             <Toaster
               position="top-center"

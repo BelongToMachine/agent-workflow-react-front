@@ -1,15 +1,17 @@
 "use client";
 
 import { CheckIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  applyAccentColor,
   accentColorOptions,
   getStoredAccentColor,
   storeAccentColor,
   type AccentColor,
 } from "@/lib/accentColor";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   SettingsPanel,
   SettingsPanelHeader,
@@ -20,10 +22,21 @@ export function AppearanceSettings() {
   const [selectedAccentColor, setSelectedAccentColor] = useState<AccentColor>(
     getStoredAccentColor
   );
+  const [appliedAccentColor, setAppliedAccentColor] =
+    useState<AccentColor>(getStoredAccentColor);
+
+  useEffect(() => {
+    return () => applyAccentColor(getStoredAccentColor());
+  }, []);
 
   const handleAccentColorChange = (accentColor: AccentColor) => {
     setSelectedAccentColor(accentColor);
-    storeAccentColor(accentColor);
+    applyAccentColor(accentColor);
+  };
+
+  const handleApplyAccentColor = () => {
+    storeAccentColor(selectedAccentColor);
+    setAppliedAccentColor(selectedAccentColor);
   };
 
   return (
@@ -67,6 +80,16 @@ export function AppearanceSettings() {
               </button>
             );
           })}
+        </div>
+
+        <div className="mt-4 flex justify-end">
+          <Button
+            disabled={selectedAccentColor === appliedAccentColor}
+            onClick={handleApplyAccentColor}
+            type="button"
+          >
+            {t("settings.applyAccentColor")}
+          </Button>
         </div>
 
         <section className="mt-6 border-t border-border/60 pt-5">

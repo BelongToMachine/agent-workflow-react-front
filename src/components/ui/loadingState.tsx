@@ -39,7 +39,7 @@ export function LoadingState({ message }: { message: string }) {
   return (
     <main
       aria-busy="true"
-      className="flex h-dvh min-h-0 w-full items-center justify-center bg-background px-6 text-center"
+      className="flex h-dvh min-h-0 w-full items-center justify-center bg-workspace-background px-6 text-center"
     >
       <LoadingIndicator message={message} />
     </main>
@@ -59,7 +59,7 @@ export function InlineLoadingState({
     <div
       aria-busy="true"
       className={cn(
-        "flex min-h-80 items-center justify-center bg-background px-6 text-center",
+        "flex min-h-80 items-center justify-center bg-workspace-background px-6 text-center",
         fillViewport && "min-h-dvh",
         className
       )}

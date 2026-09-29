@@ -585,7 +585,7 @@ export function BusinessDataTablesPage() {
   const contentGroup = tables.filter((table) => table.category === "content");
 
   return (
-    <main className="business-data-page min-h-full bg-background px-4 py-6 text-foreground md:px-8 md:py-8">
+    <main className="business-data-page min-h-full bg-workspace-background px-4 py-6 text-foreground md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-4">
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -852,18 +852,66 @@ export function BusinessDataTablesPage() {
                   {activeTable.key === "ProductPrice" ? copy.databaseRecord : copy.mockRecord}
                   {" · "}{rowKey(activeTable, selectedRecord)}
                 </SheetDescription>
-                <div className="mt-3 flex gap-1 rounded-lg bg-muted p-1">
-                  <button className={`business-detail-tab ${!showJson ? "business-detail-tab-active" : ""}`} onClick={() => setShowJson(false)} type="button">{copy.fieldsView}</button>
-                  <button className={`business-detail-tab ${showJson ? "business-detail-tab-active" : ""}`} onClick={() => setShowJson(true)} type="button">{copy.jsonView}</button>
+                <div
+                  aria-label={copy.detail}
+                  className="app-tab-list app-tab-list-segmented mt-3"
+                  onKeyDown={(event) => {
+                    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+                      return;
+                    }
+                    event.preventDefault();
+                    const nextShowJson =
+                      event.key === "Home"
+                        ? false
+                        : event.key === "End"
+                          ? true
+                          : !showJson;
+                    setShowJson(nextShowJson);
+                    document
+                      .getElementById(
+                        nextShowJson
+                          ? "business-detail-tab-json"
+                          : "business-detail-tab-fields"
+                      )
+                      ?.focus();
+                  }}
+                  role="tablist"
+                >
+                  <button
+                    aria-controls="business-detail-panel-fields"
+                    aria-selected={!showJson}
+                    className="app-tab"
+                    id="business-detail-tab-fields"
+                    onClick={() => setShowJson(false)}
+                    role="tab"
+                    tabIndex={showJson ? -1 : 0}
+                    type="button"
+                  >
+                    {copy.fieldsView}
+                  </button>
+                  <button
+                    aria-controls="business-detail-panel-json"
+                    aria-selected={showJson}
+                    className="app-tab"
+                    id="business-detail-tab-json"
+                    onClick={() => setShowJson(true)}
+                    role="tab"
+                    tabIndex={showJson ? 0 : -1}
+                    type="button"
+                  >
+                    {copy.jsonView}
+                  </button>
                 </div>
               </SheetHeader>
 
               <div className="flex-1 overflow-y-auto px-6 py-4">
-                {showJson ? (
-                  <pre className="overflow-x-auto rounded-lg border border-border bg-muted/45 p-4 font-mono text-xs leading-6 text-foreground">
-                    {JSON.stringify(selectedRecord, null, 2)}
-                  </pre>
-                ) : (
+                <div
+                  aria-labelledby="business-detail-tab-fields"
+                  hidden={showJson}
+                  id="business-detail-panel-fields"
+                  role="tabpanel"
+                  tabIndex={0}
+                >
                   <dl className="space-y-4">
                     {selectedFields.map((field) => {
                       const value = selectedRecord[field.field];
@@ -880,7 +928,18 @@ export function BusinessDataTablesPage() {
                       );
                     })}
                   </dl>
-                )}
+                </div>
+                <div
+                  aria-labelledby="business-detail-tab-json"
+                  hidden={!showJson}
+                  id="business-detail-panel-json"
+                  role="tabpanel"
+                  tabIndex={0}
+                >
+                  <pre className="overflow-x-auto rounded-lg border border-border bg-muted/45 p-4 font-mono text-xs leading-6 text-foreground">
+                    {JSON.stringify(selectedRecord, null, 2)}
+                  </pre>
+                </div>
 
                 {activeTable.key !== "RealProductResearch" && activeTable.key !== "ProductPrice" && selectedRecord.researchId ? (
                   <div className="mt-6 rounded-lg border border-border bg-muted/35 p-3.5">

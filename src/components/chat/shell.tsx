@@ -120,7 +120,7 @@ export function ChatShell() {
     return (
       <>
         <InlineLoadingState
-          className="h-full min-h-0 flex-1"
+          className="h-full min-h-0 flex-1 bg-workspace-background"
           message={t("common.loading")}
         />
         <DataStreamHandler />
@@ -130,14 +130,14 @@ export function ChatShell() {
 
   return (
     <>
-      <div className="flex h-full min-h-0 w-full flex-row overflow-hidden bg-background">
+      <div className="flex h-full min-h-0 w-full flex-row overflow-hidden bg-workspace-background">
         <div
           className={cn(
-            "flex min-w-0 flex-col bg-background transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+            "flex min-w-0 flex-col bg-workspace-background transition-[width] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
             isArtifactVisible ? "w-full lg:w-[40%]" : "w-full"
           )}
         >
-          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background md:border-t md:border-l md:border-border/60">
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-workspace-background">
             <Messages
               addToolApprovalResponse={addToolApprovalResponse}
               chatId={chatId}
@@ -152,7 +152,7 @@ export function ChatShell() {
               status={status}
             />
 
-            <div className="sticky bottom-0 z-10 mx-auto flex w-full max-w-5xl shrink-0 gap-2 border-t border-border/60 bg-background px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:border-t-0 md:bg-transparent md:px-4 md:pt-4 md:pb-4">
+            <div className="sticky bottom-0 z-10 mx-auto flex w-full max-w-5xl shrink-0 gap-2 border-t border-border/60 bg-workspace-background px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] md:border-t-0 md:bg-transparent md:px-4 md:pt-4 md:pb-4">
               {!isReadonly && (
                 <MultimodalInput
                   attachments={attachments}
@@ -185,7 +185,7 @@ export function ChatShell() {
           <Suspense
             fallback={
               <InlineLoadingState
-                className="h-full min-h-0 flex-1"
+                className="h-full min-h-0 flex-1 bg-workspace-background"
                 message={t("common.loading")}
               />
             }

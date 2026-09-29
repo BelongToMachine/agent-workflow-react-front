@@ -14,7 +14,7 @@ export function SettingsPage({
   const { t } = useTranslation();
 
   return (
-    <main className="min-h-full bg-background px-4 py-6 md:px-8 md:py-8">
+    <main className="min-h-full bg-workspace-background px-4 py-6 md:px-8 md:py-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
         <header className="border-b border-border/60 pb-5">
           <h1 className="text-2xl font-semibold tracking-tight">{t(titleKey)}</h1>

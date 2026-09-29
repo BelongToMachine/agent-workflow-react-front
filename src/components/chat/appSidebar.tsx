@@ -133,11 +133,11 @@ export function AppSidebar({
   return (
     <>
       <Sidebar
-        className="**:data-[slot=sidebar-inner]:rounded-lg **:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:border-sidebar-border/70 **:data-[slot=sidebar-inner]:shadow-none"
+        className="inset-y-2 data-[side=left]:left-2 h-[calc(100dvh-1rem)] **:data-[slot=sidebar-inner]:rounded-l-lg **:data-[slot=sidebar-inner]:rounded-r-none **:data-[slot=sidebar-inner]:border **:data-[slot=sidebar-inner]:border-r-0 **:data-[slot=sidebar-inner]:border-sidebar-border/70 **:data-[slot=sidebar-inner]:shadow-none"
         collapsible="icon"
-        variant="inset"
+        variant="sidebar"
       >
-        <SidebarHeader className="border-b border-sidebar-border/60 p-3">
+        <SidebarHeader className="h-14 shrink-0 justify-center border-b border-sidebar-border/60 px-3 py-0">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton

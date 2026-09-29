@@ -27,7 +27,7 @@ export function WorkspaceHeader({ user }: { user: User | undefined }) {
   const { t } = useTranslation();
 
   return (
-    <header className="z-20 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border/60 bg-background px-3 sm:px-5">
+    <header className="z-20 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border/60 bg-workspace-background px-3 sm:px-5">
       <div className="flex min-w-0 items-center gap-3">
         <SidebarTrigger className="size-9 rounded-lg text-muted-foreground hover:text-foreground" />
         <span aria-hidden="true" className="hidden h-5 w-px bg-border sm:block" />

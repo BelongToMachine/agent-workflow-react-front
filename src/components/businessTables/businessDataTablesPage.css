@@ -28,22 +28,21 @@
 
 .business-table-button:hover {
   border-color: color-mix(in oklch, var(--primary) 24%, var(--border));
-  background: color-mix(in oklch, var(--muted) 45%, var(--card));
+  background: var(--brand-primary-hover);
 }
 
 .business-table-button:focus-visible,
 .business-toolbar-button:focus-visible,
 .business-mini-button:focus-visible,
 .business-text-button:focus-visible,
-.business-pin-select:focus-visible,
-.business-detail-tab:focus-visible {
+.business-pin-select:focus-visible {
   outline: 2px solid color-mix(in oklch, var(--primary) 65%, transparent);
   outline-offset: 2px;
 }
 
 .business-table-button-active {
   border-color: color-mix(in oklch, var(--primary) 45%, var(--border));
-  background: color-mix(in oklch, var(--primary) 5%, var(--card));
+  background: var(--brand-primary-soft);
 }
 
 .business-table-button-active > svg {
@@ -192,21 +191,6 @@
 .business-status-muted {
   background: var(--muted);
   color: var(--muted-foreground);
-}
-
-.business-detail-tab {
-  flex: 1;
-  border-radius: 0.35rem;
-  padding: 0.42rem 0.6rem;
-  color: var(--muted-foreground);
-  font-size: 0.72rem;
-  font-weight: 500;
-  transition: background-color 120ms ease, color 120ms ease;
-}
-
-.business-detail-tab-active {
-  background: color-mix(in oklch, var(--primary) 7%, var(--card));
-  color: var(--primary);
 }
 
 .business-detail-field {

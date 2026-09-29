@@ -330,7 +330,7 @@ export const MessageResponse = memo(
     return (
       <Streamdown
         className={cn(
-          "size-full break-words [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
+          "message-response-markdown size-full break-words [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
           className
         )}
         plugins={streamdownPlugins}
