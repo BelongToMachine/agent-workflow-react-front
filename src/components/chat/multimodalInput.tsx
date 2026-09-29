@@ -4,7 +4,7 @@ import type { UseChatHelpers } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
 import equal from "fast-deep-equal";
 import {
-  ArrowUpIcon,
+  ArrowRightIcon,
   BrainIcon,
   EyeIcon,
   LockIcon,
@@ -570,7 +570,7 @@ function PureMultimodalInput({
       </div>
 
       <PromptInput
-        className="[&>div]:h-auto [&>div]:items-stretch [&>div]:flex-col [&>div]:rounded-2xl [&>div]:border-border/70 [&>div]:bg-card [&>div]:shadow-sm [&>div]:transition-shadow [&>div]:duration-200 [&>div]:focus-within:shadow-md"
+        className="[&>div]:h-auto [&>div]:items-stretch [&>div]:flex-col [&>div]:rounded-2xl [&>div]:border-border/70 [&>div]:bg-muted/20 [&>div]:shadow-none [&>div]:ring-0 [&>div]:transition-colors [&>div]:duration-200 [&>div]:has-[[data-slot=input-group-control]:focus-visible]:!border-[var(--message-accent-background)] [&>div]:has-[[data-slot=input-group-control]:focus-visible]:!ring-0"
         onSubmit={handlePromptSubmit}
       >
         {(attachments.length > 0 || uploadQueue.length > 0) && (
@@ -602,7 +602,7 @@ function PureMultimodalInput({
         )}
         <div className="flex min-w-0 w-full items-center">
           <PromptInputTextarea
-            className="min-h-16 max-h-48 min-w-0 flex-1 self-stretch overflow-y-auto px-4 pt-4 pb-3 text-base leading-6 placeholder:text-muted-foreground/70 md:text-sm"
+            className="min-h-16 max-h-48 min-w-0 flex-1 self-stretch overflow-y-auto px-4 py-5 text-base leading-6 placeholder:text-muted-foreground/70 md:text-sm"
             data-testid="multimodal-input"
             enterKeyHint="send"
             onChange={handleInput}
@@ -637,12 +637,12 @@ function PureMultimodalInput({
             <PromptInputSubmit
               aria-busy={isGenerating}
               className={cn(
-                "size-11 rounded-xl transition-all duration-200 md:size-9 md:rounded-lg",
+                "size-11 rounded-xl bg-transparent p-0 transition-colors duration-200 hover:bg-muted/50 active:scale-95 md:size-9 md:rounded-lg",
                 isGenerating
-                  ? "bg-[var(--message-accent-background)] text-[var(--message-accent-foreground)] hover:opacity-85 active:scale-95"
+                  ? "text-[var(--message-accent-background)]"
                   : input.trim()
-                    ? "bg-[var(--message-accent-background)] text-[var(--message-accent-foreground)] hover:opacity-85 active:scale-95"
-                    : "bg-muted text-muted-foreground/25 cursor-not-allowed"
+                    ? "text-[var(--message-accent-background)]"
+                    : "text-muted-foreground/45 cursor-not-allowed"
               )}
               data-testid="send-button"
               disabled={
@@ -650,12 +650,12 @@ function PureMultimodalInput({
               }
               onStop={stop}
               status={status}
-              variant="secondary"
+              variant="ghost"
             >
               {isGenerating ? (
                 <LoaderCircleIcon className="size-4 animate-spin" />
               ) : (
-                <ArrowUpIcon className="size-4" />
+                <ArrowRightIcon className="size-5" />
               )}
             </PromptInputSubmit>
           </div>

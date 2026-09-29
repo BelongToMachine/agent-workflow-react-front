@@ -137,7 +137,7 @@ export function ChatShell() {
             isArtifactVisible ? "w-full lg:w-[40%]" : "w-full"
           )}
         >
-          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background md:rounded-tl-xl md:border-t md:border-l md:border-border/60">
+          <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-background md:border-t md:border-l md:border-border/60">
             <Messages
               addToolApprovalResponse={addToolApprovalResponse}
               chatId={chatId}
@@ -152,7 +152,7 @@ export function ChatShell() {
               status={status}
             />
 
-            <div className="sticky bottom-0 z-10 mx-auto flex w-full max-w-4xl shrink-0 gap-2 border-t border-border/40 bg-background/95 px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-sm md:border-t-0 md:bg-transparent md:px-4 md:pt-4 md:pb-4 md:backdrop-blur-none">
+            <div className="sticky bottom-0 z-10 mx-auto flex w-full max-w-5xl shrink-0 gap-2 border-t border-border/40 bg-background/95 px-3 pt-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] backdrop-blur-sm md:border-t-0 md:bg-transparent md:px-4 md:pt-4 md:pb-4 md:backdrop-blur-none">
               {!isReadonly && (
                 <MultimodalInput
                   attachments={attachments}

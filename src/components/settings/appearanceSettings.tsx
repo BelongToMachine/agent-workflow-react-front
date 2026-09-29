@@ -80,7 +80,7 @@ export function AppearanceSettings() {
           </div>
           <div className="mt-4 rounded-lg border border-border/70 bg-muted/20 p-4">
             <div className="flex justify-end">
-              <div className="user-message-bubble max-w-[min(100%,24rem)] rounded-xl rounded-br-md px-3.5 py-2 text-sm leading-6 shadow-sm">
+              <div className="user-message-bubble max-w-[min(100%,24rem)] rounded-xl border border-border/70 px-3.5 py-2 text-sm leading-6">
                 {t("settings.accentColorPreviewMessage")}
               </div>
             </div>
