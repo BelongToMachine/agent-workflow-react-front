@@ -94,18 +94,18 @@
   --brand-secondary-soft: color-mix(in srgb, var(--background) 84%, var(--brand-secondary) 16%);
   --primary: var(--brand-primary);
   --primary-foreground: var(--brand-primary-foreground);
-  --secondary: hsl(200 30% 93%);
+  --secondary: hsl(210 16% 93%);
   --secondary-foreground: hsl(210 30% 12%);
-  --muted: hsl(200 30% 93%);
+  --muted: hsl(210 16% 93%);
   --muted-foreground: hsl(212 18% 34%);
-  --accent: hsl(187 44% 92%);
-  --accent-foreground: hsl(210 30% 12%);
+  --accent: var(--brand-primary-soft);
+  --accent-foreground: var(--foreground);
   --destructive: oklch(0.577 0.245 27.325);
   --success: oklch(0.627 0.194 149.214);
   --warning: oklch(0.795 0.184 86.047);
   --error: oklch(0.577 0.245 27.325);
-  --border: hsl(202 26% 78%);
-  --input: hsl(202 26% 78%);
+  --border: hsl(214 16% 83%);
+  --input: var(--border);
   --ring: var(--brand-ring);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -118,7 +118,7 @@
   --sidebar-primary-foreground: var(--brand-primary-foreground);
   --sidebar-accent: var(--brand-primary-soft);
   --sidebar-accent-foreground: var(--foreground);
-  --sidebar-border: hsl(202 26% 78%);
+  --sidebar-border: var(--border);
   --sidebar-ring: var(--brand-ring);
   --user-message-background: var(--brand-primary-soft);
   --user-message-foreground: var(--foreground);
@@ -160,14 +160,14 @@
   --secondary-foreground: hsl(220 15% 94%);
   --muted: hsl(220 12% 17%);
   --muted-foreground: hsl(220 10% 70%);
-  --accent: hsl(220 12% 17%);
-  --accent-foreground: hsl(220 15% 94%);
+  --accent: var(--brand-primary-soft);
+  --accent-foreground: var(--foreground);
   --destructive: oklch(0.704 0.191 22.216);
   --success: oklch(0.627 0.194 149.214);
   --warning: oklch(0.795 0.184 86.047);
   --error: oklch(0.704 0.191 22.216);
   --border: hsl(220 11% 26%);
-  --input: hsl(220 11% 26%);
+  --input: var(--border);
   --ring: var(--brand-ring);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -681,7 +681,7 @@ textarea:focus-visible {
 .ͼo.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground,
 .ͼo.cm-selectionBackground,
 .ͼo.cm-content::selection {
-  background: oklch(0.55 0.12 250 / 0.15) !important;
+  background: color-mix(in srgb, var(--primary) 15%, transparent) !important;
 }
 
 .dark
@@ -691,7 +691,7 @@ textarea:focus-visible {
   .cm-selectionBackground,
 .dark .ͼo.cm-selectionBackground,
 .dark .ͼo.cm-content::selection {
-  background: oklch(0.55 0.12 250 / 0.2) !important;
+  background: color-mix(in srgb, var(--primary) 20%, transparent) !important;
 }
 
 .cm-activeLine {
@@ -716,20 +716,26 @@ textarea:focus-visible {
 }
 
 .cm-cursor {
-  border-left-color: oklch(0.55 0.12 250) !important;
+  border-left-color: var(--primary) !important;
   border-left-width: 2px !important;
 }
 
 .cm-matchingBracket {
-  outline: 1px solid oklch(0.55 0.12 250 / 0.3);
-  background: oklch(0.55 0.12 250 / 0.12) !important;
+  outline: 1px solid color-mix(in srgb, var(--primary) 36%, transparent);
+  background: color-mix(in srgb, var(--primary) 12%, transparent) !important;
   border-radius: 2px;
 }
 
 .suggestion-highlight {
   -webkit-user-select: none;
   user-select: none;
-  @apply cursor-pointer rounded-sm bg-blue-200 transition-colors hover:bg-blue-300 dark:bg-blue-500/40 dark:text-blue-50 dark:hover:bg-blue-400/50;
+  @apply cursor-pointer rounded-sm transition-colors;
+  background-color: color-mix(in srgb, var(--primary) 15%, transparent);
+  color: var(--primary);
+}
+
+.suggestion-highlight:hover {
+  background-color: color-mix(in srgb, var(--primary) 25%, transparent);
 }
 
 @layer base {

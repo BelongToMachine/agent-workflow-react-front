@@ -6,6 +6,7 @@ import {
   CircleHelpIcon,
   Clock3Icon,
   LockKeyholeIcon,
+  LogOutIcon,
   RefreshCwIcon,
   ShieldAlertIcon,
 } from "lucide-react";
@@ -78,19 +79,12 @@ const LocalChangePasswordPage = lazyNamed(
   "LocalChangePasswordPage"
 );
 
-const BusinessDataTablesPage = lazy(() =>
-  import("./components/businessTables/businessDataTablesPage").then((module) => ({
-    default: module.BusinessDataTablesPage,
-  }))
-);
-
 function isKnownRoute(pathname) {
   if (
     pathname === "/" ||
     pathname === "/activate" ||
     pathname === "/access-pending" ||
     pathname === "/account-suspended" ||
-    pathname === "/admin/data-tables" ||
     pathname === "/fastapi-test" ||
     pathname === "/forbidden" ||
     pathname === "/forgot-password" ||
@@ -326,16 +320,6 @@ function ChatLayout() {
             />
             <Route
               element={
-                <PermissionRoute permission="knowledge.manage">
-                  <RouteSuspense>
-                    <BusinessDataTablesPage />
-                  </RouteSuspense>
-                </PermissionRoute>
-              }
-              path="admin/data-tables"
-            />
-            <Route
-              element={
                 <PermissionRoute permission="members.read">
                   <RouteSuspense>
                     <SettingsPage
@@ -440,6 +424,7 @@ function AccentColorSync() {
 
 function WorkspaceAccessPendingPage() {
   const router = useRouter();
+  const { signOut } = useApplicationAuth();
   const { t } = useTranslation();
   return (
     <StatusPage
@@ -449,7 +434,11 @@ function WorkspaceAccessPendingPage() {
       title={t("app.accountCreated")}
       tone="warning"
     >
-      <div className="flex justify-end">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        <Button onClick={() => void signOut()} type="button" variant="outline">
+          <LogOutIcon />
+          {t("sidebar.signOut")}
+        </Button>
         <Button onClick={() => router.refresh()} type="button" variant="outline">
           <RefreshCwIcon />
           {t("app.retry")}

@@ -82,16 +82,6 @@ export function AppearanceSettings() {
           })}
         </div>
 
-        <div className="mt-4 flex justify-end">
-          <Button
-            disabled={selectedAccentColor === appliedAccentColor}
-            onClick={handleApplyAccentColor}
-            type="button"
-          >
-            {t("settings.applyAccentColor")}
-          </Button>
-        </div>
-
         <section className="mt-6 border-t border-border/60 pt-5">
           <div>
             <h3 className="text-sm font-medium">
@@ -124,6 +114,16 @@ export function AppearanceSettings() {
             </div>
           </div>
         </section>
+
+        <div className="mt-4 flex justify-end">
+          <Button
+            disabled={selectedAccentColor === appliedAccentColor}
+            onClick={handleApplyAccentColor}
+            type="button"
+          >
+            {t("settings.applyAccentColor")}
+          </Button>
+        </div>
       </div>
     </SettingsPanel>
   );

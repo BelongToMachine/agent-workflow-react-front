@@ -67,7 +67,7 @@ export function ComposerKnowledgeBaseSelector({
           <ModelSelectorTrigger asChild>
             <Button
               aria-label={label}
-              className="size-11 shrink-0 rounded-lg p-0 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground active:translate-y-0 md:size-8"
+              className="size-11 shrink-0 rounded-lg p-0 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent aria-expanded:text-accent-foreground active:translate-y-0 md:size-8"
               data-testid="knowledge-base-selector"
               variant="ghost"
             >
@@ -149,7 +149,7 @@ export function ComposerKnowledgeBaseSelectorOptions({
       <ModelSelectorEmpty>{emptyMessage}</ModelSelectorEmpty>
       <ModelSelectorGroup heading={availableLabel}>
         <ModelSelectorItem
-          className="data-[selected=true]:bg-muted data-[selected=true]:text-foreground"
+          className="data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
           onSelect={() => {
             onChange("");
             onClose();
@@ -172,7 +172,7 @@ export function ComposerKnowledgeBaseSelectorOptions({
 
           return (
             <ModelSelectorItem
-              className="data-[selected=true]:bg-muted data-[selected=true]:text-foreground"
+              className="data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
               key={knowledgeBase.knowledgeBaseId}
               onSelect={() => {
                 onChange(knowledgeBase.knowledgeBaseId);

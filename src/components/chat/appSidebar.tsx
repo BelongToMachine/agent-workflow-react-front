@@ -50,6 +50,7 @@ import {
   AlertDialogTitle,
 } from "../ui/alertDialog";
 import { Spinner } from "../ui/spinner";
+import { ProductWordmark } from "@/components/brand/productWordmark";
 
 export function AppSidebar({
   canManageKnowledgeBases,
@@ -73,7 +74,6 @@ export function AppSidebar({
   const isKnowledgeBasesActive = activePathname.startsWith(
     "/settings/knowledge-bases"
   );
-  const isBusinessDataActive = activePathname === "/admin/data-tables";
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
   const [isDeletingAll, setIsDeletingAll] = useState(false);
 
@@ -145,12 +145,12 @@ export function AppSidebar({
                 className="h-10 gap-2.5 rounded-lg px-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
                 tooltip={t("app.name")}
               >
-                <Link href="/" onClick={closeMobile}>
+                <Link aria-label={t("app.name")} href="/" onClick={closeMobile}>
                   <span className="grid size-7 shrink-0 place-items-center rounded-md bg-sidebar-primary/10 text-sidebar-primary">
                     <MessageSquareIcon className="size-4" />
                   </span>
-                  <span className="truncate font-semibold tracking-tight group-data-[collapsible=icon]:hidden">
-                    {t("app.name")}
+                  <span className="min-w-0 truncate text-sm group-data-[collapsible=icon]:hidden">
+                    <ProductWordmark />
                   </span>
                 </Link>
               </SidebarMenuButton>
@@ -226,27 +226,6 @@ export function AppSidebar({
                       >
                         <DatabaseIcon className="size-4" />
                         <span className="text-[13px]">{t("sidebar.knowledgeBases")}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ) : null}
-                {canManageKnowledgeBases ? (
-                  <SidebarMenuItem>
-                    <SidebarMenuButton
-                      asChild
-                      className={getSidebarNavigationItemClassName(isBusinessDataActive)}
-                      isActive={isBusinessDataActive}
-                      onClick={closeMobile}
-                      tooltip={t("sidebar.businessData")}
-                    >
-                      <Link
-                        aria-current={isBusinessDataActive ? "page" : undefined}
-                        href="/admin/data-tables"
-                      >
-                        <DatabaseIcon className="size-4" />
-                        <span className="text-[13px]">
-                          {t("sidebar.businessData")}
-                        </span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

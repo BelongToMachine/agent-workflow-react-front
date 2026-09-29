@@ -782,7 +782,7 @@ function ModelSelectorOption({
       className={cn(
         "flex w-full transition-colors",
         curated
-          ? "data-[selected=true]:bg-muted data-[selected=true]:text-foreground"
+          ? "data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
           : "cursor-not-allowed opacity-40 data-[selected=true]:bg-transparent data-[selected=true]:opacity-60 data-[selected=true]:ring-1 data-[selected=true]:ring-muted-foreground/30 data-[selected=true]:ring-inset"
       )}
       onSelect={handleSelect}
@@ -862,7 +862,7 @@ function PureModelSelectorCompact({
           <ModelSelectorTrigger asChild>
             <Button
               aria-label={t("chat.selectModel")}
-              className="size-11 shrink-0 rounded-lg p-0 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground active:translate-y-0 md:size-9"
+              className="size-11 shrink-0 rounded-lg p-0 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent aria-expanded:text-accent-foreground active:translate-y-0 md:size-9"
               data-testid="model-selector"
               variant="ghost"
             >

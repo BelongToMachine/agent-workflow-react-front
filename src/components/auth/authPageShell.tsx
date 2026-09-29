@@ -2,6 +2,7 @@ import { lazy, Suspense, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { SparklesIcon } from "lucide-react";
 import { Link } from "@/lib/router";
+import { ProductWordmark } from "@/components/brand/productWordmark";
 
 const AuthPreview = lazy(() =>
   import("../chat/preview").then((module) => ({ default: module.Preview }))
@@ -27,7 +28,7 @@ export function AuthPageShell({
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <SparklesIcon aria-hidden="true" className="size-4" />
           </span>
-          {t("app.name")}
+          <ProductWordmark />
         </Link>
 
         <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-8 sm:py-12">

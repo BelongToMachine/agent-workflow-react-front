@@ -10,8 +10,9 @@ describe("sidebar navigation styles", () => {
     const inactiveClassName = getClassName?.(false) ?? "";
 
     expect(activeClassName).toContain("bg-sidebar-accent");
-    expect(activeClassName).toContain("border-sidebar-border");
+    expect(activeClassName).toContain("border-sidebar-primary/30");
     expect(inactiveClassName).toContain("border-transparent");
+    expect(inactiveClassName).toContain("hover:border-sidebar-primary/30");
     expect(inactiveClassName).not.toContain("bg-sidebar-accent ");
   });
 });

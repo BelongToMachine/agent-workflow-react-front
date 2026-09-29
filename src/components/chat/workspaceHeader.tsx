@@ -15,7 +15,6 @@ function getPageTitle(pathname: string, t: TFunction) {
     return t("sidebar.knowledgeBases");
   }
   if (pathname === "/upload") return t("sidebar.upload");
-  if (pathname === "/admin/data-tables") return t("sidebar.businessData");
   if (pathname === "/settings/appearance") return t("settings.accentColor");
   if (pathname === "/settings/password") return t("auth.changePassword");
   if (pathname === "/fastapi-test") return t("settings.fastApiConnection");
@@ -29,7 +28,7 @@ export function WorkspaceHeader({ user }: { user: User | undefined }) {
   return (
     <header className="z-20 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-border/60 bg-workspace-background px-3 sm:px-5">
       <div className="flex min-w-0 items-center gap-3">
-        <SidebarTrigger className="size-9 rounded-lg text-muted-foreground hover:text-foreground" />
+        <SidebarTrigger className="size-9 rounded-lg bg-sidebar-primary/10 text-sidebar-primary hover:bg-sidebar-primary/15 hover:text-sidebar-primary" />
         <span aria-hidden="true" className="hidden h-5 w-px bg-border sm:block" />
         <h1 className="truncate text-sm font-semibold text-foreground">
           {getPageTitle(pathname, t)}

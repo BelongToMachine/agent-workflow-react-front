@@ -131,7 +131,7 @@ export function SidebarUserNav({
     ) : isHeader ? (
       <Button
         aria-label={displayName}
-        className="h-9 max-w-48 justify-start gap-2 rounded-lg px-2 text-foreground hover:bg-muted"
+        className="h-9 max-w-48 justify-start gap-2 rounded-lg px-2 text-foreground hover:bg-primary/[0.08] hover:text-primary"
         data-testid="user-nav-button"
         variant="ghost"
       >

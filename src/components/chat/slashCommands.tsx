@@ -100,7 +100,9 @@ function SlashCommandMenuItem({
     <button
       className={cn(
         "flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors",
-        index === selectedIndex ? "bg-muted/70" : "hover:bg-muted/40"
+        index === selectedIndex
+          ? "bg-accent text-accent-foreground"
+          : "hover:bg-accent/60"
       )}
       data-selected={index === selectedIndex}
       onClick={handleClick}
