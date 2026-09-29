@@ -1,4 +1,5 @@
 export const ACCENT_COLOR_STORAGE_KEY = "asianode-accent-color";
+export const DEFAULT_ACCENT_COLOR: AccentColor = "sage";
 
 export const accentColorValues = [
   "neutral",
@@ -27,7 +28,7 @@ export const accentColorOptions: Array<{
   },
   {
     labelKey: "settings.accentColorSage",
-    swatch: "oklch(0.58 0.13 175)",
+    swatch: "hsl(191 92% 26%)",
     value: "sage",
   },
   {
@@ -48,14 +49,14 @@ export function isAccentColor(value: string | null): value is AccentColor {
 
 export function getStoredAccentColor(): AccentColor {
   if (typeof window === "undefined") {
-    return "neutral";
+    return DEFAULT_ACCENT_COLOR;
   }
 
   try {
     const saved = window.localStorage.getItem(ACCENT_COLOR_STORAGE_KEY);
-    return isAccentColor(saved) ? saved : "neutral";
+    return isAccentColor(saved) ? saved : DEFAULT_ACCENT_COLOR;
   } catch {
-    return "neutral";
+    return DEFAULT_ACCENT_COLOR;
   }
 }
 

@@ -66,12 +66,14 @@
 
 涉及 `src/globals.css`、`src/lib/accentColor.ts`、`src/App.jsx`、`src/components/settings/appearanceSettings.tsx`、`src/lib/i18n.ts` 和 `src/components/ui/`。
 
-- [ ] 将 `sage` 方案映射为青绿色并作为无偏好时的默认方案，保留已有存储值；把浅/深色的品牌 token 连接到 Tailwind 语义色。核对 `.dark` 与 `data-accent-color` 叠加时的优先级。
-- [ ] 更新 Button、Badge、Input/InputGroup、Select、Tabs、Sidebar、Dialog 等通用状态；普通控件继续使用中性表面，主操作和选中态使用可切换重点色。
-- [ ] 重做外观设置预览：同屏展示主按钮、导航选中态、链接/焦点、聊天气泡和少量辅助色。调整中英文文案，使预览与真实界面一致。
+- [x] 将 `sage` 方案映射为青绿色并作为无偏好时的默认方案，保留已有存储值；把浅/深色的品牌 token 连接到 Tailwind 语义色。核对 `.dark` 与 `data-accent-color` 叠加时的优先级。
+- [x] 更新 Button、Badge、Input/InputGroup、Select 等基础控件状态，并通过语义 token 覆盖 Sidebar 的主色和选中态；普通控件继续使用中性表面，主操作和选中态使用可切换重点色。
+- [x] 重做外观设置预览：同屏展示主按钮、导航选中态、链接/焦点、聊天气泡和少量辅助色。调整中英文文案，使预览与真实界面一致。
 - [ ] 检查首次加载、切换、刷新、存储不可用以及旧值恢复；清除无引用的旧 token 前先确认组件使用情况。
 
 **完成标准**：五个方案都可切换并持久化，旧值可恢复；浅色/深色和键盘焦点可读；现有页面无大面积样式回退。
+
+> 阶段 B 的主题映射、首次绘制默认值、基础控件焦点和外观预览已完成。五个方案在浅/深色下的逐项浏览器验收，以及存储异常场景，留到阶段 E 的完整矩阵执行。
 
 ### 阶段 C：应用外壳、聊天与 Artifact
 
