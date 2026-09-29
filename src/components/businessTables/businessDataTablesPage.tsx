@@ -636,7 +636,7 @@ export function BusinessDataTablesPage() {
           </span>
         </div>
 
-        <section className="overflow-hidden rounded-xl border border-border bg-card">
+        <section className="overflow-hidden rounded-lg border border-border/70 bg-card">
           <div className="flex flex-col gap-3 border-b border-border px-3 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between md:px-4">
             <div className="relative w-full min-w-0 flex-1 sm:min-w-[220px] sm:max-w-[420px]">
               <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />

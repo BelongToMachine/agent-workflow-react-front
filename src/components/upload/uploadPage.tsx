@@ -415,7 +415,7 @@ export function UploadPage() {
                 className={cn(
                   "-mb-px min-h-10 shrink-0 border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   activeTab === tab
-                    ? "border-foreground text-foreground"
+                    ? "border-primary bg-primary/[0.04] text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground"
                 )}
                 id={`upload-tab-${tab}`}
@@ -437,7 +437,7 @@ export function UploadPage() {
             role="tabpanel"
             tabIndex={0}
           >
-          <section className="w-full overflow-hidden rounded-xl border border-border bg-card">
+          <section className="w-full overflow-hidden rounded-lg border border-border/70 bg-card">
             <div className="border-b border-border/70 p-4 sm:p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -833,7 +833,7 @@ function AutomatedUploadPanel({
   ];
 
   return (
-    <section className="overflow-hidden rounded-xl border border-border bg-card">
+    <section className="overflow-hidden rounded-lg border border-border/70 bg-card">
       <div className="flex flex-col gap-4 border-b border-border/70 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-5">
         <div>
           <p className="text-muted-foreground text-xs uppercase tracking-[0.16em]">
@@ -985,7 +985,7 @@ function AutomatedUploadPanel({
         ) : null}
 
         {selectedFile ? (
-          <div className="mx-auto mt-6 flex max-w-2xl items-center gap-3 rounded-xl border border-border/70 bg-background/45 px-3 py-3">
+          <div className="mx-auto mt-6 flex max-w-2xl items-center gap-3 rounded-lg border border-border/70 bg-background/45 px-3 py-3">
             <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
               {stage === "complete" ? (
                 <CheckCircle2Icon className="size-4 text-emerald-600" />
@@ -1038,10 +1038,10 @@ function AutomatedUploadPanel({
 
         <div
           className={cn(
-            "group mx-auto mt-6 flex min-h-40 max-w-2xl cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-6 py-7 text-center outline-none transition-colors",
+            "group mx-auto mt-6 flex min-h-40 max-w-2xl cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed px-6 py-7 text-center outline-none transition-colors",
             isDragging
-              ? "border-foreground bg-muted/70"
-              : "border-border/90 bg-background/35 hover:border-foreground/50 hover:bg-muted/30",
+              ? "border-primary bg-primary/[0.04]"
+              : "border-border/90 bg-background/35 hover:border-primary/40 hover:bg-primary/[0.03]",
             (disabled || isRunning) && "pointer-events-none opacity-60",
             selectedFile && "min-h-28"
           )}

@@ -60,7 +60,7 @@ export function ParsedDocumentBlocks({
   }
 
   return (
-    <section className="mx-4 mb-4 overflow-hidden rounded-xl border border-border/70 bg-card/30">
+    <section className="mx-4 mb-4 overflow-hidden rounded-lg border border-border/70 bg-card/30">
       <Collapsible onOpenChange={setIsExpanded} open={isExpanded}>
         <CollapsibleTrigger asChild>
           <Button

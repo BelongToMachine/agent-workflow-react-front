@@ -36,7 +36,7 @@ export function SettingsPanel({
   return (
     <section
       className={cn(
-        "min-w-0 rounded-xl border border-border/70 bg-card shadow-sm",
+        "min-w-0 rounded-lg border border-border/70 bg-card",
         className
       )}
       {...props}
@@ -96,7 +96,7 @@ export function SettingsEmptyState({
   return (
     <section
       aria-live="polite"
-      className="grid min-h-64 place-items-center rounded-xl border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center"
+      className="grid min-h-64 place-items-center rounded-lg border border-dashed border-border/80 bg-card/50 px-6 py-10 text-center"
       role="status"
     >
       <div className="max-w-md">

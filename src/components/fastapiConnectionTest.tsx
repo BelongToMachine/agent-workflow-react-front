@@ -74,7 +74,7 @@ export function FastApiConnectionTest() {
   const isSuccess = connection.status === "success";
 
   return (
-    <section className="w-full max-w-3xl overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+    <section className="w-full max-w-3xl overflow-hidden rounded-lg border border-border/70 bg-card">
       <header className="border-b border-border/70 p-4 sm:p-5">
         <div className="mb-2 flex flex-wrap items-center gap-2">
           <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">

@@ -1,7 +1,3 @@
-.business-data-page {
-  --business-grid-shadow: 0 1px 2px oklch(0 0 0 / 0.035);
-}
-
 .business-mock-badge {
   display: inline-flex;
   align-items: center;
@@ -27,7 +23,7 @@
   padding: 0.55rem 0.65rem;
   color: var(--foreground);
   text-align: left;
-  transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+  transition: border-color 140ms ease, background-color 140ms ease;
 }
 
 .business-table-button:hover {
@@ -48,7 +44,6 @@
 .business-table-button-active {
   border-color: color-mix(in oklch, var(--primary) 45%, var(--border));
   background: color-mix(in oklch, var(--primary) 5%, var(--card));
-  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--primary) 7%, transparent);
 }
 
 .business-table-button-active > svg {
@@ -75,7 +70,11 @@
 .business-toolbar-button:hover,
 .business-toolbar-button-active {
   border-color: color-mix(in oklch, var(--primary) 28%, var(--border));
-  background: color-mix(in oklch, var(--muted) 58%, var(--card));
+  background: color-mix(in oklch, var(--primary) 6%, var(--card));
+}
+
+.business-toolbar-button-active {
+  color: var(--primary);
 }
 
 .business-icon-button {
@@ -206,9 +205,8 @@
 }
 
 .business-detail-tab-active {
-  background: var(--card);
-  color: var(--foreground);
-  box-shadow: var(--shadow-card);
+  background: color-mix(in oklch, var(--primary) 7%, var(--card));
+  color: var(--primary);
 }
 
 .business-detail-field {

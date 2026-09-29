@@ -571,7 +571,7 @@ export function KnowledgeFileLibrary({
 
   return (
     <div className="space-y-4">
-      <section className="overflow-hidden rounded-xl border border-border bg-card">
+      <section className="overflow-hidden rounded-lg border border-border/70 bg-card">
       <div className="flex flex-col gap-4 border-b border-border/70 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
         <div className="flex items-start gap-3">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
@@ -863,7 +863,7 @@ function ParsedDocumentLibrary({
   t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   return (
-    <section className="overflow-hidden rounded-xl border border-border bg-card">
+    <section className="overflow-hidden rounded-lg border border-border/70 bg-card">
       <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
         <div className="flex items-start gap-3">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
@@ -1383,7 +1383,7 @@ function KnowledgeChunkSelector({
   };
 
   return (
-    <section className="overflow-hidden rounded-xl border border-border/70 bg-card/40">
+    <section className="overflow-hidden rounded-lg border border-border/70 bg-card/40">
       <div className="flex flex-col gap-3 border-b border-border/70 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h5 className="font-medium text-sm">

@@ -161,7 +161,7 @@ function StatusPage({
         fullScreen ? "min-h-dvh" : "min-h-full"
       )}
     >
-      <section className="w-full max-w-xl overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <section className="w-full max-w-xl overflow-hidden rounded-lg border border-border/70 bg-card">
         <div className="flex flex-col gap-4 p-5 sm:flex-row sm:gap-5 sm:p-6">
           <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-lg", toneClass)}>
             <Icon aria-hidden="true" className="size-5" />
@@ -294,7 +294,7 @@ function ChatLayout() {
           user={user}
         />
       </RouteSuspense>
-      <SidebarInset className="m-2 h-[calc(100dvh-1rem)] min-h-0 overflow-hidden rounded-xl border border-border bg-background shadow-sm max-md:m-0 max-md:h-dvh max-md:rounded-none max-md:border-0">
+      <SidebarInset className="m-2 h-[calc(100dvh-1rem)] min-h-0 overflow-hidden rounded-lg border border-border/70 bg-background max-md:m-0 max-md:h-dvh max-md:rounded-none max-md:border-0">
         <WorkspaceHeader user={user} />
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-background">
           <RouteSuspense>

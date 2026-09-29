@@ -22,7 +22,7 @@ export function KnowledgeBaseWorkspace() {
           className={cn(
             "-mb-px inline-flex min-h-10 shrink-0 items-center justify-center border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             activeSection === "management"
-              ? "border-foreground text-foreground"
+              ? "border-primary bg-primary/[0.04] text-primary"
               : "border-transparent text-muted-foreground hover:text-foreground"
           )}
           href="/settings/knowledge-bases/files"
@@ -34,7 +34,7 @@ export function KnowledgeBaseWorkspace() {
           className={cn(
             "-mb-px inline-flex min-h-10 shrink-0 items-center justify-center border-b-2 px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             activeSection === "access"
-              ? "border-foreground text-foreground"
+              ? "border-primary bg-primary/[0.04] text-primary"
               : "border-transparent text-muted-foreground hover:text-foreground"
           )}
           href="/settings/knowledge-bases"

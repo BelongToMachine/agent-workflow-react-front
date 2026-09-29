@@ -47,7 +47,7 @@ export function AuthPageShell({
           fallback={
             <div
               aria-hidden="true"
-              className="h-full min-h-[calc(100dvh-1.5rem)] rounded-xl border border-border/70 bg-card"
+              className="h-full min-h-[calc(100dvh-1.5rem)] rounded-lg border border-border/70 bg-card"
             />
           }
         >

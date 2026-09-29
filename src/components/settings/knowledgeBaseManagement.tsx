@@ -302,7 +302,7 @@ export function KnowledgeBaseManagement() {
       ) : null}
 
       <div className="grid min-w-0 gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <section className="min-w-0 rounded-xl border border-border bg-card p-2">
+        <section className="min-w-0 rounded-lg border border-border/70 bg-card p-2">
           <div className="flex items-center justify-between border-b border-border/70 px-3 py-3">
             <div className="text-muted-foreground text-[11px] font-medium uppercase tracking-[0.12em]">
               {t("settings.knowledgeBasesCount", {
@@ -350,7 +350,7 @@ export function KnowledgeBaseManagement() {
                     className={cn(
                       "flex w-full items-center gap-3 rounded-md border-l-2 px-2.5 py-2.5 text-left transition-colors",
                       isSelected
-                        ? "border-primary bg-muted/70 text-foreground"
+                        ? "border-primary bg-primary/[0.06] text-primary"
                         : "border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                     )}
                     data-knowledge-base-id={knowledgeBase.knowledgeBaseId}
@@ -376,7 +376,7 @@ export function KnowledgeBaseManagement() {
           )}
         </section>
 
-        <section className="min-w-0 rounded-xl border border-border bg-card">
+        <section className="min-w-0 rounded-lg border border-border/70 bg-card">
           {selectedKnowledgeBase ? (
             <>
               <div className="border-b border-border/70 p-4 sm:p-5">
