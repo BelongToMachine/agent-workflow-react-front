@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   activateLocalInvitation,
   changeLocalPassword,
+  confirmLocalPasswordReset,
   LocalAuthRequestError,
 } from "../../lib/auth/localSession";
 import { useSession } from "../../lib/auth";
@@ -140,6 +141,102 @@ export function LocalActivationPage() {
         {t("auth.alreadyActivated")}{" "}
         <Link className="font-medium text-foreground underline-offset-4 hover:underline" href="/login">
           {t("auth.signIn")}
+        </Link>
+      </p>
+    </LocalAccountShell>
+  );
+}
+
+export function LocalPasswordResetPage() {
+  const router = useRouter();
+  const { update } = useSession();
+  const { t } = useTranslation();
+  const search = useLocationSearch();
+  const token = new URLSearchParams(search).get("token") ?? "";
+  const [password, setPassword] = useState("");
+  const [confirmation, setConfirmation] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setErrorMessage("");
+    if (!token) {
+      setErrorMessage(t("auth.resetMissingToken"));
+      return;
+    }
+    if (password !== confirmation) {
+      setErrorMessage(t("auth.passwordsDoNotMatch"));
+      return;
+    }
+    if (password.length < 12) {
+      setErrorMessage(t("auth.passwordMinLength"));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await confirmLocalPasswordReset(token, password);
+      await update();
+      router.replace("/");
+    } catch (error) {
+      setErrorMessage(
+        error instanceof LocalAuthRequestError && error.status === 400
+          ? t("auth.resetLinkInvalidOrExpired")
+          : t("auth.unableToResetPassword")
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <LocalAccountShell eyebrow={t("auth.accountSecurity")}>
+      <h1 className="mt-3 text-2xl font-semibold tracking-tight">
+        {t("auth.resetPassword")}
+      </h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        {t("auth.resetPasswordDescription")}
+      </p>
+      <form className="mt-8 flex flex-col gap-4" onSubmit={handleSubmit}>
+        <FormMessage error>
+          {errorMessage || (!token ? t("auth.resetMissingToken") : "")}
+        </FormMessage>
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          {t("auth.newPassword")}
+          <input
+            autoComplete="new-password"
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            minLength={12}
+            onChange={(event) => setPassword(event.target.value)}
+            required
+            type="password"
+            value={password}
+          />
+        </label>
+        <label className="flex flex-col gap-2 text-sm font-medium">
+          {t("auth.confirmNewPassword")}
+          <input
+            autoComplete="new-password"
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+            minLength={12}
+            onChange={(event) => setConfirmation(event.target.value)}
+            required
+            type="password"
+            value={confirmation}
+          />
+        </label>
+        <button
+          className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={isSubmitting || !token}
+          type="submit"
+        >
+          {isSubmitting ? t("auth.resettingPassword") : t("auth.resetPassword")}
+        </button>
+      </form>
+      <p className="mt-5 text-center text-[13px] text-muted-foreground">
+        <Link className="text-foreground underline-offset-4 hover:underline" href="/login">
+          {t("auth.backToSignIn")}
         </Link>
       </p>
     </LocalAccountShell>

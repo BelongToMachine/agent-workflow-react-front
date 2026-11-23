@@ -74,6 +74,10 @@ const LocalActivationPage = lazyNamed(
   () => import("./components/auth/localAccountPages"),
   "LocalActivationPage"
 );
+const LocalPasswordResetPage = lazyNamed(
+  () => import("./components/auth/localAccountPages"),
+  "LocalPasswordResetPage"
+);
 const LocalChangePasswordPage = lazyNamed(
   () => import("./components/auth/localAccountPages"),
   "LocalChangePasswordPage"
@@ -672,7 +676,14 @@ function App() {
             path="/activate"
           />
           <Route element={<PasswordHelpPage />} path="/forgot-password" />
-          <Route element={<PasswordHelpPage />} path="/reset-password" />
+          <Route
+            element={
+              <RouteSuspense>
+                <LocalPasswordResetPage />
+              </RouteSuspense>
+            }
+            path="/reset-password"
+          />
           <Route element={<WorkspaceAccessPendingPage />} path="/access-pending" />
           <Route element={<AccountSuspendedPage />} path="/account-suspended" />
           <Route element={<ForbiddenPage />} path="/forbidden" />
