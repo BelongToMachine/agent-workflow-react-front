@@ -143,6 +143,12 @@ type InvitationResponse = Invitation & {
   activationUrl?: string | null;
 };
 
+type PasswordResetLinkResponse = {
+  email: string;
+  expiresAt: string;
+  resetUrl: string;
+};
+
 const roleDescriptions: Record<WorkspaceRole, string> = {
   admin: "roles.adminDescription",
   editor: "roles.editorDescription",
@@ -186,6 +192,10 @@ export function MemberPermissions() {
   const [inviteRole, setInviteRole] = useState<WorkspaceRole>("employee");
   const [generatedInvitation, setGeneratedInvitation] =
     useState<InvitationResponse | null>(null);
+  const [passwordResetTarget, setPasswordResetTarget] = useState<Member | null>(null);
+  const [generatedPasswordReset, setGeneratedPasswordReset] = useState<
+    (PasswordResetLinkResponse & { userId: string }) | null
+  >(null);
   const [candidateId, setCandidateId] = useState<string>("");
   const [candidateRole, setCandidateRole] = useState<WorkspaceRole>("viewer");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -298,6 +308,16 @@ export function MemberPermissions() {
       path: `/api/v1/admin/auth/invitations/${encodeURIComponent(invitationId)}/revoke?workspace_id=${encodeURIComponent(fastApiWorkspaceId)}`,
     }),
   });
+  const passwordResetMutation = useBackendMutation<
+    PasswordResetLinkResponse,
+    { userId: string }
+  >({
+    mutationKey: ["backend", "user", identity, "password-reset", "issue"],
+    request: ({ userId }) => ({
+      init: { method: "POST" },
+      path: `/api/v1/admin/auth/users/${encodeURIComponent(userId)}/password-reset?workspace_id=${encodeURIComponent(fastApiWorkspaceId)}`,
+    }),
+  });
 
   const { data, error: queryError, isLoading } = membersQuery;
   const { isPending: isSaving } = saveMutation;
@@ -306,6 +326,7 @@ export function MemberPermissions() {
   const { isPending: isCreatingInvitation } = createInvitationMutation;
   const { isPending: isRegeneratingInvitation } = regenerateInvitationMutation;
   const { isPending: isRevokingInvitation } = revokeInvitationMutation;
+  const { isPending: isIssuingPasswordReset } = passwordResetMutation;
   const getDefaultPermissionsForRole = useCallback(
     (selectedRole: WorkspaceRole) =>
       agentToolCatalogQuery.data?.defaultPermissionsByRole[selectedRole] ?? [],
@@ -568,6 +589,48 @@ export function MemberPermissions() {
       toast.error(t("settings.copyFailed"));
     }
   }, [generatedInvitation, t]);
+
+  const copyPasswordResetLink = useCallback(async () => {
+    const resetUrl = generatedPasswordReset?.resetUrl;
+    if (!resetUrl) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(resetUrl);
+      toast.success(t("settings.linkCopied"));
+    } catch {
+      setError(t("settings.copyFailedDescription"));
+      toast.error(t("settings.copyFailed"));
+    }
+  }, [generatedPasswordReset, t]);
+
+  const issuePasswordResetLink = useCallback(async () => {
+    if (
+      !passwordResetTarget ||
+      !canManageMembers ||
+      passwordResetTarget.status !== "active"
+    ) {
+      return;
+    }
+
+    setError(null);
+    try {
+      const result = await passwordResetMutation.mutateAsync({
+        userId: passwordResetTarget.userId,
+      });
+      setGeneratedPasswordReset({ ...result, userId: passwordResetTarget.userId });
+      setPasswordResetTarget(null);
+      toast.success(t("settings.passwordResetLinkCreated"));
+    } catch (resetError) {
+      const message =
+        resetError instanceof Error
+          ? resetError.message
+          : t("settings.unableToCreatePasswordResetLink");
+      setError(message);
+      toast.error(message);
+    }
+  }, [canManageMembers, passwordResetMutation, passwordResetTarget, t]);
 
   const regenerateInvitation = useCallback(
     async (invitationId: string) => {
@@ -1142,6 +1205,16 @@ export function MemberPermissions() {
                             ? t("settings.suspend")
                             : t("settings.restoreMember")}
                         </DropdownMenuItem>
+                        <DropdownMenuItem
+                          disabled={
+                            selectedMember.status !== "active" ||
+                            isIssuingPasswordReset
+                          }
+                          onSelect={() => setPasswordResetTarget(selectedMember)}
+                        >
+                          <LockKeyholeIcon />
+                          {t("settings.resetMemberPassword")}
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                     <Select
@@ -1182,6 +1255,34 @@ export function MemberPermissions() {
                     </Button>
                   </div>
                 </div>
+
+                {generatedPasswordReset?.userId === selectedMember.userId ? (
+                  <div className="border-b border-border/70 bg-amber-500/[0.04] p-5 md:px-7">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                      <label
+                        className="grid min-w-0 flex-1 gap-1.5 text-xs"
+                        htmlFor="generated-password-reset-link"
+                      >
+                        {t("settings.passwordResetLinkFor", {
+                          email: generatedPasswordReset.email,
+                        })}
+                        <Input
+                          className="font-mono text-xs"
+                          id="generated-password-reset-link"
+                          readOnly
+                          value={generatedPasswordReset.resetUrl}
+                        />
+                      </label>
+                      <Button onClick={copyPasswordResetLink} type="button" variant="outline">
+                        <CopyIcon />
+                        {t("common.copyLink")}
+                      </Button>
+                    </div>
+                    <p className="mt-2 text-amber-700 text-xs dark:text-amber-300">
+                      {t("settings.passwordResetLinkWarning")}
+                    </p>
+                  </div>
+                ) : null}
 
                 <div className="grid gap-8 p-5 md:p-7 xl:grid-cols-[220px_minmax(0,1fr)]">
                   <div>
@@ -1326,6 +1427,45 @@ export function MemberPermissions() {
               {selectedMember?.status === "active"
                 ? t("settings.suspend")
                 : t("settings.restoreMember")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        onOpenChange={(open) => {
+          if (!open && !isIssuingPasswordReset) {
+            setPasswordResetTarget(null);
+          }
+        }}
+        open={Boolean(passwordResetTarget)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("settings.passwordResetConfirmTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("settings.passwordResetConfirmDescription", {
+                email: passwordResetTarget?.email ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isIssuingPasswordReset}>
+              {t("common.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isIssuingPasswordReset}
+              onClick={(event) => {
+                event.preventDefault();
+                void issuePasswordResetLink();
+              }}
+            >
+              {isIssuingPasswordReset ? <Spinner /> : <LockKeyholeIcon />}
+              {isIssuingPasswordReset
+                ? t("settings.generatingPasswordResetLink")
+                : t("settings.resetMemberPassword")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

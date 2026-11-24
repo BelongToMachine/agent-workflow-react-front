@@ -195,6 +195,38 @@ export async function activateLocalInvitation(
   };
 }
 
+export async function confirmLocalPasswordReset(
+  token: string,
+  newPassword: string
+): Promise<LocalSessionResponse> {
+  const csrf = await getCsrfToken();
+  const response = await apiFetch("/api/v1/auth/password-reset/confirm", {
+    body: JSON.stringify({ token, newPassword }),
+    credentials: "include",
+    headers: {
+      "content-type": "application/json",
+      "X-CSRF-Token": csrf,
+    },
+    method: "POST",
+  });
+  const payload = await responsePayload(response);
+  if (!response.ok) {
+    if (response.status === 403) {
+      invalidateLocalCsrfToken();
+    }
+    throw new LocalAuthRequestError(response.status, errorMessage(payload));
+  }
+  if (!payload || typeof payload.authenticated !== "boolean") {
+    throw new LocalAuthRequestError(response.status, errorMessage(payload));
+  }
+
+  window.dispatchEvent(new Event("asianode-auth-change"));
+  return {
+    authenticated: payload.authenticated,
+    user: payload.user ?? null,
+  };
+}
+
 export async function changeLocalPassword(
   currentPassword: string,
   newPassword: string
